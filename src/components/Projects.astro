@@ -1,0 +1,888 @@
+---
+const projects = [
+	{
+		title: 'Fixit CRM',
+		category: 'Workshop management · In development',
+		status: 'In active development',
+		images: [
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/v1792085649/fixitcrm-logo_nt0wkg.png',
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/v1792358571/screenshot-rocks_6_l37bsr.png',
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/v1792358571/screenshot-rocks_7_s7gf0m.png',
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/v1792358570/screenshot-rocks_9_lyilme.png',
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/v1792358570/screenshot-rocks_5_rr5q6v.png',
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/v1792358570/screenshot-rocks_8_bh9rhr.png',
+		],
+		site: 'https://fixit-crm.up.railway.app/',
+		description: [
+			'Fixit CRM helps repair shops manage customers and workshop activity without juggling spreadsheets and sticky notes.',
+			'The dashboard brings repair statuses, recent activity, items that need attention, and the day’s appointments together, with dedicated areas for customers, equipment, jobs, and appointments.',
+			'I’m actively building Fixit CRM and looking forward to sharing more as it develops.',
+		],
+		tech: [
+			{ icon: 'bx bx-code-alt', name: 'Next.js' },
+			{ icon: 'bx bxl-react', name: 'React' },
+			{ icon: 'bx bxl-typescript', name: 'TypeScript' },
+			{ icon: 'bx bx-palette', name: 'Mantine' },
+			{ icon: 'bx bx-cube', name: 'Prisma' },
+			{ icon: 'bx bxl-postgresql', name: 'PostgreSQL' },
+		],
+	},
+	{
+		title: 'Rifftales',
+		category: 'Music · Community platform',
+		images: [
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/f_auto/v1774893136/landing_f8yrtf.png',
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/f_auto/v1765410146/screenshot-rocks_1_ixoppa.png',
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/f_auto/v1765410146/screenshot-rocks_2_nklksx.png',
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/f_auto/v1769166212/edit_cit2nv.png',
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/f_auto/v1765410146/screenshot-rocks_4_jbjvsa.png',
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/f_auto/v1765410145/screenshot-rocks_5_btfnqh.png',
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/f_auto/v1765410145/screenshot-rocks_3_fkuwru.png',
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/f_auto/v1774274890/lighthouse-rt_j5p90x.png',
+			'https://res.cloudinary.com/dx8d5hlk1/image/upload/v1775234049/passwordless_pn3fl7.png',
+		],
+		site: 'https://www.rifftales.net',
+		description: [
+			'Rifftales is a place for musicians to upload, browse, and share the instruments and gear they love. It brings a social side to collecting, with likes, comments, and conversations around each setup.',
+			'An AI-powered description generator turns a few keywords into a story prompt, giving musicians a starting point for sharing their gear.',
+			'Built with a Node.js and Express backend, MongoDB, custom passwordless JWT authentication, and a React frontend using Context API and Tailwind CSS.',
+		],
+		tech: [
+			{ icon: 'bx bxl-javascript', name: 'JavaScript' },
+			{ icon: 'bx bxl-nodejs', name: 'Node.js' },
+			{ icon: 'bx bxl-mongodb', name: 'MongoDB' },
+			{ icon: 'bx bxl-react', name: 'React' },
+			{ icon: 'bx bxl-tailwind-css', name: 'Tailwind CSS' },
+			{ icon: 'bx bxl-html5', name: 'HTML5' },
+			{ icon: 'bx bxl-git', name: 'Git' },
+			{ icon: 'bx bxl-visual-studio', name: 'VS Code' },
+		],
+	},
+	{
+		title: 'Melody Apps',
+		category: 'Freelance · Website',
+		images: ['https://res.cloudinary.com/dx8d5hlk1/image/upload/v1778596830/melodyapps_vvzhxu.webp'],
+		site: 'https://www.melodyapps.co.uk',
+		description: [
+			'A straightforward home for my freelance software development work, where clients can get a feel for what I do and get in touch.',
+			'Built with just HTML and CSS. Keeping it simple makes the site fast, reliable, and easy to maintain.',
+		],
+		tech: [
+			{ icon: 'bx bxl-html5', name: 'HTML5' },
+			{ icon: 'bx bxl-css3', name: 'CSS3' },
+		],
+	},
+	{
+		title: 'Simple Weight Loss Tracker',
+		category: 'Personal · Tracking app',
+		images: ['https://res.cloudinary.com/dx8d5hlk1/image/upload/f_auto/v1775227131/weightloss_yjh5am.png'],
+		site: 'http://www.simpleweightlosstracker.co.uk',
+		description: [
+			'I built this tracker to follow my own weight-loss progress and keep the experience private and ad-free.',
+			'It uses plain JavaScript and Chart.js, with Astro providing routing and Markdown support.',
+		],
+		tech: [
+			{ icon: 'bx bxl-javascript', name: 'JavaScript' },
+			{ icon: 'bx bxl-html5', name: 'HTML5' },
+			{ icon: 'bx bxl-git', name: 'Git' },
+			{ icon: 'bx bxl-visual-studio', name: 'VS Code' },
+		],
+	},
+	{
+		title: 'whatsthescore',
+		category: 'Sports · Scorekeeping app',
+		images: ['https://res.cloudinary.com/dx8d5hlk1/image/upload/f_auto/v1775227131/whatsthescore2025_nuo4h8.png'],
+		site: 'https://whatsthescore.netlify.app/',
+		source: 'https://github.com/tabrezakhtar/whatsthescore-web',
+		description: [
+			'A simple way to keep score during a tennis match, with just two buttons so the score stays easy to manage while you play.',
+			'Built with React Context API and BeerCSS. The tennis scoring logic was developed test-first with Jest to cover the many edge cases in the rules.',
+		],
+		tech: [
+			{ icon: 'bx bxl-javascript', name: 'JavaScript' },
+			{ icon: 'bx bxl-react', name: 'React' },
+			{ icon: 'bx bxl-html5', name: 'HTML5' },
+			{ icon: 'bx bxl-git', name: 'Git' },
+			{ icon: 'bx bxl-visual-studio', name: 'VS Code' },
+		],
+	},
+];
+---
+
+<section class="work-section" id="work" aria-labelledby="work-title">
+	<div class="projects-window">
+		<div class="projects-titlebar">
+			<span class="title-mark" aria-hidden="true">❯</span>
+			<span class="terminal-title">tabrez@localhost <span>~/projects</span> zsh</span>
+			<span class="terminal-title-meta">{projects.length} projects</span>
+		</div>
+		<div class="project-pane-content">
+			<div class="section-heading">
+				<div>
+					<p class="terminal-prompt"><span>tabrez@localhost</span>:~/projects$ ls -lt</p>
+					<h2 id="work-title">Selected work<span class="coral-dot">.</span></h2>
+				</div>
+				<p class="section-aside">A few things I’ve built.<br />More always in progress.</p>
+			</div>
+
+			<div class="portfolio-list">
+				{projects.map((project, index) => (
+					<article class="portfolio-project" data-gallery-root>
+						<div class="project-gallery">
+							<div class="main-image-container">
+								<button class="main-image-trigger" type="button" data-open-dialog aria-label={`Open ${project.title} gallery`}>
+									<img
+										src={project.images[0]}
+										alt={`${project.title} preview`}
+										data-gallery-main
+										loading={index === 0 ? 'eager' : 'lazy'}
+										decoding="async"
+									/>
+									<span class="image-open-label"><i class="bx bx-expand-alt" aria-hidden="true"></i> Open gallery</span>
+								</button>
+								{project.images.length > 1 && (
+									<>
+										<button class="gallery-nav gallery-nav--previous" type="button" data-gallery-step="-1" aria-label={`Previous ${project.title} image`}>
+											<i class="bx bx-chevron-left" aria-hidden="true"></i>
+										</button>
+										<button class="gallery-nav gallery-nav--next" type="button" data-gallery-step="1" aria-label={`Next ${project.title} image`}>
+											<i class="bx bx-chevron-right" aria-hidden="true"></i>
+										</button>
+									</>
+								)}
+								<span class="gallery-counter" data-gallery-counter aria-live="polite">1 / {project.images.length}</span>
+							</div>
+							{project.images.length > 1 && (
+								<div class="gallery-thumbnails" role="group" aria-label={`${project.title} image selection`}>
+									{project.images.map((image, imageIndex) => (
+										<button
+											class:list={['gallery-thumbnail', imageIndex === 0 && 'is-active']}
+											type="button"
+											data-gallery-index={imageIndex}
+											data-image-src={image}
+											data-image-alt={`${project.title} screenshot ${imageIndex + 1}`}
+											aria-label={`Show ${project.title} screenshot ${imageIndex + 1}`}
+											aria-pressed={imageIndex === 0}
+										>
+											<img src={image} alt="" loading="lazy" decoding="async" />
+										</button>
+									))}
+								</div>
+							)}
+						</div>
+						<div class="portfolio-details">
+							<div class="portfolio-heading">
+								<div>
+									<p class="project-category">{project.category}</p>
+									<h3>{project.title}</h3>
+								</div>
+								{project.status && <span class="project-status"><span></span>{project.status}</span>}
+							</div>
+							<div class="project-description">
+								{project.description.map((paragraph) => <p>{paragraph}</p>)}
+							</div>
+							<ul class="project-tech" aria-label={`${project.title} technologies`}>
+								{project.tech.map((item) => (
+									<li><i class={item.icon} aria-hidden="true"></i>{item.name}</li>
+								))}
+							</ul>
+							<div class="project-actions">
+								<a href={project.site} target="_blank" rel="noopener noreferrer">Visit project <span aria-hidden="true">↗</span></a>
+								{project.source && <a href={project.source} target="_blank" rel="noopener noreferrer">Source code <span aria-hidden="true">↗</span></a>}
+								<button type="button" data-open-dialog>More info <span aria-hidden="true">+</span></button>
+							</div>
+						</div>
+						<dialog class="project-dialog" aria-labelledby={`project-dialog-title-${index}`}>
+							<div class="project-dialog-content">
+								<header class="project-dialog-header">
+									<div>
+										<p class="project-category">{project.category}</p>
+										<h3 id={`project-dialog-title-${index}`}>{project.title}</h3>
+									</div>
+									<button class="dialog-close" type="button" data-close-dialog aria-label="Close project details"><i class="bx bx-x" aria-hidden="true"></i></button>
+								</header>
+								<div class="dialog-gallery">
+									<div class="dialog-image-container">
+										<img src={project.images[0]} alt={`${project.title} preview`} data-dialog-main />
+										{project.images.length > 1 && (
+											<>
+												<button class="gallery-nav gallery-nav--previous" type="button" data-gallery-step="-1" aria-label={`Previous ${project.title} image`}><i class="bx bx-chevron-left" aria-hidden="true"></i></button>
+												<button class="gallery-nav gallery-nav--next" type="button" data-gallery-step="1" aria-label={`Next ${project.title} image`}><i class="bx bx-chevron-right" aria-hidden="true"></i></button>
+											</>
+										)}
+										<span class="gallery-counter" data-dialog-counter aria-live="polite">1 / {project.images.length}</span>
+									</div>
+									{project.images.length > 1 && (
+										<div class="gallery-thumbnails dialog-thumbnails" role="group" aria-label={`${project.title} image selection`}>
+											{project.images.map((image, imageIndex) => (
+												<button
+													class:list={['gallery-thumbnail', imageIndex === 0 && 'is-active']}
+													type="button"
+													data-gallery-index={imageIndex}
+													data-image-src={image}
+													data-image-alt={`${project.title} screenshot ${imageIndex + 1}`}
+													aria-label={`Show ${project.title} screenshot ${imageIndex + 1}`}
+													aria-pressed={imageIndex === 0}
+												>
+													<img src={image} alt="" loading="lazy" decoding="async" />
+												</button>
+											))}
+										</div>
+									)}
+								</div>
+								<div class="dialog-project-info">
+									{project.status && <p class="project-status"><span></span>{project.status}</p>}
+									<div class="project-description">
+										{project.description.map((paragraph) => <p>{paragraph}</p>)}
+									</div>
+									<ul class="project-tech" aria-label={`${project.title} technologies`}>
+										{project.tech.map((item) => <li><i class={item.icon} aria-hidden="true"></i>{item.name}</li>)}
+									</ul>
+									<div class="project-actions">
+										<a href={project.site} target="_blank" rel="noopener noreferrer">Visit project <span aria-hidden="true">↗</span></a>
+										{project.source && <a href={project.source} target="_blank" rel="noopener noreferrer">Source code <span aria-hidden="true">↗</span></a>}
+									</div>
+								</div>
+							</div>
+						</dialog>
+					</article>
+				))}
+			</div>
+		</div>
+		<div class="projects-statusbar">
+			<span class="status-session">[dev-session]</span>
+			<span>0:portfolio-  1:projects*  2:about-</span>
+			<span class="status-right">{projects.length} projects · 0 errors</span>
+		</div>
+	</div>
+</section>
+
+<script>
+	document.querySelectorAll<HTMLElement>('[data-gallery-root]').forEach((gallery) => {
+		const mainImage = gallery.querySelector<HTMLImageElement>('[data-gallery-main]');
+		const dialogImage = gallery.querySelector<HTMLImageElement>('[data-dialog-main]');
+		const dialog = gallery.querySelector<HTMLDialogElement>('.project-dialog');
+		const thumbnailButtons = Array.from(
+			gallery.querySelectorAll<HTMLButtonElement>('.project-gallery [data-gallery-index]'),
+		);
+		let currentIndex = 0;
+		let lastTrigger: HTMLButtonElement | null = null;
+
+		const setImage = (index: number) => {
+			if (thumbnailButtons.length === 0) return;
+			currentIndex = (index + thumbnailButtons.length) % thumbnailButtons.length;
+			const selected = thumbnailButtons[currentIndex];
+			const imageSrc = selected.dataset.imageSrc ?? '';
+			const imageAlt = selected.dataset.imageAlt ?? '';
+
+			[mainImage, dialogImage].forEach((image) => {
+				if (!image) return;
+				image.src = imageSrc;
+				image.alt = imageAlt;
+			});
+
+			gallery.querySelectorAll<HTMLButtonElement>('[data-gallery-index]').forEach((button) => {
+				const isActive = Number(button.dataset.galleryIndex) === currentIndex;
+				button.classList.toggle('is-active', isActive);
+				button.setAttribute('aria-pressed', String(isActive));
+			});
+			gallery.querySelectorAll<HTMLElement>('[data-gallery-counter], [data-dialog-counter]').forEach((counter) => {
+				counter.textContent = `${currentIndex + 1} / ${thumbnailButtons.length}`;
+			});
+		};
+
+		gallery.querySelectorAll<HTMLButtonElement>('[data-gallery-index]').forEach((button) => {
+			button.addEventListener('click', () => setImage(Number(button.dataset.galleryIndex)));
+		});
+
+		gallery.querySelectorAll<HTMLButtonElement>('[data-gallery-step]').forEach((button) => {
+			button.addEventListener('click', () => setImage(currentIndex + Number(button.dataset.galleryStep)));
+		});
+
+		gallery.querySelectorAll<HTMLButtonElement>('[data-open-dialog]').forEach((button) => {
+			button.addEventListener('click', () => {
+				if (!dialog) return;
+				lastTrigger = button;
+				setImage(currentIndex);
+				dialog.showModal();
+			});
+		});
+
+		gallery.querySelector<HTMLButtonElement>('[data-close-dialog]')?.addEventListener('click', () => dialog?.close());
+		dialog?.addEventListener('click', (event) => {
+			if (event.target === dialog) dialog.close();
+		});
+		dialog?.addEventListener('close', () => lastTrigger?.focus());
+		dialog?.addEventListener('keydown', (event) => {
+			if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+				event.preventDefault();
+				setImage(currentIndex + (event.key === 'ArrowRight' ? 1 : -1));
+			}
+		});
+
+		setImage(0);
+	});
+</script>
+
+<style>
+	.work-section {
+		padding: 0 0 72px;
+	}
+
+	.projects-window {
+		min-width: 0;
+		border: 1px solid #59406f;
+		background: #100e1d;
+		box-shadow: 0 0 0 1px #ff4fd80c, 0 14px 52px #03020b70, 0 0 32px #8c38ff12;
+	}
+
+	.projects-titlebar {
+		min-height: 37px;
+		padding: 0 13px;
+		border-bottom: 1px solid #38294b;
+		background: #121511;
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+	}
+
+	.title-mark {
+		margin-right: 9px;
+		color: #b9ff66;
+		font-family: 'Space Mono', monospace;
+		font-size: 11px;
+		font-weight: 700;
+	}
+
+	.terminal-title,
+	.terminal-title-meta,
+	.terminal-prompt,
+	.projects-statusbar {
+		font-family: 'Space Mono', monospace;
+	}
+
+	.terminal-title {
+		color: #e6d9f5;
+		font-size: 10px;
+	}
+
+	.terminal-title > span {
+		color: #b99aff;
+	}
+
+	.terminal-title-meta {
+		color: #8d7eaa;
+		font-size: 9px;
+	}
+
+	.project-pane-content {
+		padding: 35px clamp(18px, 3.2vw, 40px) 36px;
+	}
+
+	.section-heading {
+		margin-bottom: 27px;
+		display: flex;
+		align-items: end;
+		justify-content: space-between;
+		gap: 16px;
+	}
+
+	.terminal-prompt {
+		margin: 0 0 15px;
+		color: #d3c7e2;
+		font-size: 10px;
+	}
+
+	.terminal-prompt span {
+		color: #b9ff66;
+	}
+
+	.section-heading h2 {
+		margin: 0;
+		font-family: 'Space Grotesk', sans-serif;
+		font-size: 39px;
+		font-weight: 500;
+		line-height: 1.04;
+	}
+
+	.coral-dot {
+		color: #ff4fd8;
+	}
+
+	.section-aside {
+		margin: 0 0 7px;
+		color: #a89bbd;
+		font-size: 13px;
+		line-height: 1.8;
+	}
+
+	.portfolio-list {
+		display: grid;
+		gap: 22px;
+	}
+
+	.portfolio-project {
+		min-width: 0;
+		padding: 20px 0 22px;
+		border-top: 1px solid #453156;
+		display: grid;
+		grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+		align-items: start;
+		gap: 26px;
+	}
+
+	.project-gallery {
+		min-width: 0;
+	}
+
+	.main-image-container,
+	.dialog-image-container {
+		position: relative;
+		min-width: 0;
+		aspect-ratio: 16 / 10;
+		overflow: hidden;
+		border: 1px solid #453156;
+		background: #090a0d;
+	}
+
+	.main-image-trigger {
+		width: 100%;
+		height: 100%;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		display: block;
+		cursor: zoom-in;
+	}
+
+	.main-image-trigger img,
+	.dialog-image-container > img {
+		width: 100%;
+		height: 100%;
+		background: #090a0d;
+		display: block;
+		object-fit: contain;
+	}
+
+	.main-image-trigger:focus-visible,
+	.gallery-nav:focus-visible,
+	.gallery-thumbnail:focus-visible,
+	.dialog-close:focus-visible {
+		outline: 2px solid #40f4ff;
+		outline-offset: -3px;
+	}
+
+	.image-open-label {
+		position: absolute;
+		bottom: 10px;
+		left: 10px;
+		padding: 6px 8px;
+		background: #0b0b1ce8;
+		color: #40f4ff;
+		font-family: 'Space Mono', monospace;
+		font-size: 9px;
+		pointer-events: none;
+	}
+
+	.image-open-label i {
+		margin-right: 4px;
+	}
+
+	.gallery-nav {
+		position: absolute;
+		z-index: 1;
+		top: 50%;
+		width: 36px;
+		height: 36px;
+		padding: 0;
+		border: 1px solid #40f4ff70;
+		border-radius: 50%;
+		background: #0b0b1ce8;
+		color: #40f4ff;
+		transform: translateY(-50%);
+		display: grid;
+		place-items: center;
+		cursor: pointer;
+		transition: background 150ms ease, color 150ms ease;
+	}
+
+	.gallery-nav:hover {
+		background: #40f4ff;
+		color: #0b0b1c;
+	}
+
+	.gallery-nav i {
+		font-size: 23px;
+	}
+
+	.gallery-nav--previous {
+		left: 10px;
+	}
+
+	.gallery-nav--next {
+		right: 10px;
+	}
+
+	.gallery-counter {
+		position: absolute;
+		right: 10px;
+		bottom: 10px;
+		padding: 5px 7px;
+		background: #0b0b1ce8;
+		color: #f6f1ff;
+		font-family: 'Space Mono', monospace;
+		font-size: 9px;
+	}
+
+	.gallery-thumbnails {
+		margin-top: 9px;
+		padding: 2px 1px 5px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 7px;
+	}
+
+	.gallery-thumbnail {
+		width: 68px;
+		height: 48px;
+		padding: 2px;
+		border: 1px solid #453156;
+		background: #090a0d;
+		flex: 0 0 auto;
+		cursor: pointer;
+		transition: border-color 150ms ease;
+	}
+
+	.gallery-thumbnail img {
+		width: 100%;
+		height: 100%;
+		display: block;
+		object-fit: cover;
+	}
+
+	.gallery-thumbnail:hover,
+	.gallery-thumbnail.is-active {
+		border-color: #40f4ff;
+	}
+
+	.project-dialog {
+		width: min(1120px, calc(100vw - 32px));
+		max-width: none;
+		max-height: min(850px, calc(100dvh - 32px));
+		padding: 0;
+		border: 1px solid #59406f;
+		background: #100e1d;
+		color: #f6f1ff;
+		box-shadow: 0 24px 80px #000b;
+	}
+
+	.project-dialog::backdrop {
+		background: #05050bd9;
+		backdrop-filter: blur(5px);
+	}
+
+	.project-dialog-content {
+		padding: 20px;
+		display: grid;
+		grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+		align-items: start;
+		gap: 18px 24px;
+	}
+
+	.project-dialog-header {
+		grid-column: 1 / -1;
+		padding-bottom: 12px;
+		border-bottom: 1px solid #453156;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+	}
+
+	.project-dialog-header .project-category {
+		margin-bottom: 5px;
+	}
+
+	.project-dialog-header h3 {
+		margin: 0;
+		font-family: 'Space Grotesk', sans-serif;
+		font-size: 24px;
+		font-weight: 500;
+	}
+
+	.dialog-close {
+		width: 38px;
+		height: 38px;
+		padding: 0;
+		border: 1px solid #453156;
+		background: #171326;
+		color: #f6f1ff;
+		flex: 0 0 auto;
+		cursor: pointer;
+	}
+
+	.dialog-close:hover {
+		border-color: #ff4fd8;
+		color: #ff4fd8;
+	}
+
+	.dialog-close i {
+		font-size: 23px;
+	}
+
+	.dialog-gallery {
+		min-width: 0;
+	}
+
+	.dialog-image-container {
+		aspect-ratio: 4 / 3;
+	}
+
+	.dialog-thumbnails {
+		max-height: none;
+	}
+
+	.dialog-project-info {
+		max-height: min(68vh, 650px);
+		overflow-y: auto;
+		padding-right: 4px;
+	}
+
+	.dialog-project-info .project-status {
+		width: fit-content;
+		margin: 0 0 13px;
+	}
+
+	.project-actions button {
+		padding: 0;
+		border: 0;
+		background: transparent;
+		color: #40f4ff;
+		font-family: 'Space Mono', monospace;
+		font-size: 10px;
+		cursor: pointer;
+	}
+
+	.project-actions button:hover {
+		color: #b9ff66;
+	}
+
+	.project-actions button span {
+		margin-left: 4px;
+	}
+
+	.portfolio-details {
+		min-width: 0;
+	}
+
+	.portfolio-heading {
+		margin-bottom: 12px;
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 12px;
+	}
+
+	.project-category {
+		margin: 0 0 8px;
+		color: #40f4ff;
+		font-family: 'Space Mono', monospace;
+		font-size: 9px;
+	}
+
+	.portfolio-heading h3 {
+		margin: 0;
+		font-family: 'Space Grotesk', sans-serif;
+		font-size: 25px;
+		font-weight: 500;
+	}
+
+	.project-status {
+		padding: 5px 7px;
+		border: 1px solid #b9ff6655;
+		color: #b9ff66;
+		font-family: 'Space Mono', monospace;
+		font-size: 8px;
+		white-space: nowrap;
+	}
+
+	.project-status span {
+		width: 6px;
+		height: 6px;
+		margin-right: 5px;
+		border-radius: 50%;
+		background: #b9ff66;
+		display: inline-block;
+	}
+
+	.project-description p {
+		margin: 0 0 10px;
+		color: #b9aecb;
+		font-size: 12px;
+		line-height: 1.7;
+	}
+
+	.project-tech {
+		margin: 14px 0 0;
+		padding: 0;
+		list-style: none;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 7px;
+	}
+
+	.project-tech li {
+		min-height: 27px;
+		padding: 4px 7px;
+		border: 1px solid #392950;
+		color: #c1b6d2;
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		font-family: 'Space Mono', monospace;
+		font-size: 9px;
+	}
+
+	.project-tech i {
+		color: #40f4ff;
+		font-size: 14px;
+	}
+
+	.project-actions {
+		margin-top: 16px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+	}
+
+	.project-actions a {
+		color: #40f4ff;
+		font-family: 'Space Mono', monospace;
+		font-size: 10px;
+		text-decoration: none;
+	}
+
+	.project-actions a:hover {
+		color: #b9ff66;
+	}
+
+	.project-actions a span {
+		margin-left: 4px;
+	}
+
+	.projects-statusbar {
+		min-height: 26px;
+		padding: 0 11px;
+		background: #403056;
+		color: #e9dff4;
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		font-size: 9px;
+	}
+
+	.status-session {
+		padding: 3px 6px;
+		background: #ff4fd8;
+		color: #180e23;
+		font-weight: 700;
+	}
+
+	.status-right {
+		margin-left: auto;
+		color: #40f4ff;
+	}
+
+	@media (max-width: 900px) {
+		.portfolio-project {
+			gap: 18px;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.work-section {
+			padding-bottom: 45px;
+		}
+
+		.projects-titlebar {
+			min-height: 34px;
+			padding: 0 9px;
+		}
+
+		.terminal-title,
+		.terminal-title-meta {
+			font-size: 8px;
+		}
+
+		.project-pane-content {
+			padding: 24px 15px;
+		}
+
+		.section-aside {
+			display: none;
+		}
+
+		.portfolio-list {
+			gap: 10px;
+		}
+
+		.portfolio-project {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 17px;
+		}
+
+		.main-image-container {
+			aspect-ratio: 4 / 3;
+		}
+
+		.project-dialog {
+			width: calc(100vw - 20px);
+			max-height: calc(100dvh - 20px);
+		}
+
+		.project-dialog-content {
+			padding: 14px;
+			grid-template-columns: minmax(0, 1fr);
+			gap: 14px;
+		}
+
+		.project-dialog-header {
+			grid-column: auto;
+		}
+
+		.project-dialog-header h3 {
+			font-size: 20px;
+		}
+
+		.dialog-image-container {
+			aspect-ratio: 4 / 3;
+		}
+
+		.dialog-project-info {
+			max-height: 34dvh;
+		}
+
+		.gallery-thumbnail {
+			width: 58px;
+			height: 42px;
+		}
+
+		.portfolio-heading h3 {
+			font-size: 22px;
+		}
+
+		.project-description p {
+			font-size: 12px;
+		}
+
+		.projects-statusbar {
+			gap: 8px;
+			padding: 0 6px;
+			font-size: 7px;
+		}
+
+		.status-right {
+			display: none;
+		}
+	}
+</style>

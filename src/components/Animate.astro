@@ -1,14 +1,623 @@
-<div class="hero-red-panel" aria-hidden="true"></div>
+---
+/**
+ * Astro props for the full-screen ASCII cracktro.
+ * @typedef {Object} AnimateProps
+ * @property {string} text Optional scroller message; empty by default.
+ * @property {number} opacity Overall effect opacity from 0 to 1 (default 0.35).
+ * @property {number} speed Animation speed multiplier (default 1).
+ * @property {string[]} colors Up to eight hex colors for the Amiga palette.
+ * @property {number} fontSize Monospace character size in pixels (default 14).
+ */
+const {
+	text = '',
+	opacity = 0.35,
+	speed = 1,
+	colors,
+	fontSize = 14,
+} = Astro.props;
+
+const fallbackColors = ['#fa3548', '#ff8b38', '#327dff', '#35dcdd', '#bd48ff', '#ff4ab8', '#56f05d', '#fff064'];
+const palette = fallbackColors.map((fallback, index) => {
+	const candidate = Array.isArray(colors) ? colors[index] : '';
+	return typeof candidate === 'string' && /^#(?:[\da-f]{3}|[\da-f]{6})$/i.test(candidate) ? candidate : fallback;
+});
+const safeOpacity = Number.isFinite(opacity) ? Math.min(1, Math.max(0, opacity)) : 0.35;
+const safeFontSize = Number.isFinite(fontSize) ? Math.min(28, Math.max(8, fontSize)) : 14;
+const safeSpeed = Number.isFinite(speed) ? Math.max(0, Math.min(4, speed)) : 1;
+const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).join(';')};--effect-opacity:${safeOpacity};--cell-font-size:${safeFontSize}px`;
+---
+
+<div class="animate-stage">
+	<pre
+		class="animate-output"
+		data-animate-output
+		data-text={text}
+		data-opacity={safeOpacity}
+		data-speed={safeSpeed}
+		data-colors={JSON.stringify(palette)}
+		data-font-size={safeFontSize}
+		style={paletteStyle}
+		aria-hidden="true"
+	></pre>
+</div>
+
+<script>
+	const density = ' .:-=+*#%@';
+	const stars = ['.', '+', '*'];
+	const cubePoints = new Float32Array([
+		-1, -1, -1, 1, -1, -1, 1, 1, -1, -1, 1, -1,
+		-1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1,
+	]);
+	const faces = [
+		[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4],
+		[3, 7, 6, 2], [0, 4, 7, 3], [1, 2, 6, 5],
+	];
+	const edges = [
+		[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6],
+		[6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7],
+	];
+	const faceColors = [0, 2, 1, 4, 3, 5];
+	const copperColors = [0, 1, 2, 4, 6];
+	const active = new Map();
+	const bitmapFont = {
+		A: ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
+		B: ['11110', '10001', '10001', '11110', '10001', '10001', '11110'],
+		C: ['01111', '10000', '10000', '10000', '10000', '10000', '01111'],
+		D: ['11110', '10001', '10001', '10001', '10001', '10001', '11110'],
+		E: ['11111', '10000', '10000', '11110', '10000', '10000', '11111'],
+		F: ['11111', '10000', '10000', '11110', '10000', '10000', '10000'],
+		G: ['01111', '10000', '10000', '10111', '10001', '10001', '01111'],
+		H: ['10001', '10001', '10001', '11111', '10001', '10001', '10001'],
+		I: ['11111', '00100', '00100', '00100', '00100', '00100', '11111'],
+		J: ['00111', '00010', '00010', '00010', '00010', '10010', '01100'],
+		K: ['10001', '10010', '10100', '11000', '10100', '10010', '10001'],
+		L: ['10000', '10000', '10000', '10000', '10000', '10000', '11111'],
+		M: ['10001', '11011', '10101', '10101', '10001', '10001', '10001'],
+		N: ['10001', '11001', '10101', '10011', '10001', '10001', '10001'],
+		O: ['01110', '10001', '10001', '10001', '10001', '10001', '01110'],
+		P: ['11110', '10001', '10001', '11110', '10000', '10000', '10000'],
+		Q: ['01110', '10001', '10001', '10001', '10101', '10010', '01101'],
+		R: ['11110', '10001', '10001', '11110', '10100', '10010', '10001'],
+		S: ['01111', '10000', '10000', '01110', '00001', '00001', '11110'],
+		T: ['11111', '00100', '00100', '00100', '00100', '00100', '00100'],
+		U: ['10001', '10001', '10001', '10001', '10001', '10001', '01110'],
+		V: ['10001', '10001', '10001', '10001', '10001', '01010', '00100'],
+		W: ['10001', '10001', '10001', '10101', '10101', '10101', '01010'],
+		X: ['10001', '10001', '01010', '00100', '01010', '10001', '10001'],
+		Y: ['10001', '10001', '01010', '00100', '00100', '00100', '00100'],
+		Z: ['11111', '00001', '00010', '00100', '01000', '10000', '11111'],
+		0: ['01110', '10001', '10011', '10101', '11001', '10001', '01110'],
+		1: ['00100', '01100', '00100', '00100', '00100', '00100', '01110'],
+		2: ['01110', '10001', '00001', '00010', '00100', '01000', '11111'],
+		3: ['11110', '00001', '00001', '01110', '00001', '00001', '11110'],
+		4: ['00010', '00110', '01010', '10010', '11111', '00010', '00010'],
+		5: ['11111', '10000', '10000', '11110', '00001', '00001', '11110'],
+		6: ['01110', '10000', '10000', '11110', '10001', '10001', '01110'],
+		7: ['11111', '00001', '00010', '00100', '01000', '01000', '01000'],
+		8: ['01110', '10001', '10001', '01110', '10001', '10001', '01110'],
+		9: ['01110', '10001', '10001', '01111', '00001', '00001', '01110'],
+		'*': ['00000', '10101', '01110', '11111', '01110', '10101', '00000'],
+		'-': ['00000', '00000', '00000', '11111', '00000', '00000', '00000'],
+		'.': ['00000', '00000', '00000', '00000', '00000', '01100', '01100'],
+		'!': ['00100', '00100', '00100', '00100', '00100', '00000', '00100'],
+	};
+
+	function initialize(output) {
+		if (active.has(output)) return;
+
+		const fontSize = Number(output.dataset.fontSize) || 14;
+		const speed = Number(output.dataset.speed) || 0;
+		const message = (output.dataset.text || '').toUpperCase();
+		let palette = JSON.parse(output.dataset.colors || '[]');
+		if (!Array.isArray(palette) || palette.length !== 8) {
+			palette = ['#fa3548', '#ff8b38', '#327dff', '#35dcdd', '#bd48ff', '#ff4ab8', '#56f05d', '#fff064'];
+		}
+
+		const probe = document.createElement('span');
+		probe.textContent = 'M';
+		probe.style.fontSize = `${fontSize}px`;
+		probe.style.fontFamily = '"Courier New", Courier, monospace';
+		probe.style.fontWeight = '700';
+		probe.style.lineHeight = '1';
+		probe.style.whiteSpace = 'pre';
+		probe.style.display = 'inline-block';
+		probe.style.position = 'fixed';
+		probe.style.left = '-10000px';
+		probe.style.top = '-10000px';
+		probe.style.visibility = 'hidden';
+		document.body.appendChild(probe);
+		const probeBounds = probe.getBoundingClientRect();
+		const cellWidth = Math.max(1, probeBounds.width);
+		const cellHeight = Math.max(1, probeBounds.height);
+		probe.remove();
+
+		let columns = 1;
+		let rows = 1;
+		let characters = [];
+		let colors = new Uint8Array(1);
+		let depths = new Float32Array(1);
+		let starLayers = [];
+		let frame = 0;
+		let resizeTimer = 0;
+		let elapsed = 0;
+		let lastFrame = 0;
+		let running = false;
+		let onscreen = false;
+		let lightX = -0.42;
+		let lightY = -0.63;
+		let lightZ = -0.65;
+
+		const rotatedX = new Float32Array(16);
+		const rotatedY = new Float32Array(16);
+		const rotatedZ = new Float32Array(16);
+		const projectedX = new Float32Array(16);
+		const projectedY = new Float32Array(16);
+		const projectedZ = new Float32Array(16);
+		const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+		function makeStarLayer(count, velocity, colorIndex) {
+			const x = new Float32Array(count);
+			const y = new Float32Array(count);
+			const phase = new Float32Array(count);
+			for (let index = 0; index < count; index += 1) {
+				x[index] = Math.random() * columns;
+				y[index] = Math.random() * rows;
+				phase[index] = Math.random() * Math.PI * 2;
+			}
+			return { x, y, phase, count, velocity, colorIndex };
+		}
+
+		function resize() {
+			const bounds = output.getBoundingClientRect();
+			columns = Math.max(1, Math.floor(bounds.width / cellWidth));
+			rows = Math.max(1, Math.floor(bounds.height / cellHeight));
+			characters = new Array(columns * rows).fill(' ');
+			colors = new Uint8Array(columns * rows);
+			depths = new Float32Array(columns * rows);
+			starLayers = [
+				makeStarLayer(Math.max(18, Math.floor(columns * rows * 0.004)), 2.8, 3),
+				makeStarLayer(Math.max(12, Math.floor(columns * rows * 0.0025)), 5.2, 2),
+				makeStarLayer(Math.max(7, Math.floor(columns * rows * 0.0014)), 8.5, 5),
+			];
+		}
+
+		function put(x, y, glyph, colorIndex, depth, transparent) {
+			const column = Math.round(x);
+			const row = Math.round(y);
+			if (column < 0 || row < 0 || column >= columns || row >= rows) return;
+			const index = row * columns + column;
+			if (transparent) {
+				if ((column + row) % 2 !== 0) return;
+				if (characters[index] !== ' ' && density.indexOf(characters[index]) > density.indexOf(glyph)) return;
+			} else if (depth !== null && depth >= depths[index]) {
+				return;
+			}
+			if (depth !== null && !transparent) depths[index] = depth;
+			characters[index] = glyph;
+			colors[index] = colorIndex % 8;
+		}
+
+		function drawCopper(time, fade) {
+			if (fade <= 0) return;
+			for (let bar = 0; bar < copperColors.length; bar += 1) {
+				const center = rows * (0.13 + bar * 0.17) + Math.sin(time * speed * 0.65 + bar * 1.9) * rows * 0.035;
+				const amplitude = Math.max(1.5, rows * 0.022);
+				const paletteShift = time > 20 ? 1 : 0;
+				for (let column = 0; column < columns; column += 1) {
+					const wave = center + Math.sin(column * 0.055 + time * speed * (0.75 + bar * 0.06) + bar * 2.1) * amplitude;
+					for (let offset = -3; offset <= 3; offset += 1) {
+						const level = (1 - Math.abs(offset) / 4) * fade;
+						const shade = Math.min(density.length - 1, Math.floor(level * (density.length - 1)));
+						if (shade === 0) continue;
+						const row = Math.round(wave + offset);
+						const index = row * columns + column;
+						const overlaps = row >= 0 && row < rows && characters[index] !== ' ';
+						const brightShade = overlaps ? Math.min(density.length - 1, shade + 2) : shade;
+						put(column, row, density[brightShade], (copperColors[bar] + paletteShift + (overlaps ? 1 : 0)) % 8, null, false);
+					}
+				}
+			}
+		}
+
+		function drawStars(delta, time, fade) {
+			for (let layerIndex = 0; layerIndex < starLayers.length; layerIndex += 1) {
+				const layer = starLayers[layerIndex];
+				for (let index = 0; index < layer.count; index += 1) {
+					layer.x[index] -= delta * speed * layer.velocity;
+					if (layer.x[index] < 0) layer.x[index] += columns;
+					const twinkle = (Math.sin(time * 3.1 + layer.phase[index]) + 1) * 0.5;
+					if (twinkle > fade) continue;
+					const glyphIndex = layerIndex === 0 ? 0 : layerIndex === 1 ? 1 : 2;
+					put(layer.x[index], layer.y[index], stars[glyphIndex], layer.colorIndex, null, false);
+				}
+			}
+		}
+
+		// Apply X, Y, then Z rotation matrices; character-cell aspect correction is applied during projection.
+		function rotate(vertex, cosX, sinX, cosY, sinY, cosZ, sinZ, scale) {
+			const source = (vertex % 8) * 3;
+			const x = cubePoints[source] * scale;
+			const y = cubePoints[source + 1] * scale;
+			const z = cubePoints[source + 2] * scale;
+			const yX = y * cosX - z * sinX;
+			const zX = y * sinX + z * cosX;
+			const xY = x * cosY + zX * sinY;
+			const zY = -x * sinY + zX * cosY;
+			rotatedX[vertex] = xY * cosZ - yX * sinZ;
+			rotatedY[vertex] = xY * sinZ + yX * cosZ;
+			rotatedZ[vertex] = zY;
+		}
+
+		function project(vertex, centerX, centerY, focalLength, aspect, scale) {
+			const depth = 5.2 + rotatedZ[vertex];
+			projectedX[vertex] = centerX + (rotatedX[vertex] * focalLength * aspect) / depth;
+			projectedY[vertex] = centerY + (rotatedY[vertex] * focalLength) / depth;
+			projectedZ[vertex] = depth;
+		}
+
+		function rasterTriangle(a, b, c, glyph, colorIndex, transparent) {
+			const ax = projectedX[a];
+			const ay = projectedY[a];
+			const bx = projectedX[b];
+			const by = projectedY[b];
+			const cx = projectedX[c];
+			const cy = projectedY[c];
+			const denominator = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy);
+			if (Math.abs(denominator) < 0.0001) return;
+			const minX = Math.max(0, Math.floor(Math.min(ax, bx, cx)));
+			const maxX = Math.min(columns - 1, Math.ceil(Math.max(ax, bx, cx)));
+			const minY = Math.max(0, Math.floor(Math.min(ay, by, cy)));
+			const maxY = Math.min(rows - 1, Math.ceil(Math.max(ay, by, cy)));
+			for (let row = minY; row <= maxY; row += 1) {
+				for (let column = minX; column <= maxX; column += 1) {
+					const px = column + 0.5;
+					const py = row + 0.5;
+					const weightA = ((by - cy) * (px - cx) + (cx - bx) * (py - cy)) / denominator;
+					const weightB = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / denominator;
+					const weightC = 1 - weightA - weightB;
+					if (weightA < 0 || weightB < 0 || weightC < 0) continue;
+					const depth = weightA * projectedZ[a] + weightB * projectedZ[b] + weightC * projectedZ[c];
+					if (transparent) {
+						put(column, row, glyph, colorIndex, null, true);
+					} else {
+						const cell = row * columns + column;
+						if (depth < depths[cell]) {
+							depths[cell] = depth;
+							characters[cell] = glyph;
+							colors[cell] = colorIndex % 8;
+						}
+					}
+				}
+			}
+		}
+
+		function drawFace(faceIndex, offset, transparent, showBackfaces) {
+			const face = faces[faceIndex];
+			const a = face[0] + offset;
+			const b = face[1] + offset;
+			const c = face[2] + offset;
+			const abX = rotatedX[b] - rotatedX[a];
+			const abY = rotatedY[b] - rotatedY[a];
+			const abZ = rotatedZ[b] - rotatedZ[a];
+			const acX = rotatedX[c] - rotatedX[a];
+			const acY = rotatedY[c] - rotatedY[a];
+			const acZ = rotatedZ[c] - rotatedZ[a];
+			const nx = abY * acZ - abZ * acY;
+			const ny = abZ * acX - abX * acZ;
+			const nz = abX * acY - abY * acX;
+			if (!showBackfaces && nz >= 0) return;
+			const length = Math.hypot(nx, ny, nz) || 1;
+			const facing = showBackfaces ? Math.abs(nx * lightX + ny * lightY + nz * lightZ) : nx * lightX + ny * lightY + nz * lightZ;
+			const brightness = Math.max(0, facing / length);
+			// The density ramp turns flat face lighting into sparse marks on dark planes and dense glyphs on lit planes.
+			const shade = Math.max(1, Math.min(density.length - 1, Math.floor((0.16 + brightness * 0.84) * (density.length - 1))));
+			const glyph = density[transparent ? Math.min(5, shade) : shade];
+			const colorIndex = transparent ? (faceColors[faceIndex] + 3) % 8 : faceColors[faceIndex];
+			rasterTriangle(a, b, c, glyph, colorIndex, transparent);
+			rasterTriangle(a, c, face[3] + offset, glyph, colorIndex, transparent);
+		}
+
+		function drawLine(first, second, offset, time, echo, outer) {
+			let x = Math.round(projectedX[first + offset]);
+			let y = Math.round(projectedY[first + offset]);
+			const targetX = Math.round(projectedX[second + offset]);
+			const targetY = Math.round(projectedY[second + offset]);
+			const dx = Math.abs(targetX - x);
+			const sx = x < targetX ? 1 : -1;
+			const dy = -Math.abs(targetY - y);
+			const sy = y < targetY ? 1 : -1;
+			let error = dx + dy;
+			const totalSteps = Math.max(dx, -dy, 1);
+			let step = 0;
+			while (true) {
+				if (x >= 0 && y >= 0 && x < columns && y < rows) {
+					const amount = step / totalSteps;
+					const depth = projectedZ[first + offset] + (projectedZ[second + offset] - projectedZ[first + offset]) * amount;
+					const glyph = echo ? (step % 3 === 0 ? '.' : ':') : (Math.sin(time * 8 + step * 0.7) > 0.78 ? '@' : '#');
+					const colorIndex = echo ? 7 : outer ? 3 : 5;
+					if (echo || outer) {
+						if (step % (echo ? 2 : 1) === 0) put(x, y, glyph, colorIndex, null, true);
+					} else {
+					const cell = y * columns + x;
+					if (depth <= depths[cell] + 0.06) {
+						depths[cell] = Math.min(depths[cell], depth);
+						characters[cell] = glyph;
+						colors[cell] = colorIndex;
+					}
+					}
+				}
+				if (x === targetX && y === targetY) break;
+				const doubledError = 2 * error;
+				if (doubledError >= dy) {
+					error += dy;
+					x += sx;
+				}
+				if (doubledError <= dx) {
+					error += dx;
+					y += sy;
+				}
+				step += 1;
+			}
+		}
+
+		function drawCube(time, scaleFactor, echo) {
+			const mode = smoothstep(20, 23, time);
+			const rateX = 0.48 + (-0.76 - 0.48) * mode;
+			const rateY = 0.82 + (0.43 - 0.82) * mode;
+			const rateZ = 0.25 + (0.67 - 0.25) * mode;
+			const angleX = time * speed * rateX;
+			const angleY = time * speed * rateY;
+			const angleZ = time * speed * rateZ;
+			const cosX = Math.cos(angleX);
+			const sinX = Math.sin(angleX);
+			const cosY = Math.cos(angleY);
+			const sinY = Math.sin(angleY);
+			const cosZ = Math.cos(angleZ);
+			const sinZ = Math.sin(angleZ);
+			const breathing = 1 + Math.sin(time * speed * 1.35) * 0.075;
+			const scale = Math.max(0.01, 1.14 * breathing * scaleFactor);
+			const centerX = columns * 0.5;
+			const centerY = rows * 0.43 + Math.sin(time * speed * 1.1) * rows * 0.035;
+			const focalLength = Math.min(columns, rows) * 1.58;
+			// Character cells are taller than they are wide, so widen projected X by the inverse cell aspect ratio.
+			const aspect = cellHeight / cellWidth;
+
+			for (let vertex = 0; vertex < 16; vertex += 1) {
+				const vertexScale = scale * (vertex < 8 ? 1 : 1.34);
+				rotate(vertex, cosX, sinX, cosY, sinY, cosZ, sinZ, vertexScale);
+				project(vertex, centerX, centerY, focalLength, aspect, vertexScale);
+			}
+
+			for (let face = 0; face < faces.length; face += 1) drawFace(face, 8, true, true);
+			for (let edge = 0; edge < edges.length; edge += 1) drawLine(edges[edge][0], edges[edge][1], 8, time, echo, true);
+			if (!echo) {
+				for (let face = 0; face < faces.length; face += 1) drawFace(face, 0, false, false);
+			} else {
+				for (let face = 0; face < faces.length; face += 1) drawFace(face, 0, true, true);
+			}
+			for (let edge = 0; edge < edges.length; edge += 1) drawLine(edges[edge][0], edges[edge][1], 0, time, echo, false);
+		}
+
+		function drawStarsLayerFade(time) {
+			return smoothstep(0.48, 1.65, time);
+		}
+
+		function drawScroller(time) {
+			if (!message.length || time < 2.2) return;
+			const scale = 2;
+			const baseRow = Math.max(0, rows - 16);
+			const scrollWidth = Math.max(1, message.length * 12);
+			const scroll = (time * speed * 13) % scrollWidth;
+			for (let column = 0; column < columns; column += 1) {
+				const sourceX = Math.floor(scroll + column / scale);
+				const characterIndex = Math.floor(sourceX / 12) % message.length;
+				const glyphColumn = Math.floor((sourceX % 12) / scale);
+				if (glyphColumn > 4) continue;
+				const glyph = bitmapFont[message[characterIndex]];
+				if (!glyph) continue;
+				const wave = Math.round(Math.sin(column * 0.095 + time * speed * 2.4) * 1.5);
+				for (let glyphRow = 0; glyphRow < 7; glyphRow += 1) {
+					if (glyph[glyphRow][glyphColumn] !== '1') continue;
+					const y = baseRow + glyphRow * scale + wave;
+					const colorIndex = (characterIndex + Math.floor(time * 2.2)) % 8;
+					put(column, y, '@', colorIndex, null, false);
+					put(column, y + 1, '#', colorIndex, null, false);
+				}
+			}
+		}
+
+		function smoothstep(start, end, value) {
+			const amount = Math.max(0, Math.min(1, (value - start) / (end - start)));
+			return amount * amount * (3 - 2 * amount);
+		}
+
+		function render(delta) {
+			characters.fill(' ');
+			colors.fill(0);
+			depths.fill(Number.POSITIVE_INFINITY);
+			lightX = Math.cos(elapsed * 0.42) * 0.48;
+			lightY = -0.55 + Math.sin(elapsed * 0.31) * 0.22;
+			lightZ = -0.68 + Math.cos(elapsed * 0.25) * 0.15;
+			drawCopper(elapsed, smoothstep(0, 0.9, elapsed));
+			drawStars(delta, elapsed, drawStarsLayerFade(elapsed));
+			const cubeIntro = smoothstep(1.15, 3.15, elapsed);
+			if (cubeIntro > 0) {
+				const spinUp = 0.18 + cubeIntro * 0.82;
+				drawCube(elapsed - 0.24, spinUp * 0.78, true);
+				drawCube(elapsed - 0.12, spinUp * 0.9, true);
+				drawCube(elapsed, spinUp, false);
+			}
+			drawScroller(elapsed);
+
+			let html = '';
+			for (let row = 0; row < rows; row += 1) {
+				const rowStart = row * columns;
+				let runColor = colors[rowStart];
+				let run = '';
+				for (let column = 0; column < columns; column += 1) {
+					const index = rowStart + column;
+					const color = colors[index];
+					if (color !== runColor) {
+						html += `<span class="c${runColor}">${run}</span>`;
+						run = '';
+						runColor = color;
+					}
+					run += characters[index];
+				}
+				html += `<span class="c${runColor}">${run}</span>\n`;
+			}
+			output.innerHTML = html;
+		}
+
+		function requestFrame() {
+			if (running && !frame) frame = window.requestAnimationFrame(loop);
+		}
+
+		function loop(timestamp) {
+			frame = 0;
+			if (!running || document.hidden || !onscreen) return;
+			if (timestamp - lastFrame >= 1000 / 30) {
+				const delta = lastFrame ? Math.min(0.1, (timestamp - lastFrame) / 1000) : 0;
+				elapsed += delta;
+				lastFrame = timestamp;
+				render(delta);
+			}
+			requestFrame();
+		}
+
+		function updateRunning() {
+			const shouldRun = onscreen && !document.hidden && !motionPreference.matches;
+			running = shouldRun;
+			if (shouldRun) {
+				lastFrame = performance.now();
+				requestFrame();
+			} else {
+				window.cancelAnimationFrame(frame);
+				frame = 0;
+			}
+		}
+
+		function handleResize() {
+			window.clearTimeout(resizeTimer);
+			resizeTimer = window.setTimeout(() => {
+				resize();
+				render(0);
+			}, 120);
+		}
+
+		function handleVisibility() {
+			updateRunning();
+			if (motionPreference.matches && !document.hidden) render(0);
+		}
+
+		function handleMotionChange() {
+			if (motionPreference.matches) {
+				window.cancelAnimationFrame(frame);
+				frame = 0;
+				running = false;
+				elapsed = 3.25;
+				render(0);
+			} else {
+				updateRunning();
+			}
+		}
+
+		function cleanup() {
+			running = false;
+			window.cancelAnimationFrame(frame);
+			window.clearTimeout(resizeTimer);
+			window.removeEventListener('resize', handleResize);
+			document.removeEventListener('visibilitychange', handleVisibility);
+			motionPreference.removeEventListener('change', handleMotionChange);
+			intersectionObserver.disconnect();
+			resizeObserver.disconnect();
+			active.delete(output);
+		}
+
+		const intersectionObserver = new IntersectionObserver((entries) => {
+			onscreen = entries[0] ? entries[0].isIntersecting : false;
+			updateRunning();
+		});
+		const resizeObserver = new ResizeObserver(handleResize);
+		window.addEventListener('resize', handleResize, { passive: true });
+		document.addEventListener('visibilitychange', handleVisibility);
+		motionPreference.addEventListener('change', handleMotionChange);
+		intersectionObserver.observe(output);
+		resizeObserver.observe(output);
+		active.set(output, cleanup);
+		resize();
+		if (motionPreference.matches) elapsed = 3.25;
+		render(0);
+	}
+
+	function initializeAll() {
+		document.querySelectorAll('[data-animate-output]').forEach(initialize);
+	}
+
+	function cleanupAll() {
+		active.forEach((cleanup) => cleanup());
+		active.clear();
+	}
+
+	document.addEventListener('astro:page-load', initializeAll);
+	document.addEventListener('astro:before-swap', cleanupAll);
+	initializeAll();
+</script>
 
 <style>
-	.hero-red-panel {
-		min-height: 100%;
-		background: #f04452;
+	.animate-stage {
+		position: relative;
+		min-width: 0;
+		min-height: 360px;
+		overflow: hidden;
+		background: #09070e;
+	}
+
+	.animate-output {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		overflow: hidden;
+		pointer-events: none;
+		user-select: none;
+		white-space: pre;
+		font-family: "Courier New", Courier, monospace;
+		font-size: var(--cell-font-size, 14px);
+		line-height: 1;
+		font-weight: 700;
+		letter-spacing: 0;
+		opacity: var(--effect-opacity, 0.35);
+		background: transparent;
+		color: var(--c0);
 	}
 
 	@media (max-width: 640px) {
-		.hero-red-panel {
-			min-height: 110px;
+		.animate-stage {
+			min-height: 180px;
 		}
 	}
+
+	.animate-probe {
+		position: fixed;
+		left: -10000px;
+		top: -10000px;
+		visibility: hidden;
+		display: inline-block;
+		white-space: pre;
+		font-family: "Courier New", Courier, monospace;
+		line-height: 1;
+		font-weight: 700;
+	}
+
+	:global(.animate-output .c0) { color: var(--c0); }
+	:global(.animate-output .c1) { color: var(--c1); }
+	:global(.animate-output .c2) { color: var(--c2); }
+	:global(.animate-output .c3) { color: var(--c3); }
+	:global(.animate-output .c4) { color: var(--c4); }
+	:global(.animate-output .c5) { color: var(--c5); }
+	:global(.animate-output .c6) { color: var(--c6); }
+	:global(.animate-output .c7) { color: var(--c7); }
 </style>

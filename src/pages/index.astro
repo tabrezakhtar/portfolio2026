@@ -58,7 +58,7 @@ const capabilities = ['Interface design', 'Frontend development', 'Design system
 			<section class="hero" id="home" aria-labelledby="hero-title">
 				<div class="terminal-window">
 					<div class="terminal-titlebar">
-						<div class="terminal-controls" aria-hidden="true"><span></span><span></span><span></span></div>
+						<span class="terminal-title-mark" aria-hidden="true">❯</span>
 						<span class="terminal-title">tabrez@localhost <span>~</span> zsh</span>
 						<span class="terminal-title-meta">112 × 38</span>
 					</div>
@@ -118,7 +118,7 @@ const capabilities = ['Interface design', 'Frontend development', 'Design system
 			<section class="work-section" id="work" aria-labelledby="work-title">
 				<div class="terminal-window terminal-project-window">
 				<div class="terminal-titlebar">
-					<div class="terminal-controls" aria-hidden="true"><span></span><span></span><span></span></div>
+					<span class="terminal-title-mark" aria-hidden="true">❯</span>
 					<span class="terminal-title">tabrez@localhost <span>~/projects</span> zsh</span>
 					<span class="terminal-title-meta">3 projects</span>
 				</div>
@@ -162,7 +162,7 @@ const capabilities = ['Interface design', 'Frontend development', 'Design system
 			<section class="about-section" id="about" aria-labelledby="about-title">
 				<div class="terminal-window content-window">
 					<div class="terminal-titlebar">
-						<div class="terminal-controls" aria-hidden="true"><span></span><span></span><span></span></div>
+						<span class="terminal-title-mark" aria-hidden="true">❯</span>
 						<span class="terminal-title">tabrez@localhost <span>~/about</span> zsh</span>
 						<span class="terminal-title-meta">about.md</span>
 					</div>
@@ -196,7 +196,7 @@ const capabilities = ['Interface design', 'Frontend development', 'Design system
 			<section class="contact-section" id="contact" aria-labelledby="contact-title">
 				<div class="terminal-window content-window">
 					<div class="terminal-titlebar">
-						<div class="terminal-controls" aria-hidden="true"><span></span><span></span><span></span></div>
+						<span class="terminal-title-mark" aria-hidden="true">❯</span>
 						<span class="terminal-title">tabrez@localhost <span>~/contact</span> zsh</span>
 						<span class="terminal-title-meta">hello.txt</span>
 					</div>
@@ -838,30 +838,18 @@ const capabilities = ['Interface design', 'Frontend development', 'Design system
 		min-height: 37px;
 		padding: 0 13px;
 		border-bottom: 1px solid #38294b;
-		background: #171326;
+		background: #121511;
 		display: grid;
-		grid-template-columns: 1fr auto 1fr;
+		grid-template-columns: auto 1fr auto;
 		align-items: center;
 	}
 
-	.terminal-controls {
-		display: flex;
-		gap: 6px;
-	}
-
-	.terminal-controls span {
-		width: 8px;
-		aspect-ratio: 1;
-		border-radius: 50%;
-		background: #ff5f57;
-	}
-
-	.terminal-controls span:nth-child(2) {
-		background: #febc2e;
-	}
-
-	.terminal-controls span:nth-child(3) {
-		background: #28c840;
+	.terminal-title-mark {
+		margin-right: 9px;
+		color: #b9ff66;
+		font-family: 'Space Mono', monospace;
+		font-size: 11px;
+		font-weight: 700;
 	}
 
 	.terminal-title,
@@ -875,6 +863,7 @@ const capabilities = ['Interface design', 'Frontend development', 'Design system
 	}
 
 	.terminal-title {
+		justify-self: start;
 		color: #e6d9f5;
 		font-size: 10px;
 	}

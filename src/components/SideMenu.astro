@@ -18,45 +18,58 @@ const roles = [
 ---
 
 <aside class="side-menu" aria-label="Profile and site navigation">
-	<div class="profile">
-		<a class="avatar-link" href="#home" aria-label="Tabrez Akhtar home">
-			<img
-				src="https://res.cloudinary.com/dx8d5hlk1/image/upload/f_auto/v1775227131/profile_vo7jkl.png"
-				alt="Tabrez Akhtar profile picture"
-			/>
-		</a>
-		<h2><a href="#home">Tabrez Akhtar</a></h2>
-		<div class="social-links" aria-label="Social links">
-			<a href="mailto:hello@melodyapps.co.uk" aria-label="Email Tabrez Akhtar" title="Email">
-				<i class="bx bx-envelope" aria-hidden="true"></i>
+	<header class="side-titlebar">
+		<span class="side-title-mark" aria-hidden="true">❯</span>
+		<span class="side-title">tabrez@localhost <span>~/profile</span> zsh</span>
+		<span class="side-title-meta">sidebar</span>
+	</header>
+	<div class="side-menu-content">
+		<div class="profile">
+			<a class="avatar-link" href="#home" aria-label="Tabrez Akhtar home">
+				<img
+					src="https://res.cloudinary.com/dx8d5hlk1/image/upload/f_auto/v1775227131/profile_vo7jkl.png"
+					alt="Tabrez Akhtar profile picture"
+				/>
 			</a>
-			<a href="https://www.linkedin.com/in/tabrezakhtar" aria-label="LinkedIn profile of Tabrez Akhtar" title="LinkedIn" target="_blank" rel="noopener noreferrer">
-				<i class="bx bxl-linkedin" aria-hidden="true"></i>
-			</a>
-			<a href="https://github.com/tabrezakhtar" aria-label="GitHub profile of Tabrez Akhtar" title="GitHub" target="_blank" rel="noopener noreferrer">
-				<i class="bx bxl-github" aria-hidden="true"></i>
-			</a>
-			<a href="https://www.credly.com/badges/0ed0f330-58be-4cbd-a341-4ee7150699f6/public_url" aria-label="AWS Certified Developer - Associate certification" title="AWS certification" target="_blank" rel="noopener noreferrer">
-				<i class="bx bxl-aws" aria-hidden="true"></i>
-			</a>
+			<h2><a href="#home">Tabrez Akhtar</a></h2>
+			<div class="social-links" aria-label="Social links">
+				<a href="mailto:hello@melodyapps.co.uk" aria-label="Email Tabrez Akhtar" title="Email">
+					<i class="bx bx-envelope" aria-hidden="true"></i>
+				</a>
+				<a href="https://www.linkedin.com/in/tabrezakhtar" aria-label="LinkedIn profile of Tabrez Akhtar" title="LinkedIn" target="_blank" rel="noopener noreferrer">
+					<i class="bx bxl-linkedin" aria-hidden="true"></i>
+				</a>
+				<a href="https://github.com/tabrezakhtar" aria-label="GitHub profile of Tabrez Akhtar" title="GitHub" target="_blank" rel="noopener noreferrer">
+					<i class="bx bxl-github" aria-hidden="true"></i>
+				</a>
+				<a href="https://www.credly.com/badges/0ed0f330-58be-4cbd-a341-4ee7150699f6/public_url" aria-label="AWS Certified Developer - Associate certification" title="AWS certification" target="_blank" rel="noopener noreferrer">
+					<i class="bx bxl-aws" aria-hidden="true"></i>
+				</a>
+			</div>
 		</div>
+
+		<details class="role-details">
+			<summary>Specialties</summary>
+			<ul>
+				{roles.map((role) => <li>{role}</li>)}
+			</ul>
+		</details>
+
+		<nav class="side-nav" aria-label="Main navigation">
+			<p class="side-prompt"><span>tabrez@localhost</span>:~$ ls ./navigation</p>
+			<a href="#home"><i class="bx bx-home" aria-hidden="true"></i><span>Home</span></a>
+			<a href="#about"><i class="bx bx-user" aria-hidden="true"></i><span>About</span></a>
+			<a href="#work"><i class="bx bx-edit" aria-hidden="true"></i><span>Blog</span></a>
+			<a href="#work"><i class="bx bx-book-content" aria-hidden="true"></i><span>Projects</span></a>
+			<a href="#capabilities"><i class="bx bx-server" aria-hidden="true"></i><span>Services</span></a>
+			<a href="#contact"><i class="bx bx-envelope" aria-hidden="true"></i><span>Contact</span></a>
+		</nav>
 	</div>
-
-	<details class="role-details">
-		<summary>Specialties</summary>
-		<ul>
-			{roles.map((role) => <li>{role}</li>)}
-		</ul>
-	</details>
-
-	<nav class="side-nav" aria-label="Main navigation">
-		<a href="#home"><i class="bx bx-home" aria-hidden="true"></i><span>Home</span></a>
-		<a href="#about"><i class="bx bx-user" aria-hidden="true"></i><span>About</span></a>
-		<a href="#work"><i class="bx bx-edit" aria-hidden="true"></i><span>Blog</span></a>
-		<a href="#work"><i class="bx bx-book-content" aria-hidden="true"></i><span>Projects</span></a>
-		<a href="#capabilities"><i class="bx bx-server" aria-hidden="true"></i><span>Services</span></a>
-		<a href="#contact"><i class="bx bx-envelope" aria-hidden="true"></i><span>Contact</span></a>
-	</nav>
+	<footer class="side-statusbar">
+		<span>[profile]</span>
+		<span>0:navigation*</span>
+		<span>UTF-8</span>
+	</footer>
 </aside>
 
 <style>
@@ -65,12 +78,76 @@ const roles = [
 		z-index: 5;
 		inset: 0 auto 0 0;
 		width: 250px;
-		padding: 34px 22px 24px;
-		overflow-y: auto;
-		border-right: 1px solid #392950;
+		border: 1px solid #59406f;
 		background: #100e1d;
-		box-shadow: 12px 0 36px #03020b40;
+		box-shadow: 0 0 0 1px #ff4fd80c, 12px 0 36px #03020b70, 0 0 32px #8c38ff12;
 		color: #f6f1ff;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.side-titlebar {
+		min-height: 37px;
+		padding: 0 11px;
+		border-bottom: 1px solid #38294b;
+		background: #121511;
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+	}
+
+	.side-title-mark {
+		margin-right: 8px;
+		color: #b9ff66;
+		font-family: 'Space Mono', monospace;
+		font-size: 11px;
+		font-weight: 700;
+	}
+
+	.side-title,
+	.side-title-meta,
+	.side-statusbar,
+	.side-prompt {
+		font-family: 'Space Mono', monospace;
+	}
+
+	.side-title {
+		color: #e6d9f5;
+		font-size: 9px;
+		white-space: nowrap;
+	}
+
+	.side-title > span {
+		color: #b99aff;
+	}
+
+	.side-title-meta {
+		color: #8d7eaa;
+		font-size: 8px;
+	}
+
+	.side-menu-content {
+		min-height: 0;
+		padding: 26px 18px 20px;
+		overflow-y: auto;
+		flex: 1;
+	}
+
+	.side-statusbar {
+		min-height: 27px;
+		padding: 0 9px;
+		border-top: 1px solid #453156;
+		background: #1a1529;
+		color: #a99dbf;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		font-size: 8px;
+	}
+
+	.side-statusbar span:first-child {
+		color: #b9ff66;
 	}
 
 	.profile {
@@ -134,7 +211,7 @@ const roles = [
 	}
 
 	.role-details {
-		margin-top: 26px;
+		margin-top: 24px;
 		padding: 12px 0;
 		border-top: 1px solid #392950;
 		border-bottom: 1px solid #392950;
@@ -160,6 +237,17 @@ const roles = [
 		margin-top: 22px;
 		display: grid;
 		gap: 5px;
+	}
+
+	.side-prompt {
+		margin: 0 0 9px;
+		color: #c1b6d2;
+		font-size: 9px;
+		white-space: nowrap;
+	}
+
+	.side-prompt span {
+		color: #40f4ff;
 	}
 
 	.side-nav a {
@@ -194,11 +282,12 @@ const roles = [
 			inset: auto;
 			width: 100%;
 			min-height: 0;
+			box-shadow: 0 8px 26px #03020b70;
+		}
+
+		.side-menu-content {
 			padding: 15px 5%;
 			overflow: visible;
-			border-right: 0;
-			border-bottom: 1px solid #392950;
-			box-shadow: none;
 			display: grid;
 			grid-template-columns: auto 1fr;
 			align-items: center;
@@ -270,10 +359,14 @@ const roles = [
 	}
 
 	@media (max-width: 560px) {
-		.side-menu {
+		.side-menu-content {
 			grid-template-columns: 1fr;
 			gap: 10px;
 			padding: 12px 22px;
+		}
+
+		.side-title-meta {
+			display: none;
 		}
 
 		.side-nav {

@@ -22,6 +22,7 @@ const roles = [
 		<span class="side-title-mark" aria-hidden="true">❯</span>
 		<span class="side-title">tabrez@localhost <span>~/profile</span> zsh</span>
 		<span class="side-title-meta">sidebar</span>
+		<span class="side-window-indicator" aria-hidden="true"></span>
 	</header>
 	<div class="side-menu-content">
 		<div class="profile">
@@ -92,7 +93,7 @@ const roles = [
 		border-bottom: 1px solid #38294b;
 		background: #121511;
 		display: grid;
-		grid-template-columns: auto 1fr auto;
+		grid-template-columns: auto 1fr auto auto;
 		align-items: center;
 	}
 
@@ -124,6 +125,14 @@ const roles = [
 	.side-title-meta {
 		color: #8d7eaa;
 		font-size: 8px;
+	}
+
+	.side-window-indicator {
+		width: 9px;
+		height: 9px;
+		margin-left: 9px;
+		background: #ff5b64;
+		box-shadow: 0 0 8px #ff5b6466;
 	}
 
 	.side-menu-content {

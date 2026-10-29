@@ -1,0 +1,281 @@
+---
+const roles = [
+	'JavaScript developer',
+	'JavaScript engineer',
+	'React developer',
+	'React engineer',
+	'Front-end developer',
+	'Front-end engineer',
+	'Frontend developer',
+	'Frontend engineer',
+	'Full-stack developer',
+	'Full-stack engineer',
+	'Fullstack engineer',
+	'Fullstack engineer',
+	'Node.js developer',
+	'Node.js engineer',
+];
+---
+
+<aside class="side-menu" aria-label="Profile and site navigation">
+	<div class="profile">
+		<a class="avatar-link" href="#home" aria-label="Tabrez Akhtar home">
+			<img
+				src="https://res.cloudinary.com/dx8d5hlk1/image/upload/f_auto/v1775227131/profile_vo7jkl.png"
+				alt="Tabrez Akhtar profile picture"
+			/>
+		</a>
+		<h2><a href="#home">Tabrez Akhtar</a></h2>
+		<div class="social-links" aria-label="Social links">
+			<a href="mailto:hello@melodyapps.co.uk" aria-label="Email Tabrez Akhtar" title="Email">
+				<i class="bx bx-envelope" aria-hidden="true"></i>
+			</a>
+			<a href="https://www.linkedin.com/in/tabrezakhtar" aria-label="LinkedIn profile of Tabrez Akhtar" title="LinkedIn" target="_blank" rel="noopener noreferrer">
+				<i class="bx bxl-linkedin" aria-hidden="true"></i>
+			</a>
+			<a href="https://github.com/tabrezakhtar" aria-label="GitHub profile of Tabrez Akhtar" title="GitHub" target="_blank" rel="noopener noreferrer">
+				<i class="bx bxl-github" aria-hidden="true"></i>
+			</a>
+			<a href="https://www.credly.com/badges/0ed0f330-58be-4cbd-a341-4ee7150699f6/public_url" aria-label="AWS Certified Developer - Associate certification" title="AWS certification" target="_blank" rel="noopener noreferrer">
+				<i class="bx bxl-aws" aria-hidden="true"></i>
+			</a>
+		</div>
+	</div>
+
+	<details class="role-details">
+		<summary>Specialties</summary>
+		<ul>
+			{roles.map((role) => <li>{role}</li>)}
+		</ul>
+	</details>
+
+	<nav class="side-nav" aria-label="Main navigation">
+		<a href="#home"><i class="bx bx-home" aria-hidden="true"></i><span>Home</span></a>
+		<a href="#about"><i class="bx bx-user" aria-hidden="true"></i><span>About</span></a>
+		<a href="#work"><i class="bx bx-edit" aria-hidden="true"></i><span>Blog</span></a>
+		<a href="#work"><i class="bx bx-book-content" aria-hidden="true"></i><span>Projects</span></a>
+		<a href="#capabilities"><i class="bx bx-server" aria-hidden="true"></i><span>Services</span></a>
+		<a href="#contact"><i class="bx bx-envelope" aria-hidden="true"></i><span>Contact</span></a>
+	</nav>
+</aside>
+
+<style>
+	.side-menu {
+		position: fixed;
+		z-index: 5;
+		inset: 0 auto 0 0;
+		width: 250px;
+		padding: 34px 22px 24px;
+		overflow-y: auto;
+		border-right: 1px solid #392950;
+		background: #100e1d;
+		box-shadow: 12px 0 36px #03020b40;
+		color: #f6f1ff;
+	}
+
+	.profile {
+		text-align: center;
+	}
+
+	.avatar-link {
+		width: 96px;
+		aspect-ratio: 1;
+		margin: 0 auto 16px;
+		padding: 4px;
+		border: 2px solid #008080;
+		border-radius: 50%;
+		display: block;
+	}
+
+	.avatar-link img {
+		width: 100%;
+		height: 100%;
+		border-radius: 50%;
+		object-fit: cover;
+	}
+
+	.profile h2 {
+		margin: 0 0 15px;
+		font-family: 'Space Grotesk', sans-serif;
+		font-size: 19px;
+		font-weight: 600;
+	}
+
+	.profile h2 a {
+		text-decoration: none;
+	}
+
+	.social-links {
+		display: flex;
+		justify-content: center;
+		gap: 9px;
+	}
+
+	.social-links a {
+		width: 36px;
+		aspect-ratio: 1;
+		border: 1px solid #453156;
+		background: #171326;
+		color: #40f4ff;
+		display: grid;
+		place-items: center;
+		font-size: 18px;
+		text-decoration: none;
+		transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+	}
+
+	.social-links a:hover {
+		border-color: #40f4ff;
+		background: #40f4ff;
+		color: #0b0b1c;
+	}
+
+	.role-details {
+		margin-top: 26px;
+		padding: 12px 0;
+		border-top: 1px solid #392950;
+		border-bottom: 1px solid #392950;
+		color: #a89bbd;
+		font-family: 'Space Mono', monospace;
+		font-size: 10px;
+	}
+
+	.role-details summary {
+		color: #b9ff66;
+		cursor: pointer;
+		list-style-position: inside;
+		text-transform: uppercase;
+	}
+
+	.role-details ul {
+		margin: 12px 0 0;
+		padding: 0 0 0 17px;
+		line-height: 1.9;
+	}
+
+	.side-nav {
+		margin-top: 22px;
+		display: grid;
+		gap: 5px;
+	}
+
+	.side-nav a {
+		min-height: 42px;
+		padding: 0 12px;
+		border-left: 2px solid transparent;
+		color: #c1b6d2;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		font-family: 'Space Mono', monospace;
+		font-size: 11px;
+		text-decoration: none;
+		transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+	}
+
+	.side-nav a:hover,
+	.side-nav a:focus-visible {
+		border-left-color: #ff4fd8;
+		background: #ff4fd80c;
+		color: #f6f1ff;
+	}
+
+	.side-nav i {
+		color: #40f4ff;
+		font-size: 18px;
+	}
+
+	@media (max-width: 900px) {
+		.side-menu {
+			position: relative;
+			inset: auto;
+			width: 100%;
+			min-height: 0;
+			padding: 15px 5%;
+			overflow: visible;
+			border-right: 0;
+			border-bottom: 1px solid #392950;
+			box-shadow: none;
+			display: grid;
+			grid-template-columns: auto 1fr;
+			align-items: center;
+			gap: 14px 22px;
+		}
+
+		.profile {
+			display: grid;
+			grid-template-columns: 48px auto;
+			align-items: center;
+			gap: 0 11px;
+			text-align: left;
+		}
+
+		.avatar-link {
+			width: 48px;
+			margin: 0;
+			grid-row: span 2;
+		}
+
+		.profile h2 {
+			margin: 0 0 4px;
+			font-size: 14px;
+		}
+
+		.social-links {
+			justify-content: flex-start;
+			gap: 7px;
+		}
+
+		.social-links a {
+			width: 27px;
+			font-size: 15px;
+		}
+
+		.role-details {
+			grid-column: 1 / -1;
+			margin: 0;
+			padding: 8px 0;
+		}
+
+		.role-details ul {
+			columns: 2;
+		}
+
+		.side-nav {
+			margin: 0;
+			display: flex;
+			justify-content: flex-end;
+			gap: 2px;
+			overflow-x: auto;
+		}
+
+		.side-nav a {
+			min-height: 38px;
+			padding: 0 8px;
+			border-left: 0;
+			border-bottom: 2px solid transparent;
+			gap: 6px;
+			white-space: nowrap;
+			font-size: 9px;
+		}
+
+		.side-nav a:hover,
+		.side-nav a:focus-visible {
+			border-bottom-color: #ff4fd8;
+			border-left-color: transparent;
+		}
+	}
+
+	@media (max-width: 560px) {
+		.side-menu {
+			grid-template-columns: 1fr;
+			gap: 10px;
+			padding: 12px 22px;
+		}
+
+		.side-nav {
+			justify-content: flex-start;
+			margin: 0 -8px;
+		}
+	}
+</style>

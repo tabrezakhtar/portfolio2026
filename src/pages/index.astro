@@ -52,7 +52,7 @@ const aboutProjects = [
 						<a class="tmux-tab" href="#work">1: projects</a>
 						<a class="tmux-tab" href="#about">2: about</a>
 						<span class="tmux-tabs-spacer"></span>
-						<span class="tmux-clock">UTF-8 · 16:42</span>
+						<time class="tmux-clock" aria-label="Local time">UTF-8 · --:--:--</time>
 					</div>
 					<div class="terminal-grid">
 						<div class="terminal-pane terminal-pane--intro">
@@ -223,6 +223,24 @@ const aboutProjects = [
 </Layout>
 
 <script>
+	const clock = document.querySelector<HTMLTimeElement>('.tmux-clock');
+	if (clock) {
+		const updateClock = () => {
+			const now = new Date();
+			const time = new Intl.DateTimeFormat(undefined, {
+				hour: '2-digit',
+				minute: '2-digit',
+				second: '2-digit',
+				hourCycle: 'h23',
+			}).format(now);
+			clock.dateTime = now.toISOString();
+			clock.textContent = `UTF-8 · ${time}`;
+		};
+
+		updateClock();
+		window.setInterval(updateClock, 1000);
+	}
+
 	const emailPlaceholder = document.getElementById('deferred-email');
 	if (emailPlaceholder) {
 		const user = emailPlaceholder.getAttribute('data-user') || '';

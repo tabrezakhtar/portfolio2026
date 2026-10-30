@@ -514,8 +514,9 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 		height: 100%;
 		margin: 0;
 		overflow: hidden;
-		pointer-events: none;
-		user-select: none;
+		pointer-events: auto;
+		user-select: text;
+		cursor: text;
 		white-space: pre;
 		font-family: "Courier New", Courier, monospace;
 		font-size: var(--cell-font-size, 14px);

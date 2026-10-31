@@ -79,13 +79,14 @@
         type FileNode =
             | { type: "file"; content: string }
             | { type: "directory"; children: Record<string, FileNode> };
+        type DirectoryNode = Extract<FileNode, { type: "directory" }>;
         type PagerState = {
             mode: "more" | "less";
             lines: string[];
             page: number;
             output: HTMLDivElement;
         };
-        const directory = (children: Record<string, FileNode>): FileNode => ({
+        const directory = (children: Record<string, FileNode>): DirectoryNode => ({
             type: "directory",
             children,
         });
@@ -97,7 +98,7 @@
             home: directory({
                 tabrez: directory({
                     "README.txt": textFile(
-                        "WELCOME TO PROJECT CROYDON\n==========================\n\nWelcome to the Extraterrestrial Investigation Terminal.\n\nYou have accessed a restricted research archive maintained by an independent group of investigators operating in South London.\n\nThe archive contains:\n- UFO sightings and crash retrieval reports.\n- Extraterrestrial species profiles.\n- Ancient astronaut theories.\n- Government secrecy and alleged cover-ups.\n- Secret military projects.\n- New World Order documentation.\n- Intercepted transmissions.\n\nSome documents are classified. Others are probably nonsense.\n\nStart with: ls /research/aliens",
+                        "WELCOME TO PROJECT CROYDON\n==========================\n\nWelcome to the Extraterrestrial Investigation Terminal.\n\nYou have accessed a restricted research archive maintained by an independent group of investigators operating in South London.\n\nThe archive contains:\n- UFO sightings and crash retrieval reports.\n- Extraterrestrial species profiles.\n- Ancient astronaut theories.\n- Government secrecy and alleged cover-ups.\n- Secret military projects.\n- New World Order documentation.\n- Intercepted transmissions.\n\nSome documents are classified. Others are probably nonsense.\n\nStart with: ls /research",
                     ),
                     "stack.txt": textFile(
                         "TypeScript\nReact\nAstro\nCSS\nNode.js\nMongoDB\n\nEXPERIMENTAL TECHNOLOGY:\nAlien reverse-engineering interface\nQuantum communication terminal\nZeta Reticulan translation module\n\nSystem status: Operational.\nCoffee status: Critical.",
@@ -449,6 +450,15 @@
                 }),
             }),
         });
+        if (filesystem.type === "directory") {
+            const researchFolder = filesystem.children.research;
+            if (researchFolder?.type === "directory") {
+                const alienArchive = researchFolder.children.aliens;
+                if (alienArchive?.type === "directory") {
+                    researchFolder.children = alienArchive.children;
+                }
+            }
+        }
         let workingDirectory: string[] = [];
         let pager: PagerState | null = null;
         const tokenize = (value: string) =>
@@ -608,7 +618,7 @@
         };
         const commands: Partial<Record<string, (args: string[]) => string>> = {
             help: () =>
-                "Portfolio info: identity, current time, tech stack, projects, about, contact, and party mode.\nAlien research archive: /research/aliens.\nFictional field notes; reported encounters are unverified.",
+                "Portfolio info: identity, current time, tech stack, projects, about, contact, and party mode.\nAlien research archive: /research.\nFictional field notes; reported encounters are unverified.",
             pwd: () => nodePath(workingDirectory),
             ls: (args) => {
                 const showAll =

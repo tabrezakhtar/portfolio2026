@@ -73,6 +73,38 @@ const roles = [
 	</footer>
 </aside>
 
+<script>
+	const sideNav = document.querySelector('.side-nav');
+	if (sideNav) {
+		const links = Array.from(sideNav.querySelectorAll('a[href^="#"]'));
+		let clickedHash = '';
+
+		const selectLink = (link) => {
+			links.forEach((item) => {
+				const selected = item === link;
+				item.classList.toggle('is-selected', selected);
+				if (selected) item.setAttribute('aria-current', 'page');
+				else item.removeAttribute('aria-current');
+			});
+		};
+
+		const syncToHash = () => {
+			if (window.location.hash === clickedHash) return;
+			selectLink(links.find((link) => link.hash === window.location.hash));
+		};
+
+		links.forEach((link) => {
+			link.addEventListener('click', () => {
+				clickedHash = link.hash;
+				selectLink(link);
+			});
+		});
+		window.addEventListener('hashchange', syncToHash);
+		window.addEventListener('popstate', syncToHash);
+		syncToHash();
+	}
+</script>
+
 <style>
 	.side-menu {
 		position: fixed;
@@ -274,10 +306,15 @@ const roles = [
 	}
 
 	.side-nav a:hover,
-	.side-nav a:focus-visible {
+	.side-nav a:focus-visible,
+	.side-nav a.is-selected {
 		border-left-color: #ff4fd8;
-		background: #ff4fd80c;
+		background: #ff4fd814;
 		color: #f6f1ff;
+	}
+
+	.side-nav a.is-selected i {
+		color: #ff4fd8;
 	}
 
 	.side-nav i {
@@ -362,7 +399,8 @@ const roles = [
 		}
 
 		.side-nav a:hover,
-		.side-nav a:focus-visible {
+		.side-nav a:focus-visible,
+		.side-nav a.is-selected {
 			border-bottom-color: #ff4fd8;
 			border-left-color: transparent;
 		}

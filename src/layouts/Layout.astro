@@ -31,3 +31,34 @@
 		height: 100%;
 	}
 </style>
+
+<style is:global>
+	:root {
+		scrollbar-color: #59406f #100e1d;
+		scrollbar-width: thin;
+	}
+
+	::-webkit-scrollbar {
+		width: 10px;
+		height: 10px;
+	}
+
+	::-webkit-scrollbar-track {
+		border: 1px solid #38294b;
+		background: #100e1d;
+	}
+
+	::-webkit-scrollbar-thumb {
+		border: 2px solid #100e1d;
+		background: #59406f;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background: #40f4ff;
+		box-shadow: 0 0 8px #40f4ff80;
+	}
+
+	::-webkit-scrollbar-corner {
+		background: #100e1d;
+	}
+</style>

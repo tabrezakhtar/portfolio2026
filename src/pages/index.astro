@@ -45,7 +45,7 @@ const aboutProjects = [
 					<div class="terminal-titlebar">
 						<span class="terminal-title-mark" aria-hidden="true">❯</span>
 						<span class="terminal-title">tabrez@localhost <span>~</span> zsh</span>
-						<span class="terminal-title-meta">112 × 38</span>
+						<span class="terminal-title-meta" data-terminal-dimensions>-- × --</span>
 					</div>
 					<div class="tmux-tabs" aria-label="Terminal windows">
 						<span class="tmux-session">dev-session</span>
@@ -227,6 +227,39 @@ const aboutProjects = [
 </Layout>
 
 <script>
+	const terminalDimensions = document.querySelector<HTMLElement>('[data-terminal-dimensions]');
+	const terminalGrid = document.querySelector<HTMLElement>('.terminal-grid');
+	if (terminalDimensions && terminalGrid) {
+		const probe = document.createElement('span');
+		probe.textContent = 'M';
+		Object.assign(probe.style, {
+			position: 'fixed',
+			left: '-10000px',
+			top: '-10000px',
+			visibility: 'hidden',
+			display: 'inline-block',
+			font: getComputedStyle(terminalDimensions).font,
+			lineHeight: 'normal',
+		});
+		document.body.appendChild(probe);
+		const cell = probe.getBoundingClientRect();
+		probe.remove();
+
+		const updateTerminalDimensions = () => {
+			const gridStyle = getComputedStyle(terminalGrid);
+			const contentWidth = terminalGrid.clientWidth - parseFloat(gridStyle.paddingLeft) - parseFloat(gridStyle.paddingRight);
+			const contentHeight = terminalGrid.clientHeight - parseFloat(gridStyle.paddingTop) - parseFloat(gridStyle.paddingBottom);
+			const columns = Math.max(1, Math.floor(contentWidth / Math.max(1, cell.width)));
+			const rows = Math.max(1, Math.floor(contentHeight / Math.max(1, cell.height)));
+			terminalDimensions.textContent = `${columns} × ${rows}`;
+			terminalDimensions.setAttribute('aria-label', `${columns} columns by ${rows} rows`);
+		};
+
+		updateTerminalDimensions();
+		const dimensionsObserver = new ResizeObserver(updateTerminalDimensions);
+		dimensionsObserver.observe(terminalGrid);
+	}
+
 	const clock = document.querySelector<HTMLTimeElement>('.tmux-clock');
 	if (clock) {
 		const updateClock = () => {

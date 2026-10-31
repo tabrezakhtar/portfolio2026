@@ -1,8 +1,7 @@
 <div class="interactive-terminal-pane terminal-pane terminal-pane--status">
   <div class="pane-title">
-    <span>pane 0.2</span>
-    <span class="status-pane-tools">
-      <span>~/status</span>
+    <span>
+      pane 0.2
       <button
         class="status-invader-trigger"
         type="button"
@@ -10,6 +9,7 @@
         aria-label="Play Space Invaders"
       ><span class="status-invader-icon" aria-hidden="true">👾</span> &lt;-- dont click me</button>
     </span>
+    <span>~/status</span>
   </div>
   <div class="status-output">
     <div
@@ -966,7 +966,7 @@ const filesystem = directory({
           timeStyle: "medium",
           hourCycle: "h23",
         }),
-      stack: () => "Next.js · Node.js/Express · TypeScript · JavaScript · React · MongoDB",
+      stack: () => "Node.js · Express · Next.js · TypeScript · JavaScript · React · MongoDB",
       invader: () => "",
       projects: () => {
         document.getElementById("work")?.scrollIntoView({ behavior: "smooth" });
@@ -1400,20 +1400,13 @@ const filesystem = directory({
     color: #40f4ff;
   }
 
-  .interactive-terminal-pane .status-pane-tools {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-  }
-
   .interactive-terminal-pane .status-invader-trigger {
     display: inline-flex;
     align-items: center;
     gap: 3px;
     padding: 0;
     border: 0;
-    margin-left: 9px;
+    margin-left: 20px;
     background: transparent;
     color: #b9ff66;
     cursor: pointer;

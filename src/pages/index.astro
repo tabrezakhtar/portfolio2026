@@ -79,7 +79,11 @@ const aboutProjects = [
 								<p><span class="status-branch">##</span> main <span class="status-clean">● working tree clean</span></p>
 								<p><span class="prompt-symbol">❯</span> cat stack.txt</p>
 								<p class="stack-list">TypeScript <span>·</span> React <span>·</span> Astro <span>·</span> CSS</p>
-								<p class="terminal-cursor">▌</p>
+								<div class="terminal-transcript" data-terminal-output aria-live="polite" aria-relevant="additions text"></div>
+								<form class="terminal-command" data-terminal-form>
+									<label for="terminal-input"><span class="prompt-symbol">❯</span> tabrez@localhost:~$</label>
+									<input id="terminal-input" name="command" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="try help" aria-label="Terminal command" />
+								</form>
 							</div>
 						</div>
 					</div>
@@ -258,6 +262,127 @@ const aboutProjects = [
 		updateTerminalDimensions();
 		const dimensionsObserver = new ResizeObserver(updateTerminalDimensions);
 		dimensionsObserver.observe(terminalGrid);
+	}
+
+	const terminalForm = document.querySelector<HTMLFormElement>('[data-terminal-form]');
+	const terminalInput = terminalForm?.querySelector<HTMLInputElement>('input');
+	const terminalOutput = document.querySelector<HTMLElement>('[data-terminal-output]');
+	const terminalWindow = terminalForm?.closest<HTMLElement>('.terminal-window');
+	if (terminalForm && terminalInput && terminalOutput && terminalWindow) {
+		const history: string[] = [];
+		let historyIndex = 0;
+		let draft = '';
+		let partyTimer = 0;
+		let partyBurst: HTMLDivElement | null = null;
+		const commands: Record<string, () => string> = {
+			help: () => 'Try: whoami, date, stack, projects, about, contact, party, clear',
+			whoami: () => 'Tabrez: full-stack engineer, interface tinkerer, professional human.',
+			date: () => new Date().toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'medium', hourCycle: 'h23' }),
+			stack: () => 'TypeScript · React · Astro · CSS',
+			projects: () => {
+				document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' });
+				return 'Opening selected work...';
+			},
+			about: () => {
+				document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+				return 'Opening about.md...';
+			},
+			contact: () => {
+				document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+				return 'Opening contact.txt...';
+			},
+			party: () => {
+				terminalWindow.classList.remove('is-party');
+				void terminalWindow.offsetWidth;
+				terminalWindow.classList.add('is-party');
+				window.clearTimeout(partyTimer);
+				partyBurst?.remove();
+				partyBurst = document.createElement('div');
+				partyBurst.className = 'terminal-party-burst';
+				partyBurst.setAttribute('aria-hidden', 'true');
+				const banner = document.createElement('pre');
+				banner.className = 'terminal-party-banner';
+				banner.textContent = '+----------------------+\n|  >>> PARTY MODE <<<  |\n+----------------------+';
+				partyBurst.append(banner);
+				const symbols = ['*', '+', 'x', '.', 'o', '/', '\\', '|', '-', '='];
+				const colors = ['#40f4ff', '#b9ff66', '#ff4fd8'];
+				for (let index = 0; index < 52; index += 1) {
+					const spark = document.createElement('span');
+					spark.className = 'terminal-party-spark';
+					spark.textContent = symbols[index % symbols.length];
+					const burstX = index < 26 ? 28 : 72;
+					const burstY = index < 26 ? 32 : 68;
+					spark.style.left = `${burstX + (Math.random() - 0.5) * 16}%`;
+					spark.style.top = `${burstY + (Math.random() - 0.5) * 16}%`;
+					spark.style.color = colors[index % colors.length];
+					spark.style.setProperty('--spark-x', `${Math.round((Math.random() - 0.5) * 230)}px`);
+					spark.style.setProperty('--spark-y', `${Math.round((Math.random() - 0.5) * 170)}px`);
+					spark.style.animationDuration = `${900 + Math.random() * 600}ms`;
+					spark.style.animationDelay = `${Math.random() * 160}ms`;
+					partyBurst.append(spark);
+				}
+				terminalWindow.append(partyBurst);
+				partyTimer = window.setTimeout(() => {
+					terminalWindow.classList.remove('is-party');
+					partyBurst?.remove();
+					partyBurst = null;
+				}, 1750);
+				return 'Neon protocol engaged. Nice moves.';
+			},
+			sudo: () => 'Permission denied: your taste is already dangerously powerful.',
+		};
+
+		const clearOutput = () => {
+			terminalOutput.replaceChildren();
+			terminalOutput.hidden = true;
+		};
+
+		terminalForm.addEventListener('submit', (event) => {
+			event.preventDefault();
+			const line = terminalInput.value.trim();
+			if (!line) return;
+
+			if (history.at(-1) !== line) history.push(line);
+			if (history.length > 30) history.shift();
+			historyIndex = history.length;
+			draft = '';
+
+			const [name] = line.split(/\s+/);
+			if (name.toLowerCase() === 'clear') {
+				clearOutput();
+				terminalInput.value = '';
+				return;
+			}
+
+			const response = commands[name.toLowerCase()]?.() ?? `Command not found: ${name}. Type "help" to see available commands.`;
+			terminalOutput.hidden = false;
+			const commandLine = document.createElement('p');
+			commandLine.className = 'terminal-entry-command';
+			commandLine.textContent = `tabrez@localhost:~$ ${line}`;
+			const responseLine = document.createElement('p');
+			responseLine.className = 'terminal-entry-response';
+			responseLine.textContent = response;
+			terminalOutput.append(commandLine, responseLine);
+			while (terminalOutput.childElementCount > 12) terminalOutput.firstElementChild?.remove();
+			terminalOutput.scrollTop = terminalOutput.scrollHeight;
+			terminalInput.value = '';
+		});
+
+		terminalInput.addEventListener('keydown', (event) => {
+			if (event.key === 'ArrowUp') {
+				event.preventDefault();
+				if (historyIndex === history.length) draft = terminalInput.value;
+				historyIndex = Math.max(0, historyIndex - 1);
+				terminalInput.value = history[historyIndex] ?? draft;
+			} else if (event.key === 'ArrowDown') {
+				event.preventDefault();
+				historyIndex = Math.min(history.length, historyIndex + 1);
+				terminalInput.value = historyIndex === history.length ? draft : history[historyIndex] ?? '';
+			} else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'l') {
+				event.preventDefault();
+				clearOutput();
+			}
+		});
 	}
 
 	const clock = document.querySelector<HTMLTimeElement>('.tmux-clock');
@@ -850,6 +975,7 @@ const aboutProjects = [
 	}
 
 	.terminal-window {
+		position: relative;
 		min-width: 0;
 		border: 1px solid #59406f;
 		background: #100e1d;
@@ -1034,6 +1160,75 @@ const aboutProjects = [
 		margin: 0;
 	}
 
+	.terminal-transcript,
+	.terminal-command {
+		grid-column: 1 / -1;
+	}
+
+	.terminal-transcript {
+		max-height: 96px;
+		padding: 7px 10px;
+		border-left: 1px solid #59406f;
+		background: #0c0b14;
+		display: grid;
+		gap: 4px;
+		overflow-y: auto;
+		font-size: 9px;
+		white-space: pre-wrap;
+	}
+
+	.terminal-transcript[hidden] {
+		display: none;
+	}
+
+	.terminal-entry-command,
+	.terminal-entry-response {
+		margin: 0;
+	}
+
+	.terminal-entry-command {
+		color: #8d7eaa;
+	}
+
+	.terminal-entry-response {
+		color: #40f4ff;
+	}
+
+	.terminal-command {
+		min-width: 0;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		color: #c1b6d2;
+		font-size: 9px;
+	}
+
+	.terminal-command label {
+		flex: 0 0 auto;
+	}
+
+	.terminal-command input {
+		min-width: 0;
+		flex: 1;
+		padding: 3px 0;
+		border: 0;
+		border-bottom: 1px solid transparent;
+		border-radius: 0;
+		outline: 0;
+		background: transparent;
+		color: #f6f1ff;
+		font: inherit;
+		caret-color: #b9ff66;
+	}
+
+	.terminal-command input::placeholder {
+		color: #716780;
+	}
+
+	.terminal-command input:focus-visible {
+		border-bottom-color: #b9ff66;
+	}
+
 	.prompt-symbol,
 	.status-branch {
 		color: #ff4fd8;
@@ -1048,9 +1243,79 @@ const aboutProjects = [
 		color: #40f4ff;
 	}
 
-	.terminal-cursor {
-		color: #ff4fd8;
-		animation: cursor-blink 1.15s steps(2, start) infinite;
+	.terminal-window.is-party {
+		animation: terminal-party 220ms steps(2, end) 5;
+	}
+
+	:global(.terminal-party-burst) {
+		position: absolute;
+		inset: 0;
+		z-index: 3;
+		overflow: hidden;
+		pointer-events: none;
+	}
+
+	:global(.terminal-party-spark) {
+		position: absolute;
+		z-index: 1;
+		font-family: 'Space Mono', monospace;
+		font-size: 14px;
+		font-weight: 700;
+		text-shadow: 0 0 9px currentColor;
+		animation: party-spark 1050ms cubic-bezier(0.15, 0.7, 0.3, 1) both;
+	}
+
+	:global(.terminal-party-banner) {
+		position: absolute;
+		z-index: 2;
+		top: 50%;
+		left: 50%;
+		margin: 0;
+		color: #b9ff66;
+		font-family: 'Space Mono', monospace;
+		font-size: 11px;
+		line-height: 1.5;
+		text-align: center;
+		text-shadow: 0 0 12px #b9ff66a0;
+		transform: translate(-50%, -50%);
+		animation: party-banner 1500ms ease-out both;
+	}
+
+	@keyframes terminal-party {
+		50% {
+			border-color: #b9ff66;
+			box-shadow: 0 0 0 1px #b9ff6640, 0 0 22px #40f4ff65;
+		}
+	}
+
+	@keyframes party-spark {
+		0% {
+			opacity: 0;
+			transform: translate(-50%, -50%) scale(0.25) rotate(0deg);
+		}
+		15% {
+			opacity: 1;
+		}
+		100% {
+			opacity: 0;
+			transform: translate(calc(-50% + var(--spark-x)), calc(-50% + var(--spark-y))) scale(1.35) rotate(180deg);
+		}
+	}
+
+	@keyframes party-banner {
+		0% {
+			opacity: 0;
+			transform: translate(-50%, -50%) scale(0.55);
+		}
+		15%,
+		68% {
+			opacity: 1;
+			transform: translate(-50%, -50%) scale(1);
+		}
+		100% {
+			opacity: 0;
+			transform: translate(-50%, -65%) scale(1.08);
+		}
 	}
 
 	.tmux-statusbar {
@@ -1251,12 +1516,6 @@ const aboutProjects = [
 	.footer-links a,
 	.footer-links span {
 		font-family: 'Space Mono', monospace;
-	}
-
-	@keyframes cursor-blink {
-		to {
-			visibility: hidden;
-		}
 	}
 
 	@keyframes rise-in {

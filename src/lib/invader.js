@@ -1,0 +1,124 @@
+const BOARD_WIDTH = 36;
+const BOARD_HEIGHT = 13;
+const PLAYER_Y = BOARD_HEIGHT - 2;
+
+export const createInvaderGame = (onExit) => {
+  const game = document.createElement("div");
+  game.className = "terminal-entry terminal-invader-game";
+  game.dataset.invaderGame = "";
+  game.tabIndex = 0;
+  game.setAttribute("role", "application");
+  game.setAttribute("aria-label", "ASCII Space Invaders game");
+
+  const board = document.createElement("pre");
+  board.className = "terminal-invader-board";
+  const instructions = document.createElement("p");
+  instructions.className = "terminal-invader-instructions";
+  instructions.textContent = "A/D or arrows move  |  Space fires  |  Q quits";
+  game.append(board, instructions);
+
+  const invaders = Array.from({ length: 24 }, (_, index) => ({
+    x: 3 + (index % 8) * 4,
+    y: 1 + Math.floor(index / 8),
+    alive: true,
+  }));
+  let playerX = Math.floor(BOARD_WIDTH / 2);
+  let bullet = null;
+  let direction = 1;
+  let ticks = 0;
+  let stopped = false;
+  let timer;
+
+  const render = () => {
+    const cells = Array.from({ length: BOARD_HEIGHT }, () =>
+      Array.from({ length: BOARD_WIDTH }, () => " "),
+    );
+    for (const invader of invaders) {
+      if (invader.alive) cells[invader.y][invader.x] = "W";
+    }
+    if (bullet) cells[bullet.y][bullet.x] = "|";
+    cells[PLAYER_Y][playerX] = "A";
+
+    const border = `+${"-".repeat(BOARD_WIDTH)}+`;
+    board.textContent = [
+      "SPACE INVADERS",
+      border,
+      ...cells.map((row) => `|${row.join("")}|`),
+      border,
+    ].join("\n");
+  };
+
+  const finish = (message) => {
+    if (stopped) return;
+    stopped = true;
+    window.clearInterval(timer);
+    instructions.textContent = `${message}  |  Q returns to the terminal`;
+    game.removeAttribute("data-invader-game");
+    game.tabIndex = -1;
+    onExit();
+  };
+
+  const tick = () => {
+    if (stopped) return;
+    ticks += 1;
+    if (bullet) {
+      bullet.y -= 1;
+      const hit = invaders.find(
+        (invader) => invader.alive && invader.x === bullet?.x && invader.y === bullet?.y,
+      );
+      if (hit) {
+        hit.alive = false;
+        bullet = null;
+      } else if (bullet.y < 0) {
+        bullet = null;
+      }
+    }
+
+    if (ticks % 4 === 0) {
+      const activeInvaders = invaders.filter((invader) => invader.alive);
+      const leftEdge = Math.min(...activeInvaders.map((invader) => invader.x));
+      const rightEdge = Math.max(...activeInvaders.map((invader) => invader.x));
+      if (leftEdge + direction < 1 || rightEdge + direction >= BOARD_WIDTH - 1) {
+        direction *= -1;
+        for (const invader of activeInvaders) invader.y += 1;
+      } else {
+        for (const invader of activeInvaders) invader.x += direction;
+      }
+      if (activeInvaders.some((invader) => invader.y >= PLAYER_Y)) {
+        render();
+        finish("GAME OVER");
+        return;
+      }
+    }
+
+    render();
+    if (invaders.every((invader) => !invader.alive)) finish("ALL CLEAR");
+  };
+
+  timer = window.setInterval(tick, 160);
+  game.addEventListener("keydown", (event) => {
+    if (stopped) return;
+    const key = event.key.toLowerCase();
+    if (key === "q" || key === "escape") {
+      event.preventDefault();
+      finish("GAME ENDED");
+    } else if (key === "arrowleft" || key === "a") {
+      event.preventDefault();
+      playerX = Math.max(1, playerX - 1);
+      render();
+    } else if (key === "arrowright" || key === "d") {
+      event.preventDefault();
+      playerX = Math.min(BOARD_WIDTH - 2, playerX + 1);
+      render();
+    } else if (key === " ") {
+      event.preventDefault();
+      if (!bullet) {
+        bullet = { x: playerX, y: PLAYER_Y - 1 };
+        render();
+      }
+    }
+  });
+
+  render();
+  return game;
+};

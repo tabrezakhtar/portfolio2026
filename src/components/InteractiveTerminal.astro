@@ -1,7 +1,15 @@
 <div class="interactive-terminal-pane terminal-pane terminal-pane--status">
   <div class="pane-title">
     <span>pane 0.2</span>
-    <span>~/status</span>
+    <span class="status-pane-tools">
+      <span>~/status</span>
+      <button
+        class="status-invader-trigger"
+        type="button"
+        data-invader-trigger
+        aria-label="Play Space Invaders"
+      ><span class="status-invader-icon" aria-hidden="true">👾</span> &lt;-- dont click me</button>
+    </span>
   </div>
   <div class="status-output">
     <div
@@ -23,6 +31,10 @@
       <p class="stack-list">
         TypeScript <span>·</span> React <span>·</span> Astro <span>·</span> CSS
       </p>
+      <p class="command-hint">
+        Commands: whoami · date · stack · projects · about · contact · party · invader
+      </p>
+      <p class="command-hint">Type help for archive commands. Press Tab to complete.</p>
     </div>
     <form class="terminal-command" data-terminal-form>
       <p class="terminal-prompt-line">
@@ -45,6 +57,8 @@
 </div>
 
 <script>
+  import { createInvaderGame } from "../lib/invader.js";
+
   const terminalForm = document.querySelector<HTMLFormElement>(
     "[data-terminal-form]",
   );
@@ -56,6 +70,9 @@
   );
   const terminalScreen = terminalForm?.closest<HTMLElement>(".status-output");
   const terminalWindow = terminalForm?.closest<HTMLElement>(".terminal-window");
+  const invaderTrigger = document.querySelector<HTMLButtonElement>(
+    "[data-invader-trigger]",
+  );
   if (
     terminalForm &&
     terminalInput &&
@@ -73,6 +90,11 @@
     terminalScreen.addEventListener("click", () =>
       terminalInput.focus({ preventScroll: true }),
     );
+    invaderTrigger?.addEventListener("click", () => {
+      terminalInput.value = "invader";
+      renderTypedText();
+      terminalForm.requestSubmit();
+    });
     const history: string[] = [];
     let historyIndex = 0;
     let draft = "";
@@ -736,7 +758,7 @@ const filesystem = directory({
     };
     const commands: Partial<Record<string, (args: string[]) => string>> = {
       help: () =>
-        "Portfolio info: identity, current time, tech stack, projects, about, contact, and party mode.\nAlien research archive: /research.\nType a command or path and press Tab to complete it.\nFictional field notes; reported encounters are unverified.",
+        "Commands: whoami, date, stack, projects, about, contact, party, invader.\nArchive: ls, cd, pwd, cat, more, less, head, tail, find, grep, tree, stat, wc, history, man.\nType man COMMAND for details. Press Tab for command and path completion.\nAlien research archive: /research. Fictional field notes; reported encounters are unverified.",
       pwd: () => nodePath(workingDirectory),
       ls: (args) => {
         const showAll =
@@ -929,6 +951,7 @@ const filesystem = directory({
           tree: "show a directory tree",
           stat: "show file or directory details",
           wc: "count lines, words, and bytes",
+          invader: "play a small ASCII Space Invaders game",
         };
         return name && descriptions[name]
           ? `${name} - ${descriptions[name]}\n\nThis command operates on the simulated field archive.`
@@ -944,6 +967,7 @@ const filesystem = directory({
           hourCycle: "h23",
         }),
       stack: () => "Next.js · Node.js/Express · TypeScript · JavaScript · React · MongoDB",
+      invader: () => "",
       projects: () => {
         document.getElementById("work")?.scrollIntoView({ behavior: "smooth" });
         return "Opening selected work...";
@@ -1246,6 +1270,20 @@ const filesystem = directory({
       appendTerminalEntry(entry);
       terminalInput.value = "";
       renderTypedText();
+      if (commandName === "invader") {
+        terminalScreen.classList.add("is-invader-active");
+        terminalForm.hidden = true;
+        if (invaderTrigger) invaderTrigger.disabled = true;
+        const game = createInvaderGame(() => {
+          terminalScreen.classList.remove("is-invader-active");
+          terminalForm.hidden = false;
+          terminalInput.focus({ preventScroll: true });
+          if (invaderTrigger) invaderTrigger.disabled = false;
+        });
+        appendTerminalEntry(game);
+        game.focus({ preventScroll: true });
+        return;
+      }
     });
 
     document.addEventListener(
@@ -1289,6 +1327,7 @@ const filesystem = directory({
         if (
           activeElement instanceof HTMLElement &&
           (activeElement.isContentEditable ||
+            activeElement.closest("[data-invader-game]") ||
             activeElement.matches('input, textarea, select, [role="textbox"]'))
         )
           return;
@@ -1357,8 +1396,43 @@ const filesystem = directory({
       monospace;
   }
 
-  .interactive-terminal-pane .pane-title span:first-child {
+  .interactive-terminal-pane .pane-title > span:first-child {
     color: #40f4ff;
+  }
+
+  .interactive-terminal-pane .status-pane-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  .interactive-terminal-pane .status-invader-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 0;
+    border: 0;
+    margin-left: 9px;
+    background: transparent;
+    color: #b9ff66;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .interactive-terminal-pane .status-invader-trigger:hover {
+    color: #40f4ff;
+  }
+
+  .interactive-terminal-pane .status-invader-trigger:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  .interactive-terminal-pane .status-invader-icon {
+    margin-left: 3px;
+    font-size: 10px;
+    vertical-align: -1px;
   }
 
   .interactive-terminal-pane .status-output {
@@ -1377,6 +1451,12 @@ const filesystem = directory({
       monospace;
   }
 
+  .interactive-terminal-pane .status-output.is-invader-active {
+    height: 207px;
+    min-height: 207px;
+    max-height: 207px;
+  }
+
   .interactive-terminal-pane .status-output p {
     margin: 0;
   }
@@ -1387,6 +1467,10 @@ const filesystem = directory({
     gap: 4px;
     font-size: 9px;
     white-space: pre-wrap;
+  }
+
+  .interactive-terminal-pane .command-hint {
+    color: #b9ff66;
   }
 
   .interactive-terminal-pane .terminal-entry {
@@ -1418,6 +1502,23 @@ const filesystem = directory({
 
   .interactive-terminal-pane .terminal-pager-status {
     color: #b9ff66;
+  }
+
+  .interactive-terminal-pane .terminal-invader-game {
+    gap: 6px;
+    outline: none;
+  }
+
+  .interactive-terminal-pane .terminal-invader-board {
+    overflow-x: auto;
+    margin: 0;
+    color: #b9ff66;
+    font: 9px/1.2 "Space Mono", monospace;
+    white-space: pre;
+  }
+
+  .interactive-terminal-pane .terminal-invader-instructions {
+    color: #40f4ff;
   }
 
   .interactive-terminal-pane .terminal-command {

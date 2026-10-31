@@ -1,404 +1,1343 @@
 <div class="interactive-terminal-pane terminal-pane terminal-pane--status">
-	<div class="pane-title"><span>pane 0.2</span><span>~/status</span></div>
-	<div class="status-output">
-		<div class="terminal-transcript" data-terminal-output aria-live="polite" aria-relevant="additions text">
-			<p><span class="prompt-symbol">❯</span> git status --short --branch</p>
-			<p><span class="status-branch">##</span> main <span class="status-clean">● working tree clean</span></p>
-			<p><span class="prompt-symbol">❯</span> cat stack.txt</p>
-			<p class="stack-list">TypeScript <span>·</span> React <span>·</span> Astro <span>·</span> CSS</p>
-		</div>
-		<form class="terminal-command" data-terminal-form>
-			<p class="terminal-prompt-line"><span class="prompt-symbol">❯</span> tabrez@localhost:~$ <span data-typed-text></span><span class="terminal-cursor" aria-hidden="true"></span></p>
-			<input id="terminal-input" class="terminal-sr-input" name="command" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal command" />
-		</form>
-	</div>
+    <div class="pane-title"><span>pane 0.2</span><span>~/status</span></div>
+    <div class="status-output">
+        <div
+            class="terminal-transcript"
+            data-terminal-output
+            aria-live="polite"
+            aria-relevant="additions text"
+        >
+            <p>
+                <span class="prompt-symbol">❯</span> git status --short --branch
+            </p>
+            <p>
+                <span class="status-branch">##</span> main <span
+                    class="status-clean">● working tree clean</span
+                >
+            </p>
+            <p><span class="prompt-symbol">❯</span> cat stack.txt</p>
+            <p class="stack-list">
+                TypeScript <span>·</span> React <span>·</span> Astro <span
+                    >·</span
+                > CSS
+            </p>
+        </div>
+        <form class="terminal-command" data-terminal-form>
+            <p class="terminal-prompt-line">
+                <span class="prompt-symbol">❯</span> tabrez@localhost:<span
+                    data-terminal-path>/</span
+                >$ <span data-typed-text></span><span
+                    class="terminal-cursor"
+                    aria-hidden="true"></span>
+            </p>
+            <input
+                id="terminal-input"
+                class="terminal-sr-input"
+                name="command"
+                type="text"
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                aria-label="Terminal command"
+            />
+        </form>
+    </div>
 </div>
 
 <script>
-	const terminalForm = document.querySelector<HTMLFormElement>('[data-terminal-form]');
-	const terminalInput = terminalForm?.querySelector<HTMLInputElement>('input');
-	const terminalTypedText = terminalForm?.querySelector<HTMLElement>('[data-typed-text]');
-	const terminalOutput = document.querySelector<HTMLElement>('[data-terminal-output]');
-	const terminalScreen = terminalForm?.closest<HTMLElement>('.status-output');
-	const terminalWindow = terminalForm?.closest<HTMLElement>('.terminal-window');
-	if (terminalForm && terminalInput && terminalTypedText && terminalOutput && terminalScreen && terminalWindow) {
-		const renderTypedText = () => {
-			terminalTypedText.textContent = terminalInput.value;
-		};
-		terminalInput.addEventListener('input', renderTypedText);
-		terminalScreen.addEventListener('click', () => terminalInput.focus());
-		const history: string[] = [];
-		let historyIndex = 0;
-		let draft = '';
-		let partyTimer = 0;
-		let partyBurst: HTMLDivElement | null = null;
-		const commands: Partial<Record<string, () => string>> = {
-			help: () => 'Try: whoami, date, stack, projects, about, contact, party, clear',
-			whoami: () => 'Tabrez: full-stack engineer, interface tinkerer, professional human.',
-			date: () => new Date().toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'medium', hourCycle: 'h23' }),
-			stack: () => 'TypeScript · React · Astro · CSS',
-			projects: () => {
-				document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' });
-				return 'Opening selected work...';
-			},
-			about: () => {
-				document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
-				return 'Opening about.md...';
-			},
-			contact: () => {
-				document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-				return 'Opening contact.txt...';
-			},
-			party: () => {
-				terminalWindow.classList.remove('is-party');
-				void terminalWindow.offsetWidth;
-				terminalWindow.classList.add('is-party');
-				window.clearTimeout(partyTimer);
-				partyBurst?.remove();
-				partyBurst = document.createElement('div');
-				partyBurst.className = 'terminal-party-burst';
-				partyBurst.setAttribute('aria-hidden', 'true');
-				const banner = document.createElement('pre');
-				banner.className = 'terminal-party-banner';
-				banner.textContent = '+----------------------+\n|  >>> PARTY MODE <<<  |\n+----------------------+';
-				partyBurst.append(banner);
-				const symbols = ['*', '+', 'x', '.', 'o', '/', '\\', '|', '-', '='];
-				const colors = ['#40f4ff', '#b9ff66', '#ff4fd8'];
-				for (let index = 0; index < 52; index += 1) {
-					const spark = document.createElement('span');
-					spark.className = 'terminal-party-spark';
-					spark.textContent = symbols[index % symbols.length];
-					const burstX = index < 26 ? 28 : 72;
-					const burstY = index < 26 ? 32 : 68;
-					spark.style.left = `${burstX + (Math.random() - 0.5) * 16}%`;
-					spark.style.top = `${burstY + (Math.random() - 0.5) * 16}%`;
-					spark.style.color = colors[index % colors.length];
-					spark.style.setProperty('--spark-x', `${Math.round((Math.random() - 0.5) * 230)}px`);
-					spark.style.setProperty('--spark-y', `${Math.round((Math.random() - 0.5) * 170)}px`);
-					spark.style.animationDuration = `${900 + Math.random() * 600}ms`;
-					spark.style.animationDelay = `${Math.random() * 160}ms`;
-					partyBurst.append(spark);
-				}
-				terminalWindow.append(partyBurst);
-				partyTimer = window.setTimeout(() => {
-					terminalWindow.classList.remove('is-party');
-					partyBurst?.remove();
-					partyBurst = null;
-				}, 1750);
-				return 'Neon protocol engaged. Nice moves.';
-			},
-			sudo: () => 'Permission denied: your taste is already dangerously powerful.',
-		};
+    const terminalForm = document.querySelector<HTMLFormElement>(
+        "[data-terminal-form]",
+    );
+    const terminalInput =
+        terminalForm?.querySelector<HTMLInputElement>("input");
+    const terminalTypedText =
+        terminalForm?.querySelector<HTMLElement>("[data-typed-text]");
+    const terminalOutput = document.querySelector<HTMLElement>(
+        "[data-terminal-output]",
+    );
+    const terminalScreen = terminalForm?.closest<HTMLElement>(".status-output");
+    const terminalWindow =
+        terminalForm?.closest<HTMLElement>(".terminal-window");
+    if (
+        terminalForm &&
+        terminalInput &&
+        terminalTypedText &&
+        terminalOutput &&
+        terminalScreen &&
+        terminalWindow
+    ) {
+        const renderTypedText = () => {
+            terminalTypedText.textContent = terminalInput.value;
+        };
+        terminalInput.addEventListener("input", renderTypedText);
+        terminalScreen.addEventListener("click", () => terminalInput.focus());
+        const history: string[] = [];
+        let historyIndex = 0;
+        let draft = "";
+        let partyTimer = 0;
+        let partyBurst: HTMLDivElement | null = null;
+        type FileNode =
+            | { type: "file"; content: string }
+            | { type: "directory"; children: Record<string, FileNode> };
+        type PagerState = {
+            mode: "more" | "less";
+            lines: string[];
+            page: number;
+            output: HTMLDivElement;
+        };
+        const directory = (children: Record<string, FileNode>): FileNode => ({
+            type: "directory",
+            children,
+        });
+        const textFile = (content: string): FileNode => ({
+            type: "file",
+            content,
+        });
+        const filesystem = directory({
+            home: directory({
+                tabrez: directory({
+                    "README.txt": textFile(
+                        "WELCOME TO PROJECT CROYDON\n==========================\n\nWelcome to the Extraterrestrial Investigation Terminal.\n\nYou have accessed a restricted research archive maintained by an independent group of investigators operating in South London.\n\nThe archive contains:\n- UFO sightings and crash retrieval reports.\n- Extraterrestrial species profiles.\n- Ancient astronaut theories.\n- Government secrecy and alleged cover-ups.\n- Secret military projects.\n- New World Order documentation.\n- Intercepted transmissions.\n\nSome documents are classified. Others are probably nonsense.\n\nStart with: ls /research/aliens",
+                    ),
+                    "stack.txt": textFile(
+                        "TypeScript\nReact\nAstro\nCSS\nNode.js\nMongoDB\n\nEXPERIMENTAL TECHNOLOGY:\nAlien reverse-engineering interface\nQuantum communication terminal\nZeta Reticulan translation module\n\nSystem status: Operational.\nCoffee status: Critical.",
+                    ),
+                    "classified.txt": textFile(
+                        "TOP SECRET // LEVEL 7 CLEARANCE\n\nPROJECT: CROYDON WATCH\n\nObjective: Investigate suspected extraterrestrial activity in the London Borough of Croydon.\n\nIntelligence suggests that several non-human intelligence groups may be operating within the area.\n\nKnown locations of interest:\n- East Croydon railway station.\n- Former Whitgift shopping centre.\n- Purley Way retail district.\n- Addington Hills.\n- Croydon Airport.\n\nA suspected reptilian operative has been observed entering a local council building.\n\nFurther investigation required.\n\nNOTE: Do not trust anyone who says they are from the council.",
+                    ),
+                }),
+            }),
+            research: directory({
+                aliens: directory({
+                    "README.md": textFile(
+                        'THE EXTRATERRESTRIAL CONSPIRACY ARCHIVE\n=======================================\n\nWELCOME, INVESTIGATOR.\n\nThis archive contains information about alleged extraterrestrial visitors, unidentified aerial phenomena, ancient astronauts, secret government programmes and theories concerning the true origins of humanity.\n\nThe archive draws upon UFO literature, alleged whistleblower testimony, conspiracy culture, historical accounts and popular discussions including The Joe Rogan Experience.\n\nMAJOR AREAS OF INVESTIGATION:\n\n1. Extraterrestrial species and non-human intelligence.\n2. Ancient astronauts and the Anunnaki.\n3. UFO crash retrieval programmes.\n4. Area 51 and reverse-engineered technology.\n5. Underground military installations.\n6. Reptilian infiltration theories.\n7. Secret government organisations.\n8. The New World Order.\n9. Interdimensional entities.\n10. Ancient civilisations and unexplained archaeological structures.\n\nIMPORTANT:\nThese files document claims and theories. Their inclusion does not establish that the events or entities described are real.\n\nSUGGESTED COMMANDS:\n\nls species/\nls incidents/\nls projects/\nls locations/\nfind . -name "*.log"\ngrep -in reptilian species/*.txt\ncat classified/mj12-files.txt\nless projects/area-51.txt\n\nIf you discover something unusual, report it immediately.\n\nIf you discover something particularly unusual, do not post it on Reddit.',
+                    ),
 
-		const clearOutput = () => {
-			terminalOutput.replaceChildren();
-			terminalScreen.scrollTop = 0;
-		};
+                    species: directory({
+                        "greys.txt": textFile(
+                            "GREYS / ZETA RETICULANS\n======================\n\nClassification: Extraterrestrial humanoid.\nOrigin: Allegedly Zeta Reticuli.\nThreat assessment: Unknown.\n\nPHYSICAL DESCRIPTION:\n\n- Height: Usually 3 to 5 feet.\n- Grey or pale skin.\n- Oversized cranium.\n- Large black almond-shaped eyes.\n- Small nose and mouth.\n- Thin limbs and unusually long fingers.\n\nREPORTED CHARACTERISTICS:\n\nGreys are among the most frequently reported entities in UFO abduction accounts.\n\nWitnesses describe medical examinations, missing time, telepathic communication and the implantation of unidentified objects.\n\nSome theories suggest that Greys are biological workers controlled by a higher intelligence.\n\nOthers suggest they are genetically engineered biological robots.\n\nRELATED INCIDENTS:\n\n- Betty and Barney Hill, 1961.\n- Travis Walton, 1975.\n- Numerous alleged abduction cases.\n\nCROYDON OBSERVATION:\n\nA small grey figure was reportedly seen entering a branch of Greggs at 07:45.\nIt purchased a sausage roll and left without making eye contact.\n\nStatus: Unconfirmed.",
+                        ),
 
-		const appendTerminalEntry = (entry: HTMLDivElement) => {
-			terminalOutput.append(entry);
-			while (terminalOutput.querySelectorAll('.terminal-entry').length > 50) {
-				terminalOutput.querySelector('.terminal-entry')?.remove();
-			}
-			terminalScreen.scrollTop = terminalScreen.scrollHeight;
-		};
+                        "tall-greys.txt": textFile(
+                            "TALL GREYS\n==========\n\nClassification: Grey humanoid subtype.\nHeight: 6 to 8 feet.\nAppearance: Similar to conventional Greys but significantly taller.\n\nSome accounts describe Tall Greys as supervisors or commanders responsible for overseeing smaller Grey entities.\n\nALLEGED CHARACTERISTICS:\n\n- Greater physical stature.\n- More developed communication abilities.\n- Apparent authority over smaller Greys.\n- Telepathic communication.\n- Participation in alleged abduction operations.\n\nSome modern UAP accounts distinguish between multiple Grey body types.\n\nQUESTION:\nAre Tall Greys a separate species, a different caste or simply the management team?\n\nNo confirmed answer.",
+                        ),
 
-		terminalForm.addEventListener('submit', (event) => {
-			event.preventDefault();
-			const line = terminalInput.value.trim();
-			if (!line) {
-				terminalInput.value = '';
-				renderTypedText();
-				const entry = document.createElement('div');
-				entry.className = 'terminal-entry terminal-entry-empty';
-				const blankLine = document.createElement('p');
-				blankLine.className = 'terminal-empty-line';
-				entry.append(blankLine);
-				appendTerminalEntry(entry);
-				return;
-			}
+                        "reptilians.txt": textFile(
+                            "REPTILIANS / LIZARD PEOPLE\n==========================\n\nClassification: Alleged humanoid reptilian species.\nAssociated names: Draconians, Reptoids, Saurians.\nThreat assessment: HIGH (according to conspiracy literature).\n\nPHYSICAL DESCRIPTION:\n\n- Humanoid body structure.\n- Scaly skin.\n- Reptilian facial features.\n- Vertical pupils.\n- Clawed hands.\n- Some alleged specimens exceed seven feet in height.\n\nALLEGED CAPABILITIES:\n\n- Shapeshifting into human appearance.\n- Telepathic communication.\n- Advanced technology.\n- Manipulation of human institutions.\n\nTHEORY:\n\nPopularised in modern conspiracy culture by David Icke, the theory claims that reptilian entities have infiltrated positions of power and influence.\n\nSome versions claim they control royal families, governments, banking institutions and international organisations.\n\nOther accounts describe physically imposing reptilian warriors rather than human-looking infiltrators.\n\nRELATED TOPICS:\n\n- Draco constellation.\n- Bloodline theories.\n- Ancient serpent gods.\n- Secret societies.\n- Underground bases.\n\nCROYDON INTELLIGENCE:\n\nTwo suspicious individuals have been seen entering the council offices.\nBoth were wearing unusually expensive suits.\n\nInvestigation ongoing.",
+                        ),
 
-			if (history.at(-1) !== line) history.push(line);
-			if (history.length > 30) history.shift();
-			historyIndex = history.length;
-			draft = '';
+                        "draconians.txt": textFile(
+                            "DRACONIANS / DRACO EMPIRE\n=========================\n\nClassification: Alleged reptilian extraterrestrial faction.\nOrigin: Draco constellation.\n\nDraconians are frequently described in conspiracy and contactee literature as an aggressive and highly hierarchical civilisation.\n\nALLEGED CHARACTERISTICS:\n\n- Reptilian or dragon-like appearance.\n- Large physical stature.\n- Military hierarchy.\n- Advanced spacecraft.\n- Strong interest in controlling other species.\n\nSome theories describe a Draco Empire that maintains influence over other extraterrestrial groups.\n\nOther accounts distinguish between different reptilian subspecies and castes.\n\nRELATED FACTIONS:\n\n- Reptilian humanoids.\n- Draco warriors.\n- Royal Draco bloodlines.\n- Grey biological workers.\n\nStatus: Alleged extraterrestrial mythology.",
+                        ),
 
-			const [name] = line.split(/\s+/);
-			if (name.toLowerCase() === 'clear') {
-				clearOutput();
-				terminalInput.value = '';
-				renderTypedText();
-				return;
-			}
+                        "nordics.txt": textFile(
+                            "NORDICS / TALL WHITES\n=====================\n\nClassification: Human-like extraterrestrial.\nOrigin: Various accounts associate them with the Pleiades.\n\nPHYSICAL DESCRIPTION:\n\n- Tall, usually 6 to 8 feet.\n- Blonde or white hair.\n- Pale skin.\n- Blue eyes.\n- Human-like facial features.\n\nNordics are frequently described as highly advanced and apparently indistinguishable from humans at a distance.\n\nSome accounts portray them as benevolent visitors interested in humanity spiritual development.\n\nOther accounts describe them as participants in secret agreements with military organisations.\n\nRELATED TOPICS:\n\n- Charles Hall and the Tall Whites.\n- Pleiadian contactee literature.\n- Alleged military agreements.\n- Human-alien hybrid theories.\n\nNOTE:\nDo not confuse Nordics with people from Croydon wearing North Face jackets.",
+                        ),
 
-			const command = commands[name.toLowerCase()];
-			const response = command?.() ?? `zsh: command not found: ${name}`;
-			const entry = document.createElement('div');
-			entry.className = 'terminal-entry';
-			const commandLine = document.createElement('p');
-			commandLine.className = 'terminal-entry-command';
-			commandLine.textContent = `tabrez@localhost:~$ ${line}`;
-			const responseLine = document.createElement('p');
-			responseLine.className = command ? 'terminal-entry-response' : 'terminal-entry-error';
-			responseLine.textContent = response;
-			entry.append(commandLine, responseLine);
-			appendTerminalEntry(entry);
-			terminalInput.value = '';
-			renderTypedText();
-		});
+                        "mantids.txt": textFile(
+                            "MANTIS BEINGS / INSECTOIDS\n==========================\n\nClassification: Insectoid humanoid.\nPhysical resemblance: Praying mantis.\n\nDESCRIPTION:\n\n- Tall, thin body.\n- Elongated limbs.\n- Triangular insect-like head.\n- Large compound-looking eyes.\n- Long articulated fingers.\n\nREPORTED BEHAVIOUR:\n\nSome abduction accounts describe Mantis beings observing or supervising medical procedures involving human subjects.\n\nCertain accounts suggest they occupy a senior position within an alleged extraterrestrial hierarchy.\n\nSome researchers speculate that they communicate through telepathy rather than speech.\n\nRELATED SPECIES:\n\n- Greys.\n- Tall Greys.\n- Other insectoid entities.\n\nOPEN QUESTION:\nAre the Mantids independent entities or biological constructs used by another intelligence?\n\nStatus: Unverified.",
+                        ),
 
-		document.addEventListener('keydown', (event) => {
-			if (document.activeElement === terminalInput || event.isComposing || event.ctrlKey || event.metaKey || event.altKey || event.key.length !== 1) return;
-			const activeElement = document.activeElement;
-			if (activeElement instanceof HTMLElement && (activeElement.isContentEditable || activeElement.matches('input, textarea, select, [role="textbox"]'))) return;
+                        "arcturians.txt": textFile(
+                            "ARCTURIANS\n==========\n\nAlleged origin: Arcturus star system.\nClassification: Humanoid extraterrestrial.\n\nOften described in New Age and contactee literature as highly advanced spiritual beings.\n\nREPORTED FEATURES:\n\n- Blue or blue-white skin in some descriptions.\n- Slender humanoid bodies.\n- Advanced consciousness.\n- Telepathic communication.\n- Advanced healing technology.\n\nSome accounts describe Arcturians as members of a benevolent interstellar alliance.\n\nThey are frequently associated with spiritual evolution and protection of humanity.\n\nStatus: Contactee and channelled literature.",
+                        ),
 
-			event.preventDefault();
-			terminalInput.focus();
-			terminalInput.value += event.key;
-			terminalInput.setSelectionRange(terminalInput.value.length, terminalInput.value.length);
-			renderTypedText();
-		}, true);
+                        "pleiadians.txt": textFile(
+                            "PLEIADIANS\n==========\n\nAlleged origin: Pleiades star cluster.\nClassification: Humanoid extraterrestrial.\n\nPleiadians are frequently described as tall, attractive human-like beings.\n\nALLEGED CHARACTERISTICS:\n\n- Blonde or light-coloured hair.\n- Blue eyes.\n- Human-like appearance.\n- Advanced technology.\n- Telepathic communication.\n\nSome contactee accounts portray Pleiadians as benevolent visitors attempting to help humanity.\n\nAssociated concepts:\n\n- Spiritual awakening.\n- Galactic Federation.\n- Human genetic origins.\n- Ancient Earth civilisations.\n\nSome theories suggest that humanity has Pleiadian genetic ancestry.\n\nNo scientific evidence supports these claims.",
+                        ),
 
-		terminalInput.addEventListener('keydown', (event) => {
-			if (event.key === 'ArrowUp') {
-				event.preventDefault();
-				if (historyIndex === history.length) draft = terminalInput.value;
-				historyIndex = Math.max(0, historyIndex - 1);
-				terminalInput.value = history[historyIndex] ?? draft;
-				renderTypedText();
-			} else if (event.key === 'ArrowDown') {
-				event.preventDefault();
-				historyIndex = Math.min(history.length, historyIndex + 1);
-				terminalInput.value = historyIndex === history.length ? draft : history[historyIndex] ?? '';
-				renderTypedText();
-			} else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'l') {
-				event.preventDefault();
-				clearOutput();
-			}
-		});
-	}
+                        "sirians.txt": textFile(
+                            "SIRIANS\n=======\n\nAlleged origin: Sirius star system.\n\nSirians appear in ancient astronaut and New Age literature.\n\nSome accounts describe humanoid visitors, while others describe aquatic or amphibious entities.\n\nALLEGED CONNECTIONS:\n\n- Ancient Egyptian civilisation.\n- Dogon cosmological traditions.\n- Advanced astronomical knowledge.\n- Ancient engineering.\n- Human genetic development.\n\nSome theories associate Sirius with the origins of ancient Egyptian knowledge and architecture.\n\nThe historical and astronomical claims associated with these theories are disputed.",
+                        ),
+
+                        "anunnaki.txt": textFile(
+                            "THE ANUNNAKI\n============\n\nClassification: Ancient Mesopotamian deities, reinterpreted in modern ancient astronaut theories.\nOrigin: Ancient Mesopotamian mythology.\n\nThe Anunnaki were a group of deities in ancient Mesopotamian religion.\n\nModern extraterrestrial interpretations were popularised by Zecharia Sitchin.\n\nTHE NIBIRU THEORY:\n\nSitchin proposed that the Anunnaki originated from a hypothetical planet called Nibiru.\n\nAccording to his interpretation:\n\n- The Anunnaki visited Earth in antiquity.\n- They were interested in Earth resources, particularly gold.\n- They genetically modified early humans.\n- Humans were created to serve as a labour force.\n- Ancient myths preserve distorted memories of extraterrestrial visitors.\n\nRELATED TOPICS:\n\n- Sumerian civilisation.\n- Enki and Enlil.\n- Nibiru.\n- Ancient astronauts.\n- Human genetic engineering.\n- Ancient Mesopotamian tablets.\n\nIMPORTANT:\nThese extraterrestrial interpretations are not accepted by mainstream historians or Assyriologists.\n\nFIELD NOTE:\nIf the Anunnaki created humanity to mine gold, they have clearly underestimated the price of parking in Croydon.",
+                        ),
+
+                        "hybrids.txt": textFile(
+                            "HUMAN-ALIEN HYBRIDS\n===================\n\nClassification: Alleged biological hybrid.\n\nSome UFO abduction accounts describe attempts to combine human and extraterrestrial genetic material.\n\nTHEORIES INCLUDE:\n\n- Grey-human hybrids.\n- Human-reptilian hybrids.\n- Nordic-human hybrids.\n- Genetically engineered replacement populations.\n\nSome accounts describe hybrid beings that appear almost entirely human.\n\nOthers claim that hybrids are being prepared to integrate into human society.\n\nRELATED TOPICS:\n\n- Abduction phenomena.\n- Missing time.\n- Genetic experimentation.\n- Reproductive experiments.\n\nNo verified biological evidence of extraterrestrial-human hybrids exists.",
+                        ),
+
+                        "blue-avians.txt": textFile(
+                            "BLUE AVIANS\n===========\n\nClassification: Alleged bird-like humanoid.\nAssociated with: Secret space programme conspiracy theories.\n\nDESCRIPTION:\n\n- Blue feathered or feather-like appearance.\n- Humanoid body structure.\n- Bird-like facial features.\n- Supposedly highly advanced consciousness.\n\nBlue Avians became particularly associated with modern claims about secret space programmes and alleged extraterrestrial alliances.\n\nSome accounts describe them as members of a resistance movement opposing hostile extraterrestrial groups.\n\nRELATED TOPICS:\n\n- Corey Goode.\n- Secret Space Programme.\n- Sphere Being Alliance.\n- Galactic Federation.\n\nStatus: Modern conspiracy and contactee mythology.",
+                        ),
+
+                        "ultraterrestrials.txt": textFile(
+                            "ULTRATERRESTRIALS / INTERDIMENSIONAL ENTITIES\n=============================================\n\nClassification: Unknown non-human intelligence.\n\nSome theories propose that unexplained entities may not originate from other planets.\n\nAlternative possibilities include:\n\n- Parallel dimensions.\n- Other planes of existence.\n- Hidden terrestrial environments.\n- Non-human intelligence existing alongside humanity.\n- Entities capable of manipulating perception.\n\nThe term ultraterrestrial is sometimes used to describe intelligence originating from within or around Earth rather than outer space.\n\nRELATED TOPICS:\n\n- Jacques Vallee.\n- Interdimensional hypothesis.\n- Skinwalker Ranch.\n- Consciousness-related phenomena.\n\nOPEN QUESTION:\nAre UFOs spacecraft, biological entities, interdimensional visitors or something else entirely?",
+                        ),
+                    }),
+
+                    incidents: directory({
+                        "roswell-1947.log": textFile(
+                            "1947-07-02 21:14  Unusual debris reportedly discovered near Roswell, New Mexico.\n1947-07-03 08:40  Local newspaper publishes flying disc headline.\n1947-07-08 16:20  Army announces recovery of a flying disc.\n1947-07-09 11:05  Revised statement identifies material as a weather balloon.\n1947-07-10 23:59  Public controversy begins.\n1978-04-01 12:00  Jesse Marcel interview renews public interest.\n1980-01-01 09:00  Roswell becomes a major UFO tourism destination.\n1994-06-24 14:00  US Air Force publishes Project Mogul explanation.\n\nSTATUS: Disputed historical incident.\n\nCROYDON NOTE: No debris has yet been found in the Whitgift car park.",
+                        ),
+
+                        "betty-barney-hill-1961.log": textFile(
+                            "1961-09-19 22:00  Betty and Barney Hill travelling through New Hampshire.\n1961-09-19 22:15  Unusual light observed in the sky.\n1961-09-19 22:30  Object reportedly approaches vehicle.\n1961-09-20 00:00  Couple arrive home with missing time.\n1964-01-01 09:00  Hypnosis sessions begin.\n1965-10-25 12:00  Story receives major newspaper attention.\n\nThe Hill case became one of the most influential alleged alien abduction accounts.\n\nReported features include small humanoid entities, medical examinations and unusual memories recovered under hypnosis.",
+                        ),
+
+                        "rendlesham-1980.log": textFile(
+                            "1980-12-26 03:00  Unusual lights observed near RAF Woodbridge.\n1980-12-26 03:15  Military personnel investigate forest area.\n1980-12-26 04:00  Unidentified object reportedly observed.\n1980-12-26 05:00  Physical marks reported near alleged landing location.\n1980-12-28 01:00  Further lights observed.\n1980-12-29 10:00  Incident reported through military channels.\n1983-01-01 09:00  Public interest increases.\n\nSTATUS: Unexplained sightings with competing interpretations.\n\nRELATED FILE: locations/rendlesham-forest.txt",
+                        ),
+
+                        "ariel-school-1994.log": textFile(
+                            "1994-09-16 10:00  Schoolchildren in Ruwa, Zimbabwe report unusual aerial object.\n1994-09-16 10:15  Multiple pupils describe small humanoid figures.\n1994-09-16 11:00  Witness interviews begin.\n1994-09-17 09:00  Media interest increases.\n1994-09-18 12:00  Psychiatrist John Mack becomes involved in interviews.\n\nWitness descriptions include small beings with large eyes and unusual communication.\n\nThe incident remains a prominent case in UFO literature.\n\nRELATED SPECIES: Greys.",
+                        ),
+
+                        "travis-walton-1975.log": textFile(
+                            "1975-11-05 18:00  Forestry workers observe unusual light in Arizona forest.\n1975-11-05 18:30  Travis Walton approaches object.\n1975-11-05 18:35  Witnesses report a powerful beam of light.\n1975-11-05 18:40  Walton disappears.\n1975-11-10 09:00  Search operations continue.\n1975-11-10 18:00  Walton reportedly reappears.\n\nThe case became one of the most famous alleged abduction accounts.\n\nSTATUS: Contested testimony.",
+                        ),
+
+                        "nazca-2023.log": textFile(
+                            "2023-09-12 10:00  Alleged non-human specimens presented at Mexican congressional hearing.\n2023-09-12 11:00  Specimens described as ancient mummified bodies from Peru.\n2023-09-13 09:00  Scientific and media scrutiny begins.\n2023-09-14 12:00  Researchers dispute claims of extraterrestrial origin.\n2024-01-01 09:00  Further analysis and debate continue.\n\nCLAIMS:\n\n- Unusual skeletal structures.\n- Elongated skulls.\n- Three-fingered hands.\n- Alleged unusual biological composition.\n\nThe specimens have been heavily disputed and are not accepted as extraterrestrial remains by the scientific community.\n\nRELATED FILE: ancient/nazca-mummies.txt",
+                        ),
+
+                        "croydon-2026.log": textFile(
+                            "2026-10-28 20:14  Unidentified green light observed above East Croydon.\n2026-10-28 20:17  Light descends towards railway platforms.\n2026-10-28 20:19  Three small humanoids seen wearing silver jackets.\n2026-10-28 20:22  Entities attempt to board train to London Bridge.\n2026-10-28 20:24  Ticket barriers reject all three.\n2026-10-28 20:26  One entity attempts to use laser weapon on barrier.\n2026-10-28 20:28  Station staff request valid travel documentation.\n2026-10-28 20:31  Entities disappear in blue flash.\n2026-10-29 09:12  Unidentified visitor enters Surrey Street Market.\n2026-10-29 09:16  Visitor asks whether apples contain intelligent life.\n2026-10-29 09:24  Visitor attempts payment using unidentified crystal.\n2026-10-29 09:26  Vendor refuses crystal.\n2026-10-29 09:27  Visitor produces contactless bank card.\n2026-10-29 09:30  Visitor departs.\n2026-10-30 14:02  Suspicious figure seen entering former Whitgift Centre.\n2026-10-30 14:17  Figure emerges carrying shopping bags.\n2026-10-30 14:22  Figure disappears.\n2026-10-31 01:03  Bright object detected above Purley Way.\n2026-10-31 01:16  Witness reports hearing metallic noises resembling IKEA furniture assembly.\n\nINVESTIGATION STATUS: ONGOING.",
+                        ),
+                    }),
+
+                    ancient: directory({
+                        "ancient-astronauts.txt": textFile(
+                            "ANCIENT ASTRONAUT THEORY\n========================\n\nThe ancient astronaut hypothesis proposes that extraterrestrial visitors influenced early human civilisation.\n\nPOPULAR SUBJECTS:\n\n- Egyptian pyramids.\n- Sumerian civilisation.\n- Mayan architecture.\n- Nazca Lines.\n- Ancient astronomical knowledge.\n- Megalithic structures.\n- Elongated skulls.\n- Ancient religious texts.\n\nPOPULAR AUTHORS AND RESEARCHERS:\n\n- Erich von Daniken.\n- Zecharia Sitchin.\n- Graham Hancock.\n- Robert Schoch.\n- Giorgio A. Tsoukalos.\n\nSome interpretations suggest that ancient structures were built with assistance from extraterrestrial technology.\n\nMainstream archaeology attributes these achievements to human societies, engineering and accumulated knowledge.\n\nFIELD NOTE:\nIf aliens helped build the pyramids, they did an excellent job. The local council still cannot fix the potholes.",
+                        ),
+
+                        "pyramids.txt": textFile(
+                            "THE GREAT PYRAMIDS\n==================\n\nLOCATION: GIZA, EGYPT.\n\nThe Great Pyramid of Giza is one of the most frequently discussed structures in ancient astronaut literature.\n\nQUESTIONS RAISED BY ALTERNATIVE THEORIES:\n\n- How were the massive stone blocks transported?\n- Why does the pyramid have such precise geometry?\n- What astronomical alignments were intended?\n- Could advanced technology have been involved?\n- Are there undiscovered chambers or structures beneath the complex?\n\nSome ancient astronaut theories suggest the pyramids were constructed using extraterrestrial knowledge or technology.\n\nGraham Hancock and Randall Carlson have also discussed ancient civilisation, catastrophic events and lost knowledge on numerous podcasts.\n\nMAINSTREAM VIEW:\nThe pyramids were constructed by ancient Egyptians using human engineering, organisation and labour.\n\nSTATUS: Archaeological debate and alternative theories.",
+                        ),
+
+                        "nazca-mummies.txt": textFile(
+                            "NAZCA MUMMIES / PERUVIAN SPECIMENS\n==================================\n\nLOCATION: NAZCA, PERU.\n\nA collection of alleged anomalous mummified specimens has received international attention.\n\nReported features include:\n\n- Elongated skulls.\n- Unusual skeletal proportions.\n- Three-fingered hands.\n- Unusual anatomical structures.\n\nSome proponents claim the specimens represent non-human biological entities.\n\nCritics argue that the specimens are manipulated or assembled human and animal remains.\n\nThe claims have attracted considerable attention through podcasts, documentaries and congressional presentations.\n\nRELATED TOPICS:\n\n- Ancient astronaut theory.\n- Peruvian archaeology.\n- Genetic analysis.\n- Elongated skulls.\n- Non-human intelligence.\n\nSTATUS: Highly disputed. No verified extraterrestrial origin.",
+                        ),
+
+                        "book-of-enoch.txt": textFile(
+                            "THE BOOK OF ENOCH\n=================\n\nAn ancient Jewish religious text containing accounts of heavenly beings, angels and forbidden knowledge.\n\nPARTICULARLY INTERESTING SUBJECT: THE WATCHERS.\n\nAccording to the text, a group of heavenly beings descended to Earth and interacted with humanity.\n\nThe Watchers are associated with:\n\n- The Nephilim.\n- Forbidden knowledge.\n- Advanced metallurgy.\n- Astronomy.\n- Human civilisation.\n\nAncient astronaut theorists sometimes interpret these descriptions as accounts of extraterrestrial visitors.\n\nThe Book of Enoch is an important religious and historical text, but extraterrestrial interpretations are speculative.",
+                        ),
+
+                        "nephilim.txt": textFile(
+                            "THE NEPHILIM\n============\n\nOrigin: Biblical and ancient religious literature.\n\nThe Nephilim are described in Genesis and other ancient traditions.\n\nSome interpretations describe them as giants or offspring associated with the Watchers.\n\nModern alternative theories connect the Nephilim with:\n\n- Ancient extraterrestrial visitors.\n- Human-alien hybrids.\n- Giant skeleton discoveries.\n- Anunnaki mythology.\n- Ancient genetic experimentation.\n\nThe subject frequently appears in ancient astronaut documentaries and conspiracy literature.\n\nSTATUS: Religious and mythological subject with speculative extraterrestrial interpretations.",
+                        ),
+
+                        "lost-civilisation.txt": textFile(
+                            "THE LOST CIVILISATION HYPOTHESIS\n=================================\n\nCould an advanced human civilisation have existed before recorded history?\n\nThis question features heavily in the work of Graham Hancock and Randall Carlson.\n\nSUBJECTS OF INTEREST:\n\n- Younger Dryas impact hypothesis.\n- Ancient cataclysms.\n- Gobekli Tepe.\n- Megalithic architecture.\n- Ancient astronomical knowledge.\n- Submerged archaeological sites.\n- Prehistoric engineering.\n\nSome alternative theories suggest that knowledge from an earlier civilisation was passed to later cultures.\n\nOther interpretations propose extraterrestrial involvement.\n\nMainstream researchers dispute many of the more extreme claims, particularly those proposing a technologically advanced global civilisation.",
+                        ),
+
+                        "sumerian-tablets.txt": textFile(
+                            "SUMERIAN TABLETS\n================\n\nLOCATION: MESOPOTAMIA.\n\nAncient Sumerian clay tablets contain some of the earliest known examples of written language.\n\nTOPICS:\n\n- Creation stories.\n- The Epic of Gilgamesh.\n- Enki and Enlil.\n- Anunnaki deities.\n- Flood mythology.\n- Ancient kingship.\n\nZecharia Sitchin interpreted some of these texts as descriptions of extraterrestrial visitors.\n\nMainstream Assyriologists reject his translations and interpretations.\n\nINVESTIGATION QUESTION:\nAre ancient religious stories purely mythological, or do they preserve memories of historical events?\n\nNo extraterrestrial evidence established.",
+                        ),
+                    }),
+
+                    projects: directory({
+                        "area-51.txt": textFile(
+                            "AREA 51 / GROOM LAKE\n====================\n\nLOCATION: NEVADA, USA.\n\nArea 51 is a highly restricted military installation associated with experimental aircraft development and classified aerospace testing.\n\nUFO CONSPIRACY CLAIMS:\n\n- Recovered extraterrestrial spacecraft.\n- Reverse-engineering programmes.\n- Non-human biological specimens.\n- Secret military agreements.\n- Advanced propulsion systems.\n\nThe facility became particularly famous through the testimony of Bob Lazar.\n\nRELATED FILES:\n\n- bob-lazar.txt\n- s4-facility.txt\n- mj12-files.txt\n\nOFFICIAL HISTORY:\nThe site has been used for classified military aviation programmes.\n\nThe existence of alien technology at Area 51 has not been established.",
+                        ),
+
+                        "bob-lazar.txt": textFile(
+                            "BOB LAZAR / S-4 FACILITY\n========================\n\nSUBJECT: Robert Lazar.\n\nBob Lazar became widely known after claiming to have worked on reverse-engineering extraterrestrial spacecraft at a facility called S-4 near Area 51.\n\nHIS CLAIMS INCLUDE:\n\n- Nine alleged extraterrestrial craft.\n- Advanced propulsion systems.\n- Element 115.\n- Gravity manipulation.\n- Military secrecy.\n- Unusual security arrangements.\n\nLazar claimed that the craft used an exotic reactor and a gravity-based propulsion system.\n\nHis claims became a major part of modern UFO culture.\n\nRELATED TOPICS:\n\n- Area 51.\n- S-4.\n- Element 115.\n- Reverse engineering.\n- Classified aerospace technology.\n\nJoe Rogan has interviewed Bob Lazar, discussing his alleged work, the facility and the technology he described.\n\nSTATUS: Highly controversial testimony. Not independently verified.",
+                        ),
+
+                        "s4-facility.txt": textFile(
+                            "S-4 FACILITY\n============\n\nALLEGED LOCATION: NEAR PAPOOSE LAKE, NEVADA.\n\nAccording to Bob Lazar, S-4 was a secret facility used to examine and reverse-engineer extraterrestrial spacecraft.\n\nALLEGED FACILITY FEATURES:\n\n- Underground hangars.\n- Secure access tunnels.\n- Advanced propulsion laboratories.\n- Recovered craft storage.\n- Specially cleared research personnel.\n\nLazar described several different craft designs.\n\nNo independently verified evidence has established the facility as described.",
+                        ),
+
+                        "element-115.txt": textFile(
+                            "ELEMENT 115 / MOSCOVIUM\n=======================\n\nElement: 115.\nModern name: Moscovium.\nAtomic number: 115.\n\nBob Lazar claimed that an isotope of element 115 was used as a fuel source in an alleged extraterrestrial propulsion system.\n\nHe described a process involving gravitational waves and the manipulation of spacetime.\n\nSCIENTIFIC STATUS:\n\nMoscovium is a real synthetic chemical element.\n\nKnown isotopes are extremely unstable and have very short half-lives.\n\nThere is no verified evidence that element 115 can be used as an antigravity fuel source.\n\nRELATED TOPICS:\n\n- Nuclear physics.\n- Exotic matter.\n- Gravity manipulation.\n- Reverse-engineered technology.",
+                        ),
+
+                        "majestic-12.txt": textFile(
+                            "MAJESTIC 12 / MJ-12\n===================\n\nClassification: Alleged secret government organisation.\n\nMJ-12 supposedly consisted of twelve senior military, intelligence and scientific officials established to investigate extraterrestrial contact and recovered spacecraft.\n\nThe story became widely known following the circulation of alleged classified documents during the 1980s.\n\nCLAIMED RESPONSIBILITIES:\n\n- UFO crash retrieval.\n- Alien biological examination.\n- Government secrecy.\n- Reverse engineering.\n- Public information management.\n\nDOCUMENTS:\n\n- Eisenhower briefing documents.\n- Alleged presidential memoranda.\n- Special access programme files.\n\nThe authenticity of MJ-12 documents is heavily disputed, and many researchers consider them fabrications.\n\nSTATUS: Unverified conspiracy theory.",
+                        ),
+
+                        "project-blue-book.txt": textFile(
+                            "PROJECT BLUE BOOK\n==================\n\nOrganisation: United States Air Force.\nPeriod: 1952-1969.\n\nProject Blue Book investigated reports of unidentified flying objects.\n\nOBJECTIVES:\n\n- Determine whether UFOs represented a national security threat.\n- Analyse reported sightings.\n- Identify conventional explanations.\n- Evaluate unusual aerial observations.\n\nThe project investigated thousands of reports.\n\nA number remained unidentified at the conclusion of the programme.\n\nCONSPIRACY THEORIES:\n\nSome researchers argue that the programme was designed to ridicule witnesses or conceal genuine extraterrestrial encounters.\n\nOfficial investigations did not establish extraterrestrial visitation.",
+                        ),
+
+                        "project-serpo.txt": textFile(
+                            "PROJECT SERPO\n=============\n\nClassification: Alleged human-extraterrestrial exchange programme.\n\nThe Serpo story claims that a group of twelve US military personnel travelled to an extraterrestrial planet following an alleged UFO crash at Roswell.\n\nCLAIMED DETAILS:\n\n- Exchange programme with an alien civilisation.\n- Destination allegedly located in the Zeta Reticuli system.\n- Twelve human participants.\n- Long-duration extraterrestrial mission.\n- Advanced alien technology.\n\nThe story circulated through UFO conspiracy websites and alleged insider disclosures.\n\nNo credible evidence has established that the programme existed.\n\nSTATUS: Unverified.",
+                        ),
+
+                        "montauk-project.txt": textFile(
+                            "THE MONTAUK PROJECT\n===================\n\nLOCATION: CAMP HERO, MONTAUK, NEW YORK.\n\nThe Montauk Project conspiracy theory alleges that secret experiments took place at a military installation in New York.\n\nALLEGED EXPERIMENTS:\n\n- Mind control.\n- Time travel.\n- Teleportation.\n- Psychological warfare.\n- Dimensional portals.\n- Contact with extraterrestrial entities.\n\nSome versions claim connections to the Philadelphia Experiment.\n\nThe story is associated with Preston Nichols and Peter Moon.\n\nNo credible evidence supports the alleged experiments.\n\nNOTE: Stranger Things fans may recognise some of the ideas.",
+                        ),
+
+                        "project-blue-beam.txt": textFile(
+                            "PROJECT BLUE BEAM\n==================\n\nClassification: New World Order conspiracy theory.\n\nPopularised by Serge Monast during the 1990s.\n\nThe theory claims that a secret organisation intends to use advanced technology to stage a fake extraterrestrial invasion or religious event.\n\nALLEGED COMPONENTS:\n\n1. Artificial archaeological discoveries.\n2. Manipulation of religious beliefs.\n3. Advanced holographic projections.\n4. Simulated extraterrestrial contact.\n5. Establishment of a new global political and religious order.\n\nSome versions claim that the technology would create convincing images in the sky.\n\nNo credible evidence establishes that Project Blue Beam exists.\n\nFIELD NOTE:\nIf a holographic spaceship appears above Croydon, check whether it is actually an advertising drone.",
+                        ),
+
+                        "secret-space-programme.txt": textFile(
+                            "SECRET SPACE PROGRAMME\n======================\n\nThe secret space programme hypothesis claims that governments or private organisations operate classified space fleets beyond publicly acknowledged space capabilities.\n\nALLEGED COMPONENTS:\n\n- Hidden spacecraft.\n- Secret lunar facilities.\n- Mars colonies.\n- Advanced propulsion systems.\n- Human-alien alliances.\n- Genetic experimentation.\n- Space-based military operations.\n\nAssociated personalities and subjects:\n\n- Corey Goode.\n- David Wilcock.\n- Bob Lazar.\n- The Solar Warden concept.\n- Blue Avians.\n- Sphere Being Alliance.\n\nThese claims are not supported by verifiable evidence.",
+                        ),
+
+                        "skinwalker-ranch.txt": textFile(
+                            "SKINWALKER RANCH\n================\n\nLOCATION: UINTAH BASIN, UTAH, USA.\n\nA ranch associated with reports of unusual aerial phenomena, strange animals and unexplained events.\n\nREPORTED PHENOMENA:\n\n- Unidentified aerial objects.\n- Strange lights.\n- Unusual animal encounters.\n- Large wolf-like creatures.\n- Apparent anomalies in electromagnetic equipment.\n- Unexplained physical effects.\n- Reports of unusual objects entering or leaving the ground.\n\nThe ranch attracted attention from researchers including Robert Bigelow and later investigative teams.\n\nPopularised through documentaries and television series.\n\nJoe Rogan has discussed Skinwalker Ranch with various guests, including researchers and people associated with the investigations.\n\nRELATED TOPICS:\n\n- UAP.\n- Interdimensional hypothesis.\n- Bigelow Aerospace.\n- Government UAP research.\n- High strangeness.\n\nSTATUS: Reports and interpretations remain disputed.",
+                        ),
+
+                        "aatip.txt": textFile(
+                            "AATIP / ADVANCED AEROSPACE THREAT IDENTIFICATION PROGRAM\n=======================================================\n\nA US government programme associated with investigations into unidentified aerial phenomena.\n\nThe programme became widely known through reporting in 2017.\n\nASSOCIATED FIGURES:\n\n- Luis Elizondo.\n- Christopher Mellon.\n- Harry Reid.\n- Robert Bigelow.\n\nAREAS OF INTEREST:\n\n- Unidentified aerial observations.\n- Unusual flight characteristics.\n- Sensor data.\n- National security implications.\n- Advanced aerospace technology.\n\nRELATED TOPIC: UAP disclosure.",
+                        ),
+
+                        "reverse-engineering.txt": textFile(
+                            "EXTRATERRESTRIAL REVERSE ENGINEERING\n====================================\n\nTHEORY:\n\nSome UFO conspiracy theories claim that governments recovered non-human spacecraft and have spent decades attempting to reproduce their technology.\n\nALLEGED TECHNOLOGIES:\n\n- Antigravity propulsion.\n- Zero-point energy.\n- Inertial mass reduction.\n- Metamaterials.\n- Exotic alloys.\n- Electromagnetic propulsion.\n- Spacetime manipulation.\n\nSome whistleblower accounts describe crash retrieval programmes and specialised research teams.\n\nRELATED PEOPLE:\n\n- Bob Lazar.\n- David Grusch.\n- Eric Davis.\n- Hal Puthoff.\n\nNo publicly verified evidence establishes successful reverse engineering of extraterrestrial spacecraft.",
+                        ),
+                    }),
+
+                    locations: directory({
+                        "area-51.txt": textFile(
+                            "AREA 51\n=======\n\nLocation: Groom Lake, Nevada.\n\nRestricted military installation.\n\nAssociated with classified aircraft development, UFO sightings and alleged extraterrestrial research.\n\nKnown for:\n\n- U-2 spy plane.\n- A-12 OXCART.\n- Stealth aircraft development.\n- Bob Lazar claims.\n- S-4 facility allegations.\n\nSecurity classification: High.",
+                        ),
+
+                        "dulce-base.txt": textFile(
+                            "DULCE UNDERGROUND BASE\n======================\n\nAlleged location: Dulce, New Mexico.\n\nConspiracy theories describe a secret underground research facility beneath the Archuleta Mesa.\n\nALLEGED ACTIVITIES:\n\n- Human-alien genetic experiments.\n- Biological research.\n- Alien-human collaboration.\n- Underground laboratories.\n- Secret military operations.\n\nSome accounts claim the facility contains multiple underground levels shared by humans and extraterrestrial beings.\n\nThe stories are associated with Paul Bennewitz and later UFO researchers.\n\nNo verified evidence establishes the existence of this facility.",
+                        ),
+
+                        "antarctica.txt": textFile(
+                            "ANTARCTICA / THE HIDDEN BASE THEORY\n===================================\n\nAntarctica features heavily in several conspiracy theories.\n\nALLEGATIONS INCLUDE:\n\n- Secret Nazi bases.\n- Extraterrestrial installations.\n- Ancient underground structures.\n- Hidden entrances to the Hollow Earth.\n- Recovered alien technology.\n- Classified military expeditions.\n\nSome theories connect Antarctica to Admiral Richard Byrd and Operation Highjump.\n\nOthers claim that satellite imagery reveals artificial structures beneath the ice.\n\nSTATUS: No credible evidence supports the alleged alien installations.\n\nFIELD NOTE:\nIt is probably colder than Croydon. Take a coat.",
+                        ),
+
+                        "hollow-earth.txt": textFile(
+                            "HOLLOW EARTH THEORY\n===================\n\nThe Hollow Earth hypothesis proposes that the planet contains vast internal spaces or an inner civilisation.\n\nSome conspiracy variations claim that the interior contains:\n\n- Advanced civilisations.\n- Ancient human populations.\n- Reptilian species.\n- Extraterrestrial bases.\n- Underground oceans.\n- Hidden entrances near the poles.\n\nSome accounts associate the theory with Agartha and Shambhala.\n\nModern scientific evidence shows that Earth has a layered internal structure rather than a habitable hollow interior.",
+                        ),
+
+                        "skinwalker-ranch.txt": textFile(
+                            "SKINWALKER RANCH\n================\n\nLocation: Uintah Basin, Utah.\n\nFamous for reports of UFOs, unusual animals, strange lights and other unexplained phenomena.\n\nThe ranch has attracted private researchers, journalists and government-linked investigations.\n\nSome theories suggest the location is a portal or point of interaction between dimensions.\n\nRELATED FILE: projects/skinwalker-ranch.txt",
+                        ),
+
+                        "rendlesham-forest.txt": textFile(
+                            "RENDLESHAM FOREST\n=================\n\nLocation: Suffolk, England.\n\nOften described as the British Roswell.\n\nIn December 1980, US military personnel stationed at RAF Woodbridge and RAF Bentwaters reported unusual lights in the surrounding forest.\n\nSome witnesses claimed to have observed a triangular object on the ground.\n\nThe incident remains one of the most famous British UFO cases.\n\nRELATED FILE: incidents/rendlesham-1980.log",
+                        ),
+
+                        "croydon-airport.txt": textFile(
+                            "CROYDON AIRPORT\n===============\n\nLocation: Purley Way, Croydon.\n\nHistoric airport that operated from 1920 until 1959.\n\nFormerly one of the most important airports in Britain.\n\nCURRENT INVESTIGATION:\n\nA number of unexplained lights have reportedly been observed near the former airport site.\n\nSome investigators believe the location may be attractive to extraterrestrial visitors because of its historical aviation significance.\n\nAlternative explanation: aircraft.\n\nInvestigation ongoing.",
+                        ),
+
+                        "underwater-bases.txt": textFile(
+                            "UNDERWATER EXTRATERRESTRIAL BASES\n=================================\n\nSome UAP theories suggest that non-human intelligence may operate from underwater facilities.\n\nREPORTED LOCATIONS:\n\n- Pacific Ocean.\n- Atlantic Ocean.\n- Caribbean Sea.\n- Deep ocean trenches.\n- Coastal military exclusion zones.\n\nALLEGED CAPABILITIES:\n\n- Submersible spacecraft.\n- Underwater launch facilities.\n- High-speed movement between water and atmosphere.\n- Concealed bases beneath the seabed.\n\nSome recent UFO discussions, including the David Grusch appearance on Joe Rogan, have included claims about large underwater installations.\n\nNo verified evidence establishes extraterrestrial underwater bases.",
+                        ),
+                    }),
+
+                    conspiracies: directory({
+                        "new-world-order.txt": textFile(
+                            "THE NEW WORLD ORDER\n===================\n\nA broad conspiracy narrative proposing that a secretive network of powerful individuals and organisations seeks to establish a centralised global system of political and economic control.\n\nCOMMONLY CITED GROUPS:\n\n- Bilderberg Group.\n- Trilateral Commission.\n- Council on Foreign Relations.\n- Freemasons.\n- Illuminati.\n- World Economic Forum.\n\nALLEGED OBJECTIVES:\n\n- Centralised world government.\n- Global financial control.\n- Mass surveillance.\n- Population management.\n- Social engineering.\n- Suppression of dissent.\n\nSome versions connect the New World Order to extraterrestrial groups, particularly reptilians and the alleged Draco Empire.\n\nThere is no verified evidence of a single secret organisation controlling world events.",
+                        ),
+
+                        "illuminati.txt": textFile(
+                            "THE ILLUMINATI\n==============\n\nThe historical Bavarian Illuminati was founded in 1776.\n\nThe organisation was suppressed in the late eighteenth century.\n\nModern conspiracy theories claim that a surviving secret organisation operates behind governments, financial institutions and international organisations.\n\nCOMMON SYMBOLS:\n\n- All-seeing eye.\n- Pyramid.\n- Owl.\n- Number 666.\n- Secret handshakes.\n\nSome conspiracy narratives connect the Illuminati to reptilian bloodlines and extraterrestrial control.\n\nHistorical organisation: Real.\nModern global conspiracy claims: Unsubstantiated.",
+                        ),
+
+                        "men-in-black.txt": textFile(
+                            "MEN IN BLACK\n============\n\nClassification: Alleged government or non-human operatives.\n\nMen in Black are mysterious figures reported in UFO witness accounts.\n\nCOMMON DESCRIPTION:\n\n- Black suits.\n- Dark sunglasses.\n- Unusual speech patterns.\n- Pale or unusual complexions.\n- Identical vehicles.\n- Apparent knowledge of private information.\n\nALLEGED ACTIVITIES:\n\n- Intimidating UFO witnesses.\n- Confiscating evidence.\n- Suppressing information.\n- Warning people not to discuss sightings.\n\nSome theories claim that Men in Black are not human at all.\n\nOthers interpret them as intelligence personnel or folklore.\n\nCROYDON REPORT:\nA black Mercedes has been parked outside the field station for three consecutive nights.\n\nThe driver keeps asking where the nearest Greggs is.",
+                        ),
+
+                        "chemtrails.txt": textFile(
+                            "CHEMTRAILS\n==========\n\nConspiracy theory claiming that aircraft condensation trails contain chemicals deliberately dispersed for secret purposes.\n\nALLEGED PURPOSES:\n\n- Weather modification.\n- Population control.\n- Biological experimentation.\n- Mind control.\n- Solar radiation management.\n\nSome versions connect chemtrails to the New World Order and extraterrestrial activity.\n\nScientific explanation:\nPersistent aircraft contrails are formed by water vapour and ice crystals under suitable atmospheric conditions.\n\nNo credible evidence supports the widespread secret spraying claims.",
+                        ),
+
+                        "black-helicopters.txt": textFile(
+                            "BLACK HELICOPTERS\n=================\n\nBlack helicopters appear frequently in conspiracy culture.\n\nALLEGED CONNECTIONS:\n\n- Secret military surveillance.\n- Government intimidation.\n- UFO monitoring.\n- Extraterrestrial recovery operations.\n- New World Order enforcement.\n\nSome theories suggest unmarked helicopters monitor people who have witnessed UFO activity.\n\nCROYDON OBSERVATION:\nA black helicopter was seen above Purley Way.\n\nIt was subsequently identified as a police helicopter.\n\nInvestigation closed.",
+                        ),
+
+                        "reptilian-infiltration.txt": textFile(
+                            "REPTILIAN INFILTRATION THEORY\n=============================\n\nTHEORY:\n\nReptilian entities have allegedly infiltrated human institutions and assumed positions of influence.\n\nCOMMON TARGETS IN CONSPIRACY LITERATURE:\n\n- Royal families.\n- Political leaders.\n- Financial institutions.\n- Media organisations.\n- International organisations.\n\nSome accounts suggest that reptilians can disguise their physical appearance.\n\nOthers describe hybrid bloodlines extending across generations.\n\nPOPULARISED BY: David Icke.\n\nRELATED FILES:\n\n- species/reptilians.txt\n- species/draconians.txt\n- conspiracies/new-world-order.txt\n\nCROYDON WATCHLIST:\n\n1. Unknown individual in council building.\n2. Suspicious property developer.\n3. Man who never appears in photographs.\n\nThe third suspect may simply be bad at taking selfies.",
+                        ),
+
+                        "disclosure.txt": textFile(
+                            "UFO DISCLOSURE\n==============\n\nThe disclosure movement seeks greater transparency concerning government investigations into unidentified aerial phenomena and alleged non-human intelligence.\n\nCOMMON DEMANDS:\n\n- Release of classified UAP footage.\n- Disclosure of recovered materials.\n- Access to military sensor data.\n- Congressional investigations.\n- Whistleblower protection.\n- Public release of historical records.\n\nKEY FIGURES:\n\n- David Grusch.\n- Luis Elizondo.\n- Christopher Mellon.\n- David Fravor.\n- Ryan Graves.\n\nRELATED TOPICS:\n\n- UAP Task Force.\n- AARO.\n- AATIP.\n- Crash retrieval programmes.\n- Reverse engineering.\n\nThe existence of unidentified aerial phenomena is not proof of extraterrestrial visitation.",
+                        ),
+
+                        "watergate-ufo.txt": textFile(
+                            "WATERGATE AND THE UFO COVER-UP\n===============================\n\nSome conspiracy narratives propose that historical political scandals were connected to efforts to suppress information about UFOs.\n\nWatergate has occasionally appeared in theories involving alleged government secrecy and extraterrestrial disclosure.\n\nCLAIMS INCLUDE:\n\n- Political manipulation of UFO investigations.\n- Suppression of classified documents.\n- Secret presidential briefings.\n- Intelligence agency involvement.\n\nNo established evidence connects the Watergate scandal to an extraterrestrial cover-up.\n\nSTATUS: Speculative theory.",
+                        ),
+                    }),
+
+                    people: directory({
+                        "bob-lazar.txt": textFile(
+                            "BOB LAZAR\n=========\n\nKnown for claims concerning Area 51, S-4 and alleged reverse engineering of extraterrestrial spacecraft.\n\nKey subjects:\n- Element 115.\n- Gravity propulsion.\n- Nine alleged craft.\n- Secret military installations.\n\nJoe Rogan interviewed Lazar in episode #1315.\n\nRELATED FILE: projects/bob-lazar.txt",
+                        ),
+
+                        "david-grusch.txt": textFile(
+                            "DAVID GRUSCH\n============\n\nFormer US intelligence official and UAP whistleblower.\n\nGrusch has made claims concerning alleged crash retrieval programmes and government possession of non-human technology.\n\nHe has testified publicly about his investigations into UAP-related programmes.\n\nSUBJECTS DISCUSSED:\n\n- Non-human intelligence.\n- Recovered spacecraft.\n- Biological entities.\n- Government secrecy.\n- Reverse engineering.\n- Alleged interagency programmes.\n\nJoe Rogan interviewed Grusch in JRE episode #2065 and later #2560.\n\nNOTE: His claims have not been independently substantiated in full.",
+                        ),
+
+                        "graham-hancock.txt": textFile(
+                            "GRAHAM HANCOCK\n==============\n\nBritish author and journalist known for alternative theories about ancient civilisations and lost historical knowledge.\n\nMAJOR SUBJECTS:\n\n- Ancient advanced civilisations.\n- Gobekli Tepe.\n- Great Pyramid.\n- Younger Dryas.\n- Ancient cataclysms.\n- Megalithic structures.\n\nHancock has appeared on The Joe Rogan Experience discussing ancient history and the possibility of forgotten civilisations.\n\nHis theories are controversial and differ from mainstream archaeological interpretations.",
+                        ),
+
+                        "randall-carlson.txt": textFile(
+                            "RANDALL CARLSON\n===============\n\nResearcher and educator known for discussing geology, ancient architecture and catastrophic events.\n\nSUBJECTS:\n\n- Younger Dryas impact hypothesis.\n- Ancient cataclysms.\n- Megalithic architecture.\n- Sacred geometry.\n- Ancient engineering.\n- Geological evidence of past events.\n\nFrequently associated with Graham Hancock in discussions about lost civilisations and ancient history.",
+                        ),
+
+                        "jacques-vallee.txt": textFile(
+                            "JACQUES VALLEE\n==============\n\nComputer scientist, astronomer and UFO researcher.\n\nKnown for studying UFO reports and proposing that the phenomenon may be more complex than conventional extraterrestrial spacecraft explanations.\n\nKEY IDEAS:\n\n- Interdimensional hypothesis.\n- High strangeness.\n- Historical parallels in folklore.\n- Non-human intelligence.\n- UFO phenomena and consciousness.\n\nHis work has influenced many modern UFO researchers.",
+                        ),
+
+                        "travis-taylor.txt": textFile(
+                            "TRAVIS TAYLOR\n=============\n\nEngineer and scientist associated with investigations into unusual phenomena at Skinwalker Ranch.\n\nKnown for television appearances and discussions involving:\n\n- UAP.\n- Unusual electromagnetic readings.\n- Unexplained lights.\n- Experimental measurement.\n- Scientific investigation of anomalous events.\n\nSTATUS: Research and interpretation.",
+                        ),
+
+                        "joe-rogan.txt": textFile(
+                            "JOE ROGAN / UFO DISCUSSION INDEX\n=================================\n\nThe Joe Rogan Experience has hosted numerous guests discussing UFOs, ancient civilisations, secret programmes and extraterrestrial theories.\n\nRELEVANT GUESTS:\n\nBob Lazar:\nArea 51, S-4, element 115 and reverse-engineered craft.\n\nDavid Grusch:\nUAP disclosure, alleged crash retrievals, non-human intelligence and recovered biological entities.\n\nLuis Elizondo:\nGovernment UAP investigations and military encounters.\n\nDan Farah:\nUFO disclosure, alleged crash retrieval programmes and different reported alien body types.\n\nGraham Hancock:\nAncient civilisations, lost history and archaeological mysteries.\n\nRandall Carlson:\nAncient catastrophes, geology and megalithic structures.\n\nGeorge Knapp:\nUFO investigations, Bob Lazar and Skinwalker Ranch.\n\nJeremy Corbell:\nUFO footage, military encounters and investigative reporting.\n\nTravis Walton:\nAlleged abduction experience.\n\nRobert Bigelow:\nPrivate aerospace research and Skinwalker Ranch.\n\nOTHER RECURRING SUBJECTS:\n\n- The Nazca mummies.\n- Anunnaki.\n- Reptilians.\n- Tall Whites.\n- Mantis beings.\n- Grey aliens.\n- Ancient Egyptian structures.\n- Underwater UAP bases.\n- Telepathy.\n- Government secrecy.\n\nNOTE:\nA podcast discussion is not evidence that a claim is true.\n\nRecommended listening: Search for JRE episodes featuring the guests above.",
+                        ),
+                    }),
+
+                    signals: directory({
+                        "wow-signal.txt": textFile(
+                            "THE WOW! SIGNAL\n===============\n\nDATE: 15 AUGUST 1977.\nLOCATION: OHIO, USA.\nINSTRUMENT: BIG EAR RADIO TELESCOPE.\n\nA strong narrowband radio signal was detected near the hydrogen line.\n\nDuration: Approximately 72 seconds.\nFrequency: Approximately 1420 MHz.\nRepeat detections: None confirmed.\n\nAstronomer Jerry Ehman circled the unusual sequence on the printout and wrote WOW! in the margin.\n\nThe source remains unidentified.\n\nCould it have been an extraterrestrial transmission?\n\nNo conclusion has been reached.",
+                        ),
+
+                        "listening-protocol.txt": textFile(
+                            "DEEP SPACE LISTENING PROTOCOL\n=============================\n\n1. Record frequency, bandwidth and timestamp.\n2. Check local and satellite interference.\n3. Request independent observations.\n4. Preserve raw data.\n5. Do not label a signal extraterrestrial without verification.\n6. Compare with known astronomical sources.\n7. Check whether the signal originates from a mobile phone.\n8. If the signal repeats, notify the research supervisor.\n9. Do not respond with an unsolicited Rick Astley recording.\n10. Never transmit your home address.",
+                        ),
+
+                        "underwater-transmission.log": textFile(
+                            "2041-03-18 00:01:04 UTC receiver online\n2041-03-18 00:07:12 UTC baseline noise stable\n2041-03-18 00:14:39 UTC narrow pulse detected at 1420.4 MHz\n2041-03-18 00:14:41 UTC pulse duration 1.8 seconds\n2041-03-18 00:15:03 UTC local interference scan clear\n2041-03-18 00:17:26 UTC second pulse detected\n2041-03-18 00:22:11 UTC neighbouring dishes report weak correlation\n2041-03-18 00:31:50 UTC signal below detection threshold\n2041-03-18 00:46:05 UTC no further pulses\n2041-03-18 01:02:18 UTC raw spectrum archived\n2041-03-18 01:20:00 UTC observation window closed\n2041-03-18 02:10:44 UTC review note: source unidentified\n2041-03-18 03:00:00 UTC new observation requested\n2041-03-18 03:14:09 UTC receiver standby\n2041-03-18 03:45:27 UTC no further activity\n2041-03-18 04:02:11 UTC unexpected transmission received\n2041-03-18 04:02:13 UTC decoded message: IS THIS THE WAY TO LONDON?\n2041-03-18 04:02:18 UTC reply transmitted: FOLLOW THE TRAM TRACKS\n2041-03-18 04:03:00 UTC transmission terminated\n2041-03-18 04:10:00 UTC operator regrets providing directions",
+                        ),
+
+                        "telepathy.log": textFile(
+                            "2026-10-31 02:00:00  Experimental telepathy monitoring initiated.\n2026-10-31 02:04:12  Subject reports unusual mental imagery.\n2026-10-31 02:08:44  Subject describes a grey humanoid.\n2026-10-31 02:12:09  Subject reports hearing a voice.\n2026-10-31 02:13:00  Voice reportedly says: WE ARE WATCHING.\n2026-10-31 02:15:11  Subject reports second message.\n2026-10-31 02:15:13  Message decoded: YOUR PARKING PERMIT HAS EXPIRED.\n2026-10-31 02:16:00  Subject becomes distressed.\n2026-10-31 02:20:00  Experiment terminated.\n2026-10-31 02:25:00  Council correspondence discovered in subject inbox.",
+                        ),
+                    }),
+
+                    classified: directory({
+                        "mj12-files.txt": textFile(
+                            "MAJESTIC 12 // DOCUMENT 001\n===========================\n\nCLEARANCE REQUIRED: MJ-12\nDOCUMENT STATUS: UNVERIFIED COPY\n\nSUBJECT: RECOVERY OF NON-HUMAN TECHNOLOGY.\n\nThe following document allegedly describes a classified organisation responsible for investigating extraterrestrial incidents.\n\nALLEGED RESPONSIBILITIES:\n\n- Recovery of unidentified craft.\n- Examination of non-human biological specimens.\n- Scientific analysis of recovered materials.\n- Coordination with military intelligence.\n- Control of public information.\n\nDOCUMENT AUTHENTICITY: DISPUTED.\n\nWARNING: This file is a fictional terminal prop based on conspiracy folklore.",
+                        ),
+
+                        "crash-retrieval.txt": textFile(
+                            "CRASH RETRIEVAL PROGRAMME\n=========================\n\nCLASSIFICATION: TOP SECRET.\n\nTHEORY:\n\nGovernments have allegedly recovered crashed extraterrestrial spacecraft and biological entities over several decades.\n\nALLEGED INCIDENTS:\n\n- Roswell, 1947.\n- Kingman, 1953.\n- Various alleged US military recovery operations.\n\nCLAIMED PROCEDURES:\n\n1. Secure crash location.\n2. Remove witnesses.\n3. Recover material.\n4. Transport debris to classified facility.\n5. Analyse biological specimens.\n6. Reverse-engineer propulsion technology.\n7. Restrict access to information.\n\nRELATED PEOPLE:\n\nBob Lazar.\nDavid Grusch.\nLuis Elizondo.\n\nSTATUS: Alleged programme. No publicly verified evidence of extraterrestrial crash retrieval.",
+                        ),
+
+                        "black-budget.txt": textFile(
+                            "BLACK BUDGET PROGRAMMES\n=======================\n\nA black budget refers to classified government spending, particularly in defence and intelligence.\n\nUFO CONSPIRACY CLAIMS:\n\nSome researchers believe classified aerospace funding supports secret projects involving recovered non-human technology.\n\nALLEGED ACTIVITIES:\n\n- Reverse engineering.\n- Advanced propulsion.\n- Exotic materials research.\n- Secret spacecraft development.\n- Biological research.\n\nClassified military programmes do exist, but their existence does not demonstrate extraterrestrial involvement.",
+                        ),
+
+                        "alien-agreements.txt": textFile(
+                            "ALLEGED HUMAN-ALIEN AGREEMENTS\n==============================\n\nSeveral conspiracy theories claim that governments entered secret agreements with extraterrestrial civilisations.\n\nTHE ALLEGED AGREEMENTS:\n\n- Technology exchange.\n- Permission for biological experiments.\n- Secret underground research facilities.\n- Military cooperation.\n- Exchange of information.\n\nSome accounts associate these claims with President Eisenhower and the alleged Greada Treaty.\n\nOther theories suggest agreements with reptilian groups.\n\nNo verified historical evidence establishes these agreements.",
+                        ),
+
+                        "final-warning.txt": textFile(
+                            'FINAL WARNING // PROJECT CROYDON\n=================================\n\nTHIS DOCUMENT IS RESTRICTED.\n\nThe investigation has identified a possible connection between several previously unrelated incidents.\n\n1. The East Croydon sightings.\n2. Unusual activity beneath the former Whitgift Centre.\n3. A suspicious transmission originating near Purley Way.\n4. Reports of a tall reptilian figure entering a government building.\n5. An unidentified object beneath the Thames.\n\nThe evidence suggests that several separate intelligence groups may be monitoring Croydon.\n\nA message was intercepted at 03:17 this morning:\n\n"THEY HAVE FOUND THE ENTRANCE.\nTHE COUNCIL MUST NOT BE INFORMED.\nTHEY ALREADY KNOW."\n\nA second message arrived 14 seconds later:\n\n"ALSO, THE PARKING CHARGES ARE UNACCEPTABLE."\n\nEND OF DOCUMENT.\n\nIf you are reading this, disconnect the terminal immediately.',
+                        ),
+                    }),
+
+                    "crew-notes.txt": textFile(
+                        "FIELD STATION 7 // SHIFT NOTES\n==============================\n\n02:12 - Strange radio signal detected.\n02:18 - Possible Grey sighting near East Croydon.\n02:25 - Security camera malfunction.\n02:41 - Unidentified vehicle parked outside.\n03:05 - Transmission received from unknown source.\n03:12 - Reptilian activity suspected near council offices.\n03:30 - Coffee machine stops working.\n03:45 - Operator reports hearing strange noises beneath the building.\n04:02 - Message received: WE KNOW WHERE YOU LIVE.\n04:03 - Message traced to local takeaway.\n\nADDITIONAL NOTES:\n\nThe aliens appear to have developed a taste for Greggs.\nThe Zorblax have requested access to Netflix.\nOne Grey has asked whether it is possible to become a British citizen.\nThe Reptilians have reportedly registered a limited company.\n\nCoffee reserves remain critically low.\n\nSUPERVISOR NOTE:\nIf an alien offers you a job, check its references.\nIf an alien offers you cryptocurrency, decline.\nIf an alien offers to fix the Croydon tram network, accept immediately.",
+                    ),
+                }),
+            }),
+            etc: directory({
+                motd: textFile(
+                    "========================================\n       PROJECT CROYDON // FIELD STATION 7\n========================================\n\nRESTRICTED ACCESS ONLY.\n\nWelcome, authorised investigator.\n\nCurrent status: ACTIVE.\nUFO activity: ELEVATED.\nExtraterrestrial presence: UNCONFIRMED.\nGovernment surveillance: POSSIBLE.\nReptilian infiltration: UNDER INVESTIGATION.\nCoffee reserves: LOW.\n\nREMEMBER:\n\nThe truth is out there.\nIt may be in Croydon.\nIt may be in the Whitgift Centre.\nIt may be waiting for a Tramlink service.\n\nIf you encounter non-human intelligence, remain calm.\nDo not reveal classified information.\nDo not offer it your password.\n\nHave a pleasant shift.",
+                ),
+
+                hosts: textFile(
+                    "127.0.0.1 localhost\n127.0.0.1 croydon-field-station\n192.168.1.42 alien-mothership.local\n192.168.1.43 grey-research-lab.local\n192.168.1.44 reptilian-command.local\n192.168.1.45 mj12-server.local\n192.168.1.46 s4-facility.local\n192.168.1.47 galactic-federation.local\n192.168.1.48 anunnaki-archive.local\n192.168.1.49 skinwalker-observatory.local\n\n# Unidentified devices\n192.168.1.101 unknown-probe\n192.168.1.102 suspicious-toaster\n192.168.1.103 intergalactic-router\n192.168.1.104 reptilian-laptop\n192.168.1.105 black-budget-server\n\n# Do not ping the mothership.\n# It has already pinged you.",
+                ),
+            }),
+            var: directory({
+                log: directory({
+                    "system.log": textFile(
+                        "03:00 receiver online\n03:04 antenna alignment nominal\n03:12 narrowband pulse detected\n03:16 pulse lost; source unconfirmed\n03:22 coffee machine offline\n03:45 unknown device connected\n03:46 device identified as UNKNOWN-ALIEN-DEVICE\n03:47 device assigned 192.168.1.101\n03:50 device accesses /research/aliens/species\n03:52 device downloads reptilians.txt\n03:53 device downloads anunnaki.txt\n03:54 device accesses classified/mj12-files.txt\n03:55 access denied\n03:56 device attempts password: nibiru\n03:57 device attempts password: password123\n03:58 device successfully authenticates\n04:00 device disconnects\n04:01 system reports unusual temperature increase\n04:02 coffee machine begins dispensing blue liquid\n04:03 system administrator notified",
+                    ),
+
+                    "security.log": textFile(
+                        "2026-10-31 01:02:14 LOGIN attempt from unknown device\n2026-10-31 01:02:15 LOGIN failed\n2026-10-31 01:03:22 LOGIN attempt from unknown device\n2026-10-31 01:03:23 LOGIN successful\n2026-10-31 01:03:25 USERNAME: ZORBLAX_OVERLORD\n2026-10-31 01:04:00 USER accesses /research/aliens\n2026-10-31 01:04:12 USER downloads species/greys.txt\n2026-10-31 01:05:00 USER accesses classified/crash-retrieval.txt\n2026-10-31 01:06:00 USER accesses conspiracies/new-world-order.txt\n2026-10-31 01:07:00 USER attempts to access classified/final-warning.txt\n2026-10-31 01:07:01 ACCESS DENIED\n2026-10-31 01:07:03 SECURITY ALERT\n2026-10-31 01:08:00 UNKNOWN DEVICE DISCONNECTED\n\nSECURITY WARNING:\nPassword appears to be nibiru123.\nRecommend immediate password change.",
+                    ),
+
+                    "alien-activity.log": textFile(
+                        "2026-10-31 00:01 Croydon field station online\n2026-10-31 00:15 Unidentified light observed above Addington\n2026-10-31 00:22 Possible Grey activity near East Croydon\n2026-10-31 00:34 Unknown vehicle seen outside field station\n2026-10-31 00:45 Reptilian activity suspected\n2026-10-31 01:03 Unknown network device connected\n2026-10-31 01:15 Signal detected from underground location\n2026-10-31 01:30 Possible underwater transmission received\n2026-10-31 01:42 Signal identifies itself as ZORBLAX\n2026-10-31 01:45 Message received: WE ARE ALREADY HERE\n2026-10-31 02:00 All monitoring equipment shuts down\n2026-10-31 02:01 Emergency lighting activated\n2026-10-31 02:02 Unknown footsteps detected\n2026-10-31 02:03 Security camera feed interrupted\n2026-10-31 02:04 Terminal receives incoming message\n2026-10-31 02:05 Message: DO NOT TRUST THE COUNCIL\n2026-10-31 02:06 Message: THEY ARE NOT HUMAN\n2026-10-31 02:07 Message: ALSO YOUR WINDOWS LICENCE HAS EXPIRED",
+                    ),
+                }),
+            }),
+        });
+        let workingDirectory: string[] = [];
+        let pager: PagerState | null = null;
+        const tokenize = (value: string) =>
+            [...value.matchAll(/"([^"]*)"|'([^']*)'|(\S+)/g)].map(
+                (match) => match[1] ?? match[2] ?? match[3],
+            );
+        const absolutePath = (path: string) => {
+            const parts = path.startsWith("/") ? [] : [...workingDirectory];
+            for (const part of path.split("/")) {
+                if (!part || part === ".") continue;
+                if (part === "..") parts.pop();
+                else parts.push(part);
+            }
+            return parts;
+        };
+        const getNode = (path: string): FileNode | null => {
+            let node: FileNode = filesystem;
+            for (const part of absolutePath(path)) {
+                if (node.type !== "directory" || !node.children[part])
+                    return null;
+                node = node.children[part];
+            }
+            return node;
+        };
+        const nodePath = (parts: string[]) => `/${parts.join("/")}`;
+        const displayPath = (parts: string[]) =>
+            nodePath(parts).replace(/^\/home\/tabrez$/, "~");
+        const escapeRegExp = (value: string) =>
+            value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const expandPaths = (patterns: string[]) =>
+            patterns.flatMap((pattern) => {
+                if (!pattern.includes("*")) return [pattern];
+                const slash = pattern.lastIndexOf("/");
+                const directoryPath =
+                    slash < 0 ? "." : pattern.slice(0, slash) || "/";
+                const filePattern = pattern.slice(slash + 1);
+                const node = getNode(directoryPath);
+                if (!node || node.type !== "directory") return [pattern];
+                const matcher = new RegExp(
+                    `^${escapeRegExp(filePattern).replace(/\\\*/g, ".*")}$`,
+                );
+                return Object.keys(node.children)
+                    .filter((name) => matcher.test(name))
+                    .map(
+                        (name) =>
+                            `${directoryPath === "/" ? "" : directoryPath.replace(/\/$/, "")}/${name}` ||
+                            `/${name}`,
+                    );
+            });
+        const readFile = (path: string) => {
+            const node = getNode(path);
+            if (!node)
+                return { error: `cat: ${path}: No such file or directory` };
+            if (node.type !== "file")
+                return { error: `cat: ${path}: Is a directory` };
+            return { content: node.content };
+        };
+        const listDirectory = (
+            path: string,
+            showAll: boolean,
+            long: boolean,
+        ) => {
+            const node = getNode(path);
+            if (!node) return `ls: ${path}: No such file or directory`;
+            if (node.type === "file") return path;
+            const names = Object.keys(node.children).sort();
+            return (showAll ? [".", "..", ...names] : names)
+                .map((name) => {
+                    const child = node.children[name];
+                    if (name === "." || name === "..")
+                        return long
+                            ? `drwxr-xr-x 2 tabrez staff 0 Jan 01 00:00 ${name}`
+                            : name;
+                    const entry =
+                        child.type === "directory" ? `${name}/` : name;
+                    return long
+                        ? `${child.type === "directory" ? "drwxr-xr-x" : "-rw-r--r--"} 1 tabrez staff ${child.type === "file" ? child.content.length : 0} Jan 01 00:00 ${entry}`
+                        : entry;
+                })
+                .join("\n");
+        };
+        const collectPaths = (
+            path: string,
+            base: string[] = absolutePath(path),
+        ): string[] => {
+            const node = getNode(path);
+            if (!node) return [];
+            if (node.type === "file") return [nodePath(base)];
+            return Object.entries(node.children).flatMap(([name, child]) => {
+                const childPath = [...base, name];
+                return [
+                    nodePath(childPath),
+                    ...(child.type === "directory"
+                        ? collectPaths(nodePath(childPath), childPath)
+                        : []),
+                ];
+            });
+        };
+        const createOutputLine = (text: string, className = "") => {
+            const line = document.createElement("p");
+            if (className) line.className = className;
+            line.textContent = text || " ";
+            return line;
+        };
+        const openPager = (
+            mode: "more" | "less",
+            path: string,
+            content: string,
+        ) => {
+            const output = document.createElement("div");
+            output.className = "terminal-entry terminal-pager";
+            output.dataset.file = path;
+            pager = { mode, lines: content.split("\n"), page: 0, output };
+            terminalForm.hidden = true;
+            appendTerminalEntry(output);
+            renderPagerPage();
+        };
+        const renderPagerPage = () => {
+            if (!pager) return;
+            const start = pager.page * 8;
+            const pageLines = pager.lines.slice(start, start + 8);
+            pager.output.replaceChildren(
+                ...pageLines.map((line) => createOutputLine(line)),
+            );
+            const status =
+                pager.mode === "more"
+                    ? `--More-- (${Math.min(start + pageLines.length, pager.lines.length)}/${pager.lines.length}; Space/Enter next, q quit)`
+                    : `(page ${pager.page + 1}/${Math.max(1, Math.ceil(pager.lines.length / 8))}; Space/j/k/b navigate, q quit)`;
+            pager.output.append(
+                createOutputLine(status, "terminal-pager-status"),
+            );
+            terminalScreen.scrollTop = terminalScreen.scrollHeight;
+        };
+        const closePager = () => {
+            if (!pager) return;
+            pager.output.querySelector(".terminal-pager-status")?.remove();
+            pager = null;
+            terminalForm.hidden = false;
+            terminalInput.focus();
+        };
+        const pageForward = () => {
+            if (!pager) return;
+            const lastPage = Math.max(0, Math.ceil(pager.lines.length / 8) - 1);
+            if (pager.page >= lastPage) {
+                if (pager.mode === "more") closePager();
+                else renderPagerPage();
+                return;
+            }
+            pager.page += 1;
+            renderPagerPage();
+        };
+        const pageBackward = () => {
+            if (pager) {
+                pager.page = Math.max(0, pager.page - 1);
+                renderPagerPage();
+            }
+        };
+        const commands: Partial<Record<string, (args: string[]) => string>> = {
+            help: () =>
+                "Portfolio info: identity, current time, tech stack, projects, about, contact, and party mode.\nAlien research archive: /research/aliens.\nFictional field notes; reported encounters are unverified.",
+            pwd: () => nodePath(workingDirectory),
+            ls: (args) => {
+                const showAll =
+                    args.some(
+                        (arg) => arg.startsWith("-") && arg.includes("a"),
+                    ) || args.includes("--all");
+                const long =
+                    args.some(
+                        (arg) => arg.startsWith("-") && arg.includes("l"),
+                    ) || args.includes("--long");
+                const path = args.find((arg) => !arg.startsWith("-")) ?? ".";
+                const paths = expandPaths([path]);
+                if (
+                    path.includes("*") &&
+                    paths.length === 1 &&
+                    paths[0] === path
+                )
+                    return `ls: ${path}: No such file or directory`;
+                return paths
+                    .map((item) => listDirectory(item, showAll, long))
+                    .join("\n");
+            },
+            cd: (args) => {
+                const path = args[0] ?? "/home/tabrez";
+                const node = getNode(path);
+                if (!node) return `cd: ${path}: No such file or directory`;
+                if (node.type !== "directory")
+                    return `cd: ${path}: Not a directory`;
+                workingDirectory = absolutePath(path);
+                return "";
+            },
+            cat: (args) =>
+                args.length
+                    ? expandPaths(args)
+                          .map((path) => {
+                              const result = readFile(path);
+                              return result.content ?? result.error ?? "";
+                          })
+                          .join("\n")
+                    : "cat: missing file operand",
+            more: () => "",
+            less: () => "",
+            head: (args) => {
+                let count = 10;
+                const files = [...args];
+                const option = files.indexOf("-n");
+                if (option >= 0)
+                    ((count = Math.max(1, Number(files[option + 1]) || 10)),
+                        files.splice(option, 2));
+                else if (files[0]?.match(/^-[0-9]+$/))
+                    count = Number(files.shift()?.slice(1));
+                return expandPaths(files)
+                    .map((path) => {
+                        const result = readFile(path);
+                        return (
+                            result.error ??
+                            result.content
+                                ?.split("\n")
+                                .slice(0, count)
+                                .join("\n") ??
+                            ""
+                        );
+                    })
+                    .join("\n");
+            },
+            tail: (args) => {
+                let count = 10;
+                const files = [...args];
+                const option = files.indexOf("-n");
+                if (option >= 0)
+                    ((count = Math.max(1, Number(files[option + 1]) || 10)),
+                        files.splice(option, 2));
+                else if (files[0]?.match(/^-[0-9]+$/))
+                    count = Number(files.shift()?.slice(1));
+                return expandPaths(files)
+                    .map((path) => {
+                        const result = readFile(path);
+                        return (
+                            result.error ??
+                            result.content
+                                ?.split("\n")
+                                .slice(-count)
+                                .join("\n") ??
+                            ""
+                        );
+                    })
+                    .join("\n");
+            },
+            find: (args) => {
+                const path =
+                    args[0] && !args[0].startsWith("-") ? args[0] : ".";
+                const nameIndex = args.indexOf("-name");
+                const pattern = nameIndex >= 0 ? args[nameIndex + 1] : "*";
+                const matcher = new RegExp(
+                    `^${escapeRegExp(pattern).replace(/\\\*/g, ".*")}$`,
+                );
+                const node = getNode(path);
+                if (!node) return `find: ${path}: No such file or directory`;
+                const results =
+                    node.type === "file"
+                        ? [nodePath(absolutePath(path))]
+                        : [nodePath(absolutePath(path)), ...collectPaths(path)];
+                return results
+                    .filter((item) =>
+                        matcher.test(item.split("/").at(-1) ?? ""),
+                    )
+                    .join("\n");
+            },
+            grep: (args) => {
+                const insensitive =
+                    args.includes("-i") ||
+                    args.includes("-in") ||
+                    args.includes("-ni");
+                const numbered =
+                    args.includes("-n") ||
+                    args.includes("-in") ||
+                    args.includes("-ni");
+                const positional = args.filter((arg) => !arg.startsWith("-"));
+                const pattern = positional.shift();
+                if (!pattern || !positional.length)
+                    return "usage: grep [-in] PATTERN FILE...";
+                const matcher = new RegExp(
+                    escapeRegExp(pattern),
+                    insensitive ? "i" : "",
+                );
+                return (
+                    expandPaths(positional)
+                        .flatMap((path) => {
+                            const result = readFile(path);
+                            if (result.error) return [result.error];
+                            return (result.content ?? "")
+                                .split("\n")
+                                .flatMap((line, index) =>
+                                    matcher.test(line)
+                                        ? [
+                                              `${positional.length > 1 ? `${path}:` : ""}${numbered ? `${index + 1}:` : ""}${line}`,
+                                          ]
+                                        : [],
+                                );
+                        })
+                        .join("\n") || "(no matches)"
+                );
+            },
+            tree: (args) => {
+                const path = args[0] ?? ".";
+                const node = getNode(path);
+                if (!node) return `tree: ${path}: No such file or directory`;
+                const lines = [path];
+                const walk = (item: FileNode, prefix: string) => {
+                    if (item.type !== "directory") return;
+                    const entries = Object.entries(item.children).sort(
+                        ([a], [b]) => a.localeCompare(b),
+                    );
+                    entries.forEach(([name, child], index) => {
+                        const last = index === entries.length - 1;
+                        lines.push(
+                            `${prefix}${last ? "└── " : "├── "}${name}${child.type === "directory" ? "/" : ""}`,
+                        );
+                        if (child.type === "directory")
+                            walk(child, `${prefix}${last ? "    " : "│   "}`);
+                    });
+                };
+                walk(node, "");
+                return lines.join("\n");
+            },
+            stat: (args) =>
+                args
+                    .map((path) => {
+                        const node = getNode(path);
+                        if (!node)
+                            return `stat: ${path}: No such file or directory`;
+                        return `  File: ${path}\n  Type: ${node.type}\n  Size: ${node.type === "file" ? node.content.length : Object.keys(node.children).length} bytes`;
+                    })
+                    .join("\n"),
+            wc: (args) => {
+                const flags = args
+                    .filter((arg) => /^-[lwc]+$/.test(arg))
+                    .join("")
+                    .replace(/-/g, "");
+                const selected = flags ? [...new Set(flags)] : ["l", "w", "c"];
+                const files = expandPaths(
+                    args.filter((arg) => !arg.startsWith("-")),
+                );
+                return files
+                    .map((path) => {
+                        const result = readFile(path);
+                        if (result.error) return result.error;
+                        const content = result.content ?? "";
+                        const counts = {
+                            l: content.split("\n").length,
+                            w: content.trim()
+                                ? content.trim().split(/\s+/).length
+                                : 0,
+                            c: content.length,
+                        };
+                        return `${selected.map((flag) => counts[flag as keyof typeof counts]).join(" ")} ${path}`;
+                    })
+                    .join("\n");
+            },
+            history: () =>
+                history
+                    .map((entry, index) => ` ${index + 1} ${entry}`)
+                    .join("\n"),
+            man: (args) => {
+                const name = args[0];
+                const descriptions: Record<string, string> = {
+                    ls: "list directory contents",
+                    cd: "change the current directory",
+                    pwd: "print the working directory",
+                    cat: "print file contents",
+                    more: "read a file one page at a time",
+                    less: "read a file with forward and backward paging",
+                    head: "print the first lines of a file",
+                    tail: "print the last lines of a file",
+                    find: "search the archive for files",
+                    grep: "search file contents for text",
+                    tree: "show a directory tree",
+                    stat: "show file or directory details",
+                    wc: "count lines, words, and bytes",
+                };
+                return name && descriptions[name]
+                    ? `${name} - ${descriptions[name]}\n\nThis command operates on the simulated field archive.`
+                    : `No manual entry for ${name ?? "(command)"}`;
+            },
+            echo: (args) => args.join(" "),
+            uname: () => "FieldOS terminal 1.0 (simulated) x86_64",
+            whoami: () => "tabrez",
+            date: () =>
+                new Date().toLocaleString(undefined, {
+                    dateStyle: "medium",
+                    timeStyle: "medium",
+                    hourCycle: "h23",
+                }),
+            stack: () => "TypeScript · React · Astro · CSS",
+            projects: () => {
+                document
+                    .getElementById("work")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                return "Opening selected work...";
+            },
+            about: () => {
+                document
+                    .getElementById("about")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                return "Opening about.md...";
+            },
+            contact: () => {
+                document
+                    .getElementById("contact")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                return "Opening contact.txt...";
+            },
+            party: () => {
+                terminalWindow.classList.remove("is-party");
+                void terminalWindow.offsetWidth;
+                terminalWindow.classList.add("is-party");
+                window.clearTimeout(partyTimer);
+                partyBurst?.remove();
+                partyBurst = document.createElement("div");
+                partyBurst.className = "terminal-party-burst";
+                partyBurst.setAttribute("aria-hidden", "true");
+                const banner = document.createElement("pre");
+                banner.className = "terminal-party-banner";
+                banner.textContent =
+                    "+----------------------+\n|  >>> PARTY MODE <<<  |\n+----------------------+";
+                partyBurst.append(banner);
+                const symbols = [
+                    "*",
+                    "+",
+                    "x",
+                    ".",
+                    "o",
+                    "/",
+                    "\\",
+                    "|",
+                    "-",
+                    "=",
+                ];
+                const colors = ["#40f4ff", "#b9ff66", "#ff4fd8"];
+                for (let index = 0; index < 52; index += 1) {
+                    const spark = document.createElement("span");
+                    spark.className = "terminal-party-spark";
+                    spark.textContent = symbols[index % symbols.length];
+                    const burstX = index < 26 ? 28 : 72;
+                    const burstY = index < 26 ? 32 : 68;
+                    spark.style.left = `${burstX + (Math.random() - 0.5) * 16}%`;
+                    spark.style.top = `${burstY + (Math.random() - 0.5) * 16}%`;
+                    spark.style.color = colors[index % colors.length];
+                    spark.style.setProperty(
+                        "--spark-x",
+                        `${Math.round((Math.random() - 0.5) * 230)}px`,
+                    );
+                    spark.style.setProperty(
+                        "--spark-y",
+                        `${Math.round((Math.random() - 0.5) * 170)}px`,
+                    );
+                    spark.style.animationDuration = `${900 + Math.random() * 600}ms`;
+                    spark.style.animationDelay = `${Math.random() * 160}ms`;
+                    partyBurst.append(spark);
+                }
+                terminalWindow.append(partyBurst);
+                partyTimer = window.setTimeout(() => {
+                    terminalWindow.classList.remove("is-party");
+                    partyBurst?.remove();
+                    partyBurst = null;
+                }, 1750);
+                return "Neon protocol engaged. Nice moves.";
+            },
+            sudo: () =>
+                "Permission denied: your taste is already dangerously powerful.",
+        };
+
+        const clearOutput = () => {
+            terminalOutput.replaceChildren();
+            terminalScreen.scrollTop = 0;
+        };
+
+        const appendTerminalEntry = (entry: HTMLDivElement) => {
+            terminalOutput.append(entry);
+            while (
+                terminalOutput.querySelectorAll(".terminal-entry").length > 50
+            ) {
+                terminalOutput.querySelector(".terminal-entry")?.remove();
+            }
+            terminalScreen.scrollTop = terminalScreen.scrollHeight;
+        };
+
+        terminalForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const line = terminalInput.value.trim();
+            if (!line) {
+                terminalInput.value = "";
+                renderTypedText();
+                const entry = document.createElement("div");
+                entry.className = "terminal-entry terminal-entry-empty";
+                const blankLine = document.createElement("p");
+                blankLine.className = "terminal-empty-line";
+                entry.append(blankLine);
+                appendTerminalEntry(entry);
+                return;
+            }
+
+            if (history.at(-1) !== line) history.push(line);
+            if (history.length > 30) history.shift();
+            historyIndex = history.length;
+            draft = "";
+
+            const [name, ...args] = tokenize(line);
+            const commandPromptPath = displayPath(workingDirectory);
+            const commandName = name.toLowerCase();
+            if (commandName === "clear") {
+                clearOutput();
+                terminalInput.value = "";
+                renderTypedText();
+                return;
+            }
+
+            const command = commands[commandName];
+            const pagerMode =
+                commandName === "more" || commandName === "less"
+                    ? commandName
+                    : null;
+            const pagerFile = pagerMode && args[0] ? readFile(args[0]) : null;
+            if (
+                pagerMode &&
+                pagerFile &&
+                !pagerFile.error &&
+                pagerFile.content !== undefined
+            ) {
+                const commandEntry = document.createElement("div");
+                commandEntry.className = "terminal-entry";
+                commandEntry.append(
+                    createOutputLine(
+                        `tabrez@localhost:${commandPromptPath}$ ${line}`,
+                        "terminal-entry-command",
+                    ),
+                );
+                appendTerminalEntry(commandEntry);
+                openPager(pagerMode, args[0], pagerFile.content);
+                terminalInput.value = "";
+                renderTypedText();
+                return;
+            }
+            const response = pagerMode
+                ? (pagerFile?.error ?? `usage: ${pagerMode} FILE`)
+                : (command?.(args) ?? `zsh: command not found: ${name}`);
+            terminalForm.querySelector<HTMLElement>(
+                "[data-terminal-path]",
+            )!.textContent = displayPath(workingDirectory);
+            const entry = document.createElement("div");
+            entry.className = "terminal-entry";
+            const commandLine = document.createElement("p");
+            commandLine.className = "terminal-entry-command";
+            commandLine.textContent = `tabrez@localhost:${commandPromptPath}$ ${line}`;
+            entry.append(commandLine);
+            if (response) {
+                const responseLine = document.createElement("p");
+                responseLine.className =
+                    command || pagerMode
+                        ? "terminal-entry-response"
+                        : "terminal-entry-error";
+                responseLine.textContent = response;
+                entry.append(responseLine);
+            }
+            appendTerminalEntry(entry);
+            terminalInput.value = "";
+            renderTypedText();
+        });
+
+        document.addEventListener(
+            "keydown",
+            (event) => {
+                if (pager) {
+                    const key = event.key.toLowerCase();
+                    if (key === "q" || key === "escape") closePager();
+                    else if (
+                        key === " " ||
+                        key === "enter" ||
+                        key === "pagedown" ||
+                        key === "j" ||
+                        key === "arrowdown"
+                    )
+                        pageForward();
+                    else if (
+                        key === "b" ||
+                        key === "k" ||
+                        key === "pageup" ||
+                        key === "arrowup"
+                    )
+                        pageBackward();
+                    else {
+                        event.preventDefault();
+                        return;
+                    }
+                    event.preventDefault();
+                    return;
+                }
+                if (
+                    document.activeElement === terminalInput ||
+                    event.isComposing ||
+                    event.ctrlKey ||
+                    event.metaKey ||
+                    event.altKey ||
+                    event.key.length !== 1
+                )
+                    return;
+                const activeElement = document.activeElement;
+                if (
+                    activeElement instanceof HTMLElement &&
+                    (activeElement.isContentEditable ||
+                        activeElement.matches(
+                            'input, textarea, select, [role="textbox"]',
+                        ))
+                )
+                    return;
+
+                event.preventDefault();
+                terminalInput.focus();
+                terminalInput.value += event.key;
+                terminalInput.setSelectionRange(
+                    terminalInput.value.length,
+                    terminalInput.value.length,
+                );
+                renderTypedText();
+            },
+            true,
+        );
+
+        terminalInput.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowUp") {
+                event.preventDefault();
+                if (historyIndex === history.length)
+                    draft = terminalInput.value;
+                historyIndex = Math.max(0, historyIndex - 1);
+                terminalInput.value = history[historyIndex] ?? draft;
+                renderTypedText();
+            } else if (event.key === "ArrowDown") {
+                event.preventDefault();
+                historyIndex = Math.min(history.length, historyIndex + 1);
+                terminalInput.value =
+                    historyIndex === history.length
+                        ? draft
+                        : (history[historyIndex] ?? "");
+                renderTypedText();
+            } else if (
+                (event.ctrlKey || event.metaKey) &&
+                event.key.toLowerCase() === "l"
+            ) {
+                event.preventDefault();
+                clearOutput();
+            }
+        });
+    }
 </script>
 
 <style is:global>
-	.interactive-terminal-pane {
-		min-width: 0;
-		overflow: hidden;
-		border: 1px solid #413052;
-		background: #100e1d;
-		grid-column: 1 / -1;
-	}
+    .interactive-terminal-pane {
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid #413052;
+        background: #100e1d;
+        grid-column: 1 / -1;
+    }
 
-	.interactive-terminal-pane .pane-title {
-		min-height: 27px;
-		padding: 0 10px;
-		border-bottom: 1px solid #38294b;
-		background: #171326;
-		color: #847499;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		font: 9px 'Space Mono', monospace;
-	}
+    .interactive-terminal-pane .pane-title {
+        min-height: 27px;
+        padding: 0 10px;
+        border-bottom: 1px solid #38294b;
+        background: #171326;
+        color: #847499;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font:
+            9px "Space Mono",
+            monospace;
+    }
 
-	.interactive-terminal-pane .pane-title span:first-child {
-		color: #40f4ff;
-	}
+    .interactive-terminal-pane .pane-title span:first-child {
+        color: #40f4ff;
+    }
 
-	.interactive-terminal-pane .status-output {
-		height: 180px;
-		min-height: 180px;
-		max-height: 180px;
-		padding: 8px 17px;
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-		overflow-x: hidden;
-		overflow-y: auto;
-		overscroll-behavior: contain;
-		color: #c1b6d2;
-		font: 9px 'Space Mono', monospace;
-	}
+    .interactive-terminal-pane .status-output {
+        height: 180px;
+        min-height: 180px;
+        max-height: 180px;
+        padding: 8px 17px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        color: #c1b6d2;
+        font:
+            9px "Space Mono",
+            monospace;
+    }
 
-	.interactive-terminal-pane .status-output p {
-		margin: 0;
-	}
+    .interactive-terminal-pane .status-output p {
+        margin: 0;
+    }
 
-	.interactive-terminal-pane .terminal-transcript {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-		font-size: 9px;
-		white-space: pre-wrap;
-	}
+    .interactive-terminal-pane .terminal-transcript {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 9px;
+        white-space: pre-wrap;
+    }
 
-	.interactive-terminal-pane .terminal-entry {
-		display: grid;
-		gap: 4px;
-	}
+    .interactive-terminal-pane .terminal-entry {
+        display: grid;
+        gap: 4px;
+    }
 
-	.interactive-terminal-pane .terminal-empty-line {
-		height: 1em;
-	}
+    .interactive-terminal-pane .terminal-empty-line {
+        height: 1em;
+    }
 
-	.interactive-terminal-pane .terminal-entry-command,
-	.interactive-terminal-pane .terminal-entry-response,
-	.interactive-terminal-pane .terminal-entry-error {
-		margin: 0;
-	}
+    .interactive-terminal-pane .terminal-entry-command,
+    .interactive-terminal-pane .terminal-entry-response,
+    .interactive-terminal-pane .terminal-entry-error {
+        margin: 0;
+    }
 
-	.interactive-terminal-pane .terminal-entry-command {
-		color: #8d7eaa;
-	}
+    .interactive-terminal-pane .terminal-entry-command {
+        color: #8d7eaa;
+    }
 
-	.interactive-terminal-pane .terminal-entry-response {
-		color: #40f4ff;
-	}
+    .interactive-terminal-pane .terminal-entry-response {
+        color: #40f4ff;
+    }
 
-	.interactive-terminal-pane .terminal-entry-error {
-		color: #ff7b86;
-	}
+    .interactive-terminal-pane .terminal-entry-error {
+        color: #ff7b86;
+    }
 
-	.interactive-terminal-pane .terminal-command {
-		min-width: 0;
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		color: #c1b6d2;
-		font-size: 9px;
-	}
+    .interactive-terminal-pane .terminal-pager-status {
+        color: #b9ff66;
+    }
 
-	.interactive-terminal-pane .terminal-prompt-line {
-		min-width: 0;
-		word-break: break-word;
-	}
+    .interactive-terminal-pane .terminal-command {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #c1b6d2;
+        font-size: 9px;
+    }
 
-	.interactive-terminal-pane .terminal-cursor {
-		display: inline-block;
-		width: 6px;
-		height: 10px;
-		background: #b9ff66;
-		vertical-align: -1px;
-		animation: terminal-cursor-blink 1s steps(2, start) infinite;
-	}
+    .interactive-terminal-pane .terminal-prompt-line {
+        min-width: 0;
+        word-break: break-word;
+    }
 
-	@keyframes terminal-cursor-blink {
-		to {
-			visibility: hidden;
-		}
-	}
+    .interactive-terminal-pane .terminal-cursor {
+        display: inline-block;
+        width: 6px;
+        height: 10px;
+        background: #b9ff66;
+        vertical-align: -1px;
+        animation: terminal-cursor-blink 1s steps(2, start) infinite;
+    }
 
-	.interactive-terminal-pane .terminal-sr-input {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		padding: 0;
-		border: 0;
-		margin: -1px;
-		overflow: hidden;
-		clip: rect(0, 0, 0, 0);
-		white-space: nowrap;
-	}
+    @keyframes terminal-cursor-blink {
+        to {
+            visibility: hidden;
+        }
+    }
 
-	.interactive-terminal-pane .prompt-symbol,
-	.interactive-terminal-pane .status-branch {
-		color: #ff4fd8;
-	}
+    .interactive-terminal-pane .terminal-sr-input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        border: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+    }
 
-	.interactive-terminal-pane .status-clean,
-	.interactive-terminal-pane .stack-list span {
-		color: #b9ff66;
-	}
+    .interactive-terminal-pane .prompt-symbol,
+    .interactive-terminal-pane .status-branch {
+        color: #ff4fd8;
+    }
 
-	.interactive-terminal-pane .stack-list {
-		color: #40f4ff;
-	}
+    .interactive-terminal-pane .status-clean,
+    .interactive-terminal-pane .stack-list span {
+        color: #b9ff66;
+    }
 
-	.terminal-window.is-party {
-		animation: terminal-party 220ms steps(2, end) 5;
-	}
+    .interactive-terminal-pane .stack-list {
+        color: #40f4ff;
+    }
 
-	.terminal-party-burst {
-		position: absolute;
-		inset: 0;
-		z-index: 3;
-		overflow: hidden;
-		pointer-events: none;
-	}
+    .terminal-window.is-party {
+        animation: terminal-party 220ms steps(2, end) 5;
+    }
 
-	.terminal-party-spark {
-		position: absolute;
-		z-index: 1;
-		font-family: 'Space Mono', monospace;
-		font-size: 14px;
-		font-weight: 700;
-		text-shadow: 0 0 9px currentColor;
-		animation: party-spark 1050ms cubic-bezier(0.15, 0.7, 0.3, 1) both;
-	}
+    .terminal-party-burst {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        overflow: hidden;
+        pointer-events: none;
+    }
 
-	.terminal-party-banner {
-		position: absolute;
-		z-index: 2;
-		top: 50%;
-		left: 50%;
-		margin: 0;
-		color: #b9ff66;
-		font-family: 'Space Mono', monospace;
-		font-size: 11px;
-		line-height: 1.5;
-		text-align: center;
-		text-shadow: 0 0 12px #b9ff66a0;
-		transform: translate(-50%, -50%);
-		animation: party-banner 1500ms ease-out both;
-	}
+    .terminal-party-spark {
+        position: absolute;
+        z-index: 1;
+        font-family: "Space Mono", monospace;
+        font-size: 14px;
+        font-weight: 700;
+        text-shadow: 0 0 9px currentColor;
+        animation: party-spark 1050ms cubic-bezier(0.15, 0.7, 0.3, 1) both;
+    }
 
-	@keyframes terminal-party {
-		50% {
-			border-color: #b9ff66;
-			box-shadow: 0 0 0 1px #b9ff6640, 0 0 22px #40f4ff65;
-		}
-	}
+    .terminal-party-banner {
+        position: absolute;
+        z-index: 2;
+        top: 50%;
+        left: 50%;
+        margin: 0;
+        color: #b9ff66;
+        font-family: "Space Mono", monospace;
+        font-size: 11px;
+        line-height: 1.5;
+        text-align: center;
+        text-shadow: 0 0 12px #b9ff66a0;
+        transform: translate(-50%, -50%);
+        animation: party-banner 1500ms ease-out both;
+    }
 
-	@keyframes party-spark {
-		0% {
-			opacity: 0;
-			transform: translate(-50%, -50%) scale(0.25) rotate(0deg);
-		}
-		15% {
-			opacity: 1;
-		}
-		100% {
-			opacity: 0;
-			transform: translate(calc(-50% + var(--spark-x)), calc(-50% + var(--spark-y))) scale(1.35) rotate(180deg);
-		}
-	}
+    @keyframes terminal-party {
+        50% {
+            border-color: #b9ff66;
+            box-shadow:
+                0 0 0 1px #b9ff6640,
+                0 0 22px #40f4ff65;
+        }
+    }
 
-	@keyframes party-banner {
-		0% {
-			opacity: 0;
-			transform: translate(-50%, -50%) scale(0.55);
-		}
-		15%,
-		68% {
-			opacity: 1;
-			transform: translate(-50%, -50%) scale(1);
-		}
-		100% {
-			opacity: 0;
-			transform: translate(-50%, -65%) scale(1.08);
-		}
-	}
+    @keyframes party-spark {
+        0% {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.25) rotate(0deg);
+        }
+        15% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+            transform: translate(
+                    calc(-50% + var(--spark-x)),
+                    calc(-50% + var(--spark-y))
+                )
+                scale(1.35) rotate(180deg);
+        }
+    }
 
-	@media (max-width: 900px) {
-		.interactive-terminal-pane .status-output {
-			grid-template-columns: 1fr;
-		}
-	}
+    @keyframes party-banner {
+        0% {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.55);
+        }
+        15%,
+        68% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: translate(-50%, -65%) scale(1.08);
+        }
+    }
 
-	@media (max-width: 640px) {
-		.interactive-terminal-pane .status-output {
-			padding-right: 10px;
-			padding-left: 10px;
-			font-size: 8px;
-		}
-	}
+    @media (max-width: 900px) {
+        .interactive-terminal-pane .status-output {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .interactive-terminal-pane .status-output {
+            padding-right: 10px;
+            padding-left: 10px;
+            font-size: 8px;
+        }
+    }
 </style>

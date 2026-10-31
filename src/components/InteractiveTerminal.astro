@@ -8,8 +8,8 @@
 			<p class="stack-list">TypeScript <span>·</span> React <span>·</span> Astro <span>·</span> CSS</p>
 		</div>
 		<form class="terminal-command" data-terminal-form>
-			<label for="terminal-input"><span class="prompt-symbol">❯</span> tabrez@localhost:~$ <span class="terminal-cursor" aria-hidden="true"></span></label>
-			<input id="terminal-input" name="command" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="try help" aria-label="Terminal command" />
+			<p class="terminal-prompt-line"><span class="prompt-symbol">❯</span> tabrez@localhost:~$ <span data-typed-text></span><span class="terminal-cursor" aria-hidden="true"></span></p>
+			<input id="terminal-input" class="terminal-sr-input" name="command" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal command" />
 		</form>
 	</div>
 </div>
@@ -17,10 +17,16 @@
 <script>
 	const terminalForm = document.querySelector<HTMLFormElement>('[data-terminal-form]');
 	const terminalInput = terminalForm?.querySelector<HTMLInputElement>('input');
+	const terminalTypedText = terminalForm?.querySelector<HTMLElement>('[data-typed-text]');
 	const terminalOutput = document.querySelector<HTMLElement>('[data-terminal-output]');
 	const terminalScreen = terminalForm?.closest<HTMLElement>('.status-output');
 	const terminalWindow = terminalForm?.closest<HTMLElement>('.terminal-window');
-	if (terminalForm && terminalInput && terminalOutput && terminalScreen && terminalWindow) {
+	if (terminalForm && terminalInput && terminalTypedText && terminalOutput && terminalScreen && terminalWindow) {
+		const renderTypedText = () => {
+			terminalTypedText.textContent = terminalInput.value;
+		};
+		terminalInput.addEventListener('input', renderTypedText);
+		terminalScreen.addEventListener('click', () => terminalInput.focus());
 		const history: string[] = [];
 		let historyIndex = 0;
 		let draft = '';
@@ -89,10 +95,28 @@
 			terminalScreen.scrollTop = 0;
 		};
 
+		const appendTerminalEntry = (entry: HTMLDivElement) => {
+			terminalOutput.append(entry);
+			while (terminalOutput.querySelectorAll('.terminal-entry').length > 50) {
+				terminalOutput.querySelector('.terminal-entry')?.remove();
+			}
+			terminalScreen.scrollTop = terminalScreen.scrollHeight;
+		};
+
 		terminalForm.addEventListener('submit', (event) => {
 			event.preventDefault();
 			const line = terminalInput.value.trim();
-			if (!line) return;
+			if (!line) {
+				terminalInput.value = '';
+				renderTypedText();
+				const entry = document.createElement('div');
+				entry.className = 'terminal-entry terminal-entry-empty';
+				const blankLine = document.createElement('p');
+				blankLine.className = 'terminal-empty-line';
+				entry.append(blankLine);
+				appendTerminalEntry(entry);
+				return;
+			}
 
 			if (history.at(-1) !== line) history.push(line);
 			if (history.length > 30) history.shift();
@@ -103,6 +127,7 @@
 			if (name.toLowerCase() === 'clear') {
 				clearOutput();
 				terminalInput.value = '';
+				renderTypedText();
 				return;
 			}
 
@@ -117,24 +142,22 @@
 			responseLine.className = command ? 'terminal-entry-response' : 'terminal-entry-error';
 			responseLine.textContent = response;
 			entry.append(commandLine, responseLine);
-			terminalOutput.append(entry);
-			while (terminalOutput.querySelectorAll('.terminal-entry').length > 50) {
-				terminalOutput.querySelector('.terminal-entry')?.remove();
-			}
-			terminalScreen.scrollTop = terminalScreen.scrollHeight;
+			appendTerminalEntry(entry);
 			terminalInput.value = '';
+			renderTypedText();
 		});
 
 		document.addEventListener('keydown', (event) => {
-			if (document.activeElement === terminalInput || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey || event.key.length !== 1) return;
+			if (document.activeElement === terminalInput || event.isComposing || event.ctrlKey || event.metaKey || event.altKey || event.key.length !== 1) return;
 			const activeElement = document.activeElement;
-			if (activeElement instanceof HTMLElement && (activeElement.isContentEditable || activeElement.matches('input, textarea, select, button, a[href], [role="button"], [tabindex]'))) return;
+			if (activeElement instanceof HTMLElement && (activeElement.isContentEditable || activeElement.matches('input, textarea, select, [role="textbox"]'))) return;
 
 			event.preventDefault();
 			terminalInput.focus();
 			terminalInput.value += event.key;
 			terminalInput.setSelectionRange(terminalInput.value.length, terminalInput.value.length);
-		});
+			renderTypedText();
+		}, true);
 
 		terminalInput.addEventListener('keydown', (event) => {
 			if (event.key === 'ArrowUp') {
@@ -142,10 +165,12 @@
 				if (historyIndex === history.length) draft = terminalInput.value;
 				historyIndex = Math.max(0, historyIndex - 1);
 				terminalInput.value = history[historyIndex] ?? draft;
+				renderTypedText();
 			} else if (event.key === 'ArrowDown') {
 				event.preventDefault();
 				historyIndex = Math.min(history.length, historyIndex + 1);
 				terminalInput.value = historyIndex === history.length ? draft : history[historyIndex] ?? '';
+				renderTypedText();
 			} else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'l') {
 				event.preventDefault();
 				clearOutput();
@@ -211,6 +236,10 @@
 		gap: 4px;
 	}
 
+	.interactive-terminal-pane .terminal-empty-line {
+		height: 1em;
+	}
+
 	.interactive-terminal-pane .terminal-entry-command,
 	.interactive-terminal-pane .terminal-entry-response,
 	.interactive-terminal-pane .terminal-entry-error {
@@ -231,7 +260,6 @@
 
 	.interactive-terminal-pane .terminal-command {
 		min-width: 0;
-		margin-top: auto;
 		display: flex;
 		align-items: center;
 		gap: 8px;
@@ -239,8 +267,9 @@
 		font-size: 9px;
 	}
 
-	.interactive-terminal-pane .terminal-command label {
-		flex: 0 0 auto;
+	.interactive-terminal-pane .terminal-prompt-line {
+		min-width: 0;
+		word-break: break-word;
 	}
 
 	.interactive-terminal-pane .terminal-cursor {
@@ -252,36 +281,22 @@
 		animation: terminal-cursor-blink 1s steps(2, start) infinite;
 	}
 
-	.interactive-terminal-pane .terminal-command:focus-within .terminal-cursor {
-		visibility: hidden;
-	}
-
 	@keyframes terminal-cursor-blink {
 		to {
 			visibility: hidden;
 		}
 	}
 
-	.interactive-terminal-pane .terminal-command input {
-		min-width: 0;
-		flex: 1;
-		padding: 3px 0;
+	.interactive-terminal-pane .terminal-sr-input {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
 		border: 0;
-		border-bottom: 1px solid transparent;
-		border-radius: 0;
-		outline: 0;
-		background: transparent;
-		color: #f6f1ff;
-		font: inherit;
-		caret-color: #b9ff66;
-	}
-
-	.interactive-terminal-pane .terminal-command input::placeholder {
-		color: #716780;
-	}
-
-	.interactive-terminal-pane .terminal-command input:focus-visible {
-		border-bottom-color: #b9ff66;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
 	}
 
 	.interactive-terminal-pane .prompt-symbol,

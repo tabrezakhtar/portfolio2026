@@ -283,6 +283,7 @@ const aboutProjects = [
 	}
 
 	:global(body) {
+		--page-gutter: 10px;
 		margin: 0;
 		background-color: #0b0b1c;
 		background-image:
@@ -307,8 +308,8 @@ const aboutProjects = [
 	.site-shell {
 		width: auto;
 		max-width: none;
-		margin: 0 auto 0 250px;
-		padding: 0 clamp(12px, 1.5vw, 24px) 0 clamp(12px, 1.5vw, 24px);
+		margin: var(--page-gutter) var(--page-gutter) var(--page-gutter) calc(250px + 2 * var(--page-gutter));
+		padding: 0;
 	}
 
 	.site-header {
@@ -1244,9 +1245,8 @@ const aboutProjects = [
 
 	@media (max-width: 900px) {
 		.site-shell {
-			margin: 0 auto;
-			padding-right: 5%;
-			padding-left: 5%;
+			margin: var(--page-gutter);
+			padding: 0;
 		}
 
 		.hero {
@@ -1280,8 +1280,7 @@ const aboutProjects = [
 
 	@media (max-width: 640px) {
 		.site-shell {
-			padding-right: 22px;
-			padding-left: 22px;
+			padding: 0;
 		}
 
 		.site-header {

@@ -67,6 +67,8 @@
         terminalWindow
     ) {
         const renderTypedText = () => {
+            lastTabValue = "";
+            lastTabMatches = [];
             terminalTypedText.textContent = terminalInput.value;
         };
         terminalInput.addEventListener("input", renderTypedText);
@@ -74,6 +76,8 @@
         const history: string[] = [];
         let historyIndex = 0;
         let draft = "";
+        let lastTabValue = "";
+        let lastTabMatches: string[] = [];
         let partyTimer = 0;
         let partyBurst: HTMLDivElement | null = null;
         type FileNode =
@@ -466,8 +470,16 @@
                 (match) => match[1] ?? match[2] ?? match[3],
             );
         const absolutePath = (path: string) => {
-            const parts = path.startsWith("/") ? [] : [...workingDirectory];
-            for (const part of path.split("/")) {
+            const expandedPath =
+                path === "~"
+                    ? "/home/tabrez"
+                    : path.startsWith("~/")
+                      ? `/home/tabrez/${path.slice(2)}`
+                      : path;
+            const parts = expandedPath.startsWith("/")
+                ? []
+                : [...workingDirectory];
+            for (const part of expandedPath.split("/")) {
                 if (!part || part === ".") continue;
                 if (part === "..") parts.pop();
                 else parts.push(part);
@@ -618,7 +630,7 @@
         };
         const commands: Partial<Record<string, (args: string[]) => string>> = {
             help: () =>
-                "Portfolio info: identity, current time, tech stack, projects, about, contact, and party mode.\nAlien research archive: /research.\nFictional field notes; reported encounters are unverified.",
+                "Portfolio info: identity, current time, tech stack, projects, about, contact, and party mode.\nAlien research archive: /research.\nType a command or path and press Tab to complete it.\nFictional field notes; reported encounters are unverified.",
             pwd: () => nodePath(workingDirectory),
             ls: (args) => {
                 const showAll =
@@ -931,6 +943,156 @@
                 "Permission denied: your taste is already dangerously powerful.",
         };
 
+        const completionOptions: Record<string, string[]> = {
+            cd: ["--"],
+            find: ["-name"],
+            grep: ["-i", "-n", "-in"],
+            head: ["-n"],
+            ls: ["-a", "-l", "-la", "--all", "--long"],
+            tail: ["-n"],
+            wc: ["-c", "-l", "-w", "-lw", "-lwc"],
+        };
+        const pathCompletionCommands = new Set([
+            "cd",
+            "ls",
+            "cat",
+            "more",
+            "less",
+            "head",
+            "tail",
+            "stat",
+            "wc",
+        ]);
+        const commandNames = () => [...Object.keys(commands), "clear"].sort();
+        const commonPrefix = (values: string[]) => {
+            if (!values.length) return "";
+            let prefix = values[0];
+            for (const value of values.slice(1)) {
+                let index = 0;
+                while (
+                    index < prefix.length &&
+                    index < value.length &&
+                    prefix[index] === value[index]
+                )
+                    index += 1;
+                prefix = prefix.slice(0, index);
+            }
+            return prefix;
+        };
+        const completePath = (prefix: string) => {
+            if (prefix === "~") return ["~/"];
+            const slash = prefix.lastIndexOf("/");
+            const directoryPrefix = slash < 0 ? "" : prefix.slice(0, slash + 1);
+            const directoryPath =
+                slash < 0 ? "." : prefix.slice(0, slash) || "/";
+            const baseName = prefix.slice(slash + 1);
+            const node = getNode(directoryPath);
+            if (!node || node.type !== "directory") return [];
+            return Object.entries(node.children)
+                .filter(([name]) => name.startsWith(baseName))
+                .map(
+                    ([name, child]) =>
+                        `${directoryPrefix}${name}${child.type === "directory" ? "/" : ""}`,
+                )
+                .sort((left, right) => left.localeCompare(right));
+        };
+        const completionCandidates = (
+            beforeToken: string[],
+            prefix: string,
+        ): string[] => {
+            if (!beforeToken.length)
+                return commandNames().filter((name) => name.startsWith(prefix));
+
+            const commandName = beforeToken[0].toLowerCase();
+            const args = beforeToken.slice(1);
+            if (commandName === "man")
+                return commandNames().filter((name) => name.startsWith(prefix));
+            if (prefix.startsWith("-"))
+                return (completionOptions[commandName] ?? []).filter((option) =>
+                    option.startsWith(prefix),
+                );
+
+            if (commandName === "find" && args.includes("-name")) {
+                const root = args.find((arg) => !arg.startsWith("-")) ?? ".";
+                const node = getNode(root);
+                if (!node) return [];
+                const paths =
+                    node.type === "file"
+                        ? [nodePath(absolutePath(root))]
+                        : [root, ...collectPaths(root)];
+                return [...new Set(paths.map((path) => path.split("/").at(-1) ?? ""))]
+                    .filter(Boolean)
+                    .filter((name) => name.startsWith(prefix))
+                    .sort();
+            }
+
+            if (
+                pathCompletionCommands.has(commandName) ||
+                (commandName === "grep" &&
+                    args.filter((arg) => !arg.startsWith("-")).length >= 1) ||
+                commandName === "find"
+            )
+                return completePath(prefix);
+            return [];
+        };
+        const showCompletions = (matches: string[]) => {
+            const entry = document.createElement("div");
+            entry.className = "terminal-entry terminal-completion-list";
+            entry.append(createOutputLine(matches.join("    ")));
+            appendTerminalEntry(entry);
+        };
+        const completeInput = () => {
+            const value = terminalInput.value;
+            const cursor = terminalInput.selectionStart ?? value.length;
+            const selectionEnd = terminalInput.selectionEnd ?? cursor;
+            const left = value.slice(0, cursor);
+            const tokenStart = left.search(/\S*$/);
+            const rawPrefix = left.slice(tokenStart);
+            const quote = rawPrefix.startsWith('"') || rawPrefix.startsWith("'")
+                ? rawPrefix[0]
+                : "";
+            const prefix = quote ? rawPrefix.slice(1) : rawPrefix;
+            const beforeToken = tokenize(left.slice(0, tokenStart));
+            const matches = completionCandidates(beforeToken, prefix);
+            if (!matches.length) {
+                lastTabValue = "";
+                lastTabMatches = [];
+                return;
+            }
+
+            const tokenEndMatch = value.slice(selectionEnd).match(/^\S*/);
+            const tokenEnd = selectionEnd + (tokenEndMatch?.[0].length ?? 0);
+            const multiple = matches.length > 1;
+            const common = multiple ? commonPrefix(matches) : matches[0];
+            const repeatedTab =
+                value === lastTabValue &&
+                matches.length === lastTabMatches.length &&
+                matches.every((match, index) => match === lastTabMatches[index]);
+
+            if (multiple && common.length <= prefix.length) {
+                if (repeatedTab) showCompletions(matches);
+                lastTabValue = value;
+                lastTabMatches = matches;
+                return;
+            }
+
+            const completion = multiple ? common : matches[0];
+            const suffix = completion.endsWith("/")
+                ? ""
+                : quote
+                  ? quote
+                  : " ";
+            const replacement = `${quote}${completion}${suffix}`;
+            const nextValue =
+                value.slice(0, tokenStart) + replacement + value.slice(tokenEnd);
+            terminalInput.value = nextValue;
+            const nextCursor = tokenStart + replacement.length;
+            terminalInput.setSelectionRange(nextCursor, nextCursor);
+            terminalTypedText.textContent = nextValue;
+            lastTabValue = nextValue;
+            lastTabMatches = matches;
+        };
+
         const clearOutput = () => {
             terminalOutput.replaceChildren();
             terminalScreen.scrollTop = 0;
@@ -1088,7 +1250,10 @@
         );
 
         terminalInput.addEventListener("keydown", (event) => {
-            if (event.key === "ArrowUp") {
+            if (event.key === "Tab") {
+                event.preventDefault();
+                completeInput();
+            } else if (event.key === "ArrowUp") {
                 event.preventDefault();
                 if (historyIndex === history.length)
                     draft = terminalInput.value;

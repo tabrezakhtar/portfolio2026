@@ -11,11 +11,30 @@ interface Props {
 	};
 }
 
+interface PostMetadata {
+	title?: string;
+	pubDate?: string | Date;
+}
+
 const { frontmatter } = Astro.props;
 const postDate = frontmatter.pubDate ? new Date(frontmatter.pubDate) : null;
 const dateLabel = postDate && !Number.isNaN(postDate.getTime())
 	? new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(postDate)
 	: '';
+const posts = Object.entries(
+	import.meta.glob<{ frontmatter: PostMetadata }>('../pages/posts/*.md', { eager: true }),
+)
+	.map(([path, post]) => {
+		const slug = path.split('/').pop()?.replace(/\.md$/, '') ?? '';
+		const date = new Date(post.frontmatter.pubDate ?? '');
+		return { slug, title: post.frontmatter.title ?? slug, date };
+	})
+	.filter((post) => post.slug && !Number.isNaN(post.date.getTime()))
+	.sort((first, second) => second.date.getTime() - first.date.getTime());
+const currentSlug = Astro.url.pathname.split('/').filter(Boolean).at(-1);
+const currentIndex = posts.findIndex((post) => post.slug === currentSlug);
+const previousPost = currentIndex >= 0 ? posts[currentIndex + 1] : undefined;
+const nextPost = currentIndex > 0 ? posts[currentIndex - 1] : undefined;
 ---
 
 <Layout title={frontmatter.title} description={frontmatter.description}>
@@ -37,11 +56,35 @@ const dateLabel = postDate && !Number.isNaN(postDate.getTime())
 				)}
 			</header>
 			<div class="post-content"><slot /></div>
+			<nav class="article-navigation" aria-label="Article navigation">
+				{previousPost ? (
+					<a class="article-nav-link previous" href={`/posts/${previousPost.slug}`}>
+						<span class="article-nav-label"><span aria-hidden="true">←</span> Previous article</span>
+						<span class="article-nav-title">{previousPost.title}</span>
+					</a>
+				) : <span class="article-nav-empty" aria-hidden="true"></span>}
+				{nextPost && (
+					<a class="article-nav-link next" href={`/posts/${nextPost.slug}`}>
+						<span class="article-nav-label">Next article <span aria-hidden="true">→</span></span>
+						<span class="article-nav-title">{nextPost.title}</span>
+					</a>
+				)}
+			</nav>
 		</article>
 	</main>
 </Layout>
 
 <style is:global>
+	html, body { min-height: 100%; }
+	body {
+		background-color: #0b0b1c;
+		background-image:
+			repeating-linear-gradient(0deg, transparent 0, transparent 3px, #b996ff08 4px),
+			linear-gradient(90deg, #ff4fd806 1px, transparent 1px),
+			linear-gradient(#40f4ff06 1px, transparent 1px);
+		background-size: auto, 42px 42px, 42px 42px;
+		color: #f6f1ff;
+	}
 	.post-shell { width: min(940px, calc(100% - 32px)); margin: 30px auto 70px; }
 	.post-back { margin-bottom: 18px; color: #40f4ff; display: inline-flex; align-items: center; gap: 9px; font-family: 'Space Mono', monospace; font-size: 11px; text-decoration: none; }
 	.post-window { border: 1px solid #59406f; background: #100e1d; box-shadow: 0 0 0 1px #ff4fd80c, 0 14px 52px #03020b70; }
@@ -64,9 +107,24 @@ const dateLabel = postDate && !Number.isNaN(postDate.getTime())
 	.post-content code { font-family: 'Space Mono', monospace; font-size: 0.88em; }
 	.post-content :not(pre) > code { padding: 2px 5px; border: 1px solid #392950; background: #151321; color: #ff9be9; }
 	.post-content blockquote { padding-left: 18px; border-left: 2px solid #ff4fd8; color: #a99dbf; }
+	.article-navigation {
+		padding: 20px clamp(24px, 5vw, 52px);
+		border-top: 1px solid #453156;
+		display: flex;
+		justify-content: space-between;
+		gap: 20px;
+	}
+	.article-nav-link { min-width: 0; display: flex; flex-direction: column; gap: 7px; text-decoration: none; }
+	.article-nav-link.next { margin-left: auto; text-align: right; }
+	.article-nav-label { color: #40f4ff; font-family: 'Space Mono', monospace; font-size: 9px; }
+	.article-nav-title { color: #e6d9f5; font-family: 'Space Grotesk', sans-serif; font-size: 14px; }
+	.article-nav-link:hover .article-nav-title, .article-nav-link:focus-visible .article-nav-title { color: #ff9be9; }
+	.article-nav-empty { flex: 1; }
 	@media (max-width: 640px) {
 		.post-shell { width: calc(100% - 20px); margin: 18px auto 44px; }
 		.post-content { font-size: 14px; }
 		.post-content pre { padding: 12px; font-size: 10px; }
+		.article-navigation { padding: 17px; gap: 12px; }
+		.article-nav-title { font-size: 12px; }
 	}
 </style>

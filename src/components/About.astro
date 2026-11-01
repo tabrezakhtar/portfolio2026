@@ -1,0 +1,70 @@
+---
+const companies = [
+	{ name: 'The Big Word', image: 'https://res.cloudinary.com/dx8d5hlk1/image/upload/v1778541583/thebigword_pjhf14.webp' },
+	{ name: 'Sandtable', image: 'https://res.cloudinary.com/dx8d5hlk1/image/upload/v1778541582/sandtable_bvhypy.webp' },
+	{ name: 'Mizaic', image: 'https://res.cloudinary.com/dx8d5hlk1/image/upload/v1778541581/mizaic_evuogq.webp' },
+	{ name: 'Answer Digital', image: 'https://res.cloudinary.com/dx8d5hlk1/image/upload/v1778541581/answerdigital_eursew.webp' },
+	{ name: 'Findmypast', image: 'https://res.cloudinary.com/dx8d5hlk1/image/upload/v1778541581/fmp_mpybbw.webp' },
+	{ name: 'Commonplace', image: 'https://res.cloudinary.com/dx8d5hlk1/image/upload/v1778541581/commonplace_ic9frc.webp' },
+	{ name: 'Core Three', image: 'https://res.cloudinary.com/dx8d5hlk1/image/upload/v1778541581/corethree_rgdcqo.webp' },
+];
+
+const aboutProjects = [
+	{ description: 'A place for musicians to share the instruments and gear they love', name: 'Rifftales', url: 'https://www.rifftales.net' },
+	{ description: 'A document management system built for NHS teams', name: 'Mizaic', url: 'https://www.mizaic.com' },
+	{ description: 'A way for residents to shape the future of their local area', name: 'Commonplace', url: 'https://www.commonplace.is' },
+	{ description: 'Tools for data scientists to run and manage simulations', name: 'Sandtable' },
+	{ description: 'Family history software for exploring and building family trees', name: 'Findmypast', url: 'https://www.findmypast.co.uk/' },
+];
+---
+
+<section class="about-section" id="about" aria-labelledby="about-title">
+	<div class="terminal-window content-window">
+		<div class="terminal-titlebar">
+			<span class="terminal-title-mark" aria-hidden="true">❯</span>
+			<span class="terminal-title">tabrez@localhost <span>~/about</span> zsh</span>
+			<span class="terminal-title-meta">about.md</span>
+		</div>
+		<div class="content-pane">
+			<div class="about-content">
+				<p class="terminal-prompt"><span>tabrez@localhost</span>:~/about$ cat about.md</p>
+				<h2 id="about-title">About<span class="coral-dot">.</span></h2>
+				<div class="about-bio">
+					<p>I’m Tabrez, a full-stack developer who turns good ideas into practical, reliable software that solves real problems.</p>
+					<p>I like finding the simple approach: something that works well now, is easy to look after, and has room to grow.</p>
+					<p>I enjoy working with thoughtful people, whether that means starting something new or lending a hand where it’s needed.</p>
+					<p class="about-invitation"><strong>Have something good in mind? I’d love to <a href="mailto:hello@melodyapps.co.uk">hear about it</a>.</strong></p>
+				</div>
+
+				<div class="company-strip" aria-label="Companies I’ve worked with">
+					<p class="capabilities-label">COMPANIES I’VE WORKED WITH</p>
+					<div class="company-logos">
+						{companies.map((company) => (
+							<div class="company-logo-item">
+								<img src={company.image} alt={company.name} loading="lazy" />
+							</div>
+						))}
+					</div>
+				</div>
+
+				<div class="about-projects">
+					<p class="capabilities-label">SELECTED PROJECTS</p>
+					<ul>
+						{aboutProjects.map((project) => (
+							<li>
+								{project.description} (
+								{project.url ? <a href={project.url} target="_blank" rel="noopener noreferrer">{project.name}</a> : project.name}
+								).
+							</li>
+						))}
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="tmux-statusbar">
+			<span class="tmux-status-session">[dev-session]</span>
+			<span>0:portfolio-  1:projects-  2:about*</span>
+			<span class="tmux-status-right">NORMAL · UTF-8</span>
+		</div>
+	</div>
+</section>

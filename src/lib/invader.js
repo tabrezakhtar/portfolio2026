@@ -2,6 +2,23 @@ const BOARD_WIDTH = 36;
 const BOARD_HEIGHT = 13;
 const PLAYER_Y = BOARD_HEIGHT - 2;
 const MAX_BULLETS = 3;
+const BEST_TIME_KEY = "invader-best-time-ms";
+
+const formatTime = (milliseconds) => {
+  const tenths = Math.floor(milliseconds / 100);
+  const minutes = Math.floor(tenths / 600);
+  const seconds = Math.floor(tenths / 10) % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}.${tenths % 10}`;
+};
+
+const readBestTime = () => {
+  try {
+    const bestTime = Number(window.localStorage.getItem(BEST_TIME_KEY));
+    return Number.isFinite(bestTime) && bestTime > 0 ? bestTime : null;
+  } catch {
+    return null;
+  }
+};
 
 export const createInvaderGame = (onExit) => {
   const game = document.createElement("div");
@@ -15,7 +32,8 @@ export const createInvaderGame = (onExit) => {
   board.className = "terminal-invader-board";
   const instructions = document.createElement("p");
   instructions.className = "terminal-invader-instructions";
-  instructions.textContent = "Move: A / D or ← / →  |  Fire: Space  |  Quit: Q";
+  const controlsText = "A/D or ←/→ move | Space fire | Q quit";
+  instructions.textContent = `Time: 0:00.0 | ${controlsText}`;
   game.append(board, instructions);
 
   const invaders = Array.from({ length: 24 }, (_, index) => ({
@@ -29,6 +47,7 @@ export const createInvaderGame = (onExit) => {
   let ticks = 0;
   let stopped = false;
   let timer;
+  const startedAt = performance.now();
   const cells = new Uint8Array(BOARD_WIDTH * BOARD_HEIGHT);
 
   const render = () => {
@@ -57,7 +76,21 @@ export const createInvaderGame = (onExit) => {
     stopped = true;
     window.clearInterval(timer);
     document.removeEventListener("keydown", handleKeydown, true);
-    instructions.textContent = `${message}  |  Quit: Q`;
+    const elapsed = performance.now() - startedAt;
+    if (message === "YOU WIN!") {
+      const previousBest = readBestTime();
+      const bestTime = previousBest === null ? elapsed : Math.min(previousBest, elapsed);
+      try {
+        window.localStorage.setItem(BEST_TIME_KEY, String(bestTime));
+      } catch {
+        // Keep the result visible even when browser storage is unavailable.
+      }
+      instructions.textContent = previousBest === null || elapsed < previousBest
+        ? `YOU WIN! NEW BEST ${formatTime(elapsed)} | Q quit`
+        : `YOU WIN! ${formatTime(elapsed)} | BEST ${formatTime(bestTime)} | Q quit`;
+    } else {
+      instructions.textContent = `${message} | ${formatTime(elapsed)} | Q quit`;
+    }
     game.removeAttribute("data-invader-game");
     game.tabIndex = -1;
     onExit();
@@ -66,6 +99,7 @@ export const createInvaderGame = (onExit) => {
   const tick = () => {
     if (stopped) return;
     ticks += 1;
+    instructions.textContent = `Time: ${formatTime(performance.now() - startedAt)} | ${controlsText}`;
     let changed = false;
     for (let index = bullets.length - 1; index >= 0; index -= 1) {
       const bullet = bullets[index];

@@ -1,0 +1,169 @@
+---
+interface BlogFrontmatter {
+	title?: string;
+	pubDate?: string | Date;
+	description?: string;
+	author?: string;
+	tags?: string[];
+}
+
+const posts = Object.entries(
+	import.meta.glob<{ frontmatter: BlogFrontmatter }>('../pages/posts/*.md', { eager: true }),
+)
+	.map(([path, post]) => {
+		const frontmatter = post.frontmatter;
+		const slug = path.split('/').pop()?.replace(/\.md$/, '') ?? '';
+		const date = new Date(frontmatter.pubDate ?? '');
+
+		return {
+			title: frontmatter.title ?? slug,
+			description: frontmatter.description ?? '',
+			author: frontmatter.author ?? '',
+			tags: frontmatter.tags ?? [],
+			date,
+			slug,
+		};
+	})
+	.filter((post) => post.slug && !Number.isNaN(post.date.getTime()))
+	.sort((first, second) => second.date.getTime() - first.date.getTime());
+
+const formatDate = (date: Date) => new Intl.DateTimeFormat('en-GB', {
+	day: 'numeric',
+	month: 'short',
+	year: 'numeric',
+}).format(date);
+---
+
+<section class="blog-section" id="blog" aria-labelledby="blog-title">
+	<div class="blog-window">
+		<div class="blog-titlebar">
+			<span class="title-mark" aria-hidden="true">❯</span>
+			<span class="terminal-title">tabrez@localhost <span>~/blog</span> zsh</span>
+			<span class="terminal-title-meta">{posts.length} posts</span>
+		</div>
+		<div class="blog-content">
+			<div class="blog-heading">
+				<div>
+					<p class="terminal-prompt"><span>tabrez@localhost</span>:~/blog$ ls -lt *.md</p>
+					<h2 id="blog-title">Notes from the build<span class="coral-dot">.</span></h2>
+				</div>
+				<p class="blog-intro">Experiments, lessons learned, and things I’ve been figuring out.</p>
+			</div>
+
+			<ol class="blog-list">
+				{posts.map((post) => (
+					<li>
+						<article class="blog-post">
+							<time class="blog-date" datetime={post.date.toISOString()}>{formatDate(post.date)}</time>
+							<div class="blog-post-main">
+								<h3><a href={`/posts/${post.slug}`}>{post.title}<span aria-hidden="true"> ↗</span></a></h3>
+								<p class="blog-description">{post.description}</p>
+								<div class="blog-post-meta">
+									{post.author && <span class="blog-author">By {post.author}</span>}
+									{post.tags.length > 0 && (
+										<ul class="blog-tags" aria-label={`${post.title} tags`}>
+											{post.tags.map((tag) => <li>{tag}</li>)}
+										</ul>
+									)}
+								</div>
+							</div>
+						</article>
+					</li>
+				))}
+			</ol>
+		</div>
+		<div class="blog-statusbar">
+			<span class="status-session">[dev-session]</span>
+			<span>0:portfolio- 1:blog*</span>
+			<span class="status-right">SORTED BY DATE</span>
+		</div>
+	</div>
+</section>
+
+<style>
+	.blog-section { padding: 0 0 20px; }
+	.blog-window {
+		min-width: 0;
+		border: 1px solid #59406f;
+		background: #100e1d;
+		box-shadow: 0 0 0 1px #ff4fd80c, 0 14px 52px #03020b70, 0 0 32px #8c38ff12;
+	}
+	.blog-titlebar {
+		min-height: 37px;
+		padding: 0 13px;
+		border-bottom: 1px solid #38294b;
+		background: #121511;
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+	}
+	.title-mark {
+		margin-right: 9px;
+		color: #b9ff66;
+		font-family: 'Space Mono', monospace;
+		font-size: 11px;
+		font-weight: 700;
+	}
+	.terminal-title, .terminal-title-meta, .terminal-prompt, .blog-statusbar { font-family: 'Space Mono', monospace; }
+	.terminal-title { color: #e6d9f5; font-size: 10px; }
+	.terminal-title > span { color: #b99aff; }
+	.terminal-title-meta { color: #8d7eaa; font-size: 9px; }
+	.blog-content { padding: 35px clamp(18px, 3.2vw, 40px) 36px; }
+	.blog-heading {
+		margin-bottom: 27px;
+		display: flex;
+		align-items: end;
+		justify-content: space-between;
+		gap: 24px;
+	}
+	.terminal-prompt { margin: 0 0 15px; color: #d3c7e2; font-size: 10px; }
+	.terminal-prompt span { color: #b9ff66; }
+	.blog-heading h2 {
+		margin: 0;
+		font-family: 'Space Grotesk', sans-serif;
+		font-size: 39px;
+		font-weight: 500;
+		line-height: 1.04;
+	}
+	.coral-dot { color: #ff4fd8; }
+	.blog-intro { max-width: 280px; margin: 0 0 3px; color: #a89bbd; font-size: 13px; line-height: 1.8; }
+	.blog-list { margin: 0; padding: 0; border-top: 1px solid #453156; list-style: none; }
+	.blog-list > li { border-bottom: 1px solid #453156; }
+	.blog-post { position: relative; padding: 20px 0; display: grid; grid-template-columns: minmax(100px, 0.22fr) minmax(0, 1fr); gap: 22px; transition: background-color 160ms ease; }
+	.blog-post:hover, .blog-post:focus-within { background: #171426; }
+	.blog-date { padding-top: 3px; color: #40f4ff; font-family: 'Space Mono', monospace; font-size: 10px; }
+	.blog-post-main { min-width: 0; }
+	.blog-post h3 { margin: 0 0 7px; font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 500; line-height: 1.35; }
+	.blog-post h3 a { text-decoration: none; }
+	.blog-post h3 a::after { position: absolute; inset: 0; content: ''; }
+	.blog-post h3 a:focus-visible::after { outline: 2px solid #40f4ff; outline-offset: -3px; }
+	.blog-post h3 a span { color: #40f4ff; opacity: 0; transition: opacity 160ms ease; }
+	.blog-post:hover h3 a span, .blog-post:focus-within h3 a span { opacity: 1; }
+	.blog-description { margin: 0; color: #c1b6d2; font-size: 12px; line-height: 1.7; }
+	.blog-post-meta { margin-top: 12px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px; }
+	.blog-author { color: #8d7eaa; font-family: 'Space Mono', monospace; font-size: 9px; }
+	.blog-tags { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+	.blog-tags li { padding: 3px 6px; border: 1px solid #392950; color: #a99dbf; font-family: 'Space Mono', monospace; font-size: 8px; }
+	.blog-statusbar {
+		min-height: 29px;
+		padding: 0 11px;
+		border-top: 1px solid #453156;
+		background: #1a1529;
+		color: #a99dbf;
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		font-size: 8px;
+	}
+	.status-session { padding: 3px 6px; background: #ff4fd8; color: #180e23; font-weight: 700; }
+	.status-right { margin-left: auto; color: #40f4ff; }
+	@media (max-width: 640px) {
+		.blog-content { padding: 24px 17px; }
+		.blog-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
+		.blog-heading h2 { font-size: 33px; }
+		.blog-intro { max-width: 100%; }
+		.blog-post { padding: 17px 0; grid-template-columns: 1fr; gap: 7px; }
+		.blog-statusbar { gap: 8px; padding: 0 6px; font-size: 7px; }
+		.status-right { display: none; }
+	}
+</style>

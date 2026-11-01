@@ -1,13 +1,22 @@
+---
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = 'Tabrez — Developer & Digital Craftsman',
+	description = 'Tabrez is a developer creating thoughtful digital products, useful interfaces, and modern web experiences.',
+} = Astro.props;
+---
+
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<meta
-			name="description"
-			content="Tabrez is a developer creating thoughtful digital products, useful interfaces, and modern web experiences."
-		/>
+		<meta name="description" content={description} />
 		<meta name="theme-color" content="#0b0b1c" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,7 +25,7 @@
 			href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Geist+Pixel&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
 			rel="stylesheet"
 		/>
-		<title>Tabrez — Developer &amp; Digital Craftsman</title>
+		<title>{title}</title>
 	</head>
 	<body>
 		<slot />

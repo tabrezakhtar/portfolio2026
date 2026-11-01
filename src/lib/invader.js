@@ -1,6 +1,7 @@
 const BOARD_WIDTH = 36;
 const BOARD_HEIGHT = 13;
 const PLAYER_Y = BOARD_HEIGHT - 2;
+const MAX_BULLETS = 2;
 
 export const createInvaderGame = (onExit) => {
   const game = document.createElement("div");
@@ -23,7 +24,7 @@ export const createInvaderGame = (onExit) => {
     alive: true,
   }));
   let playerX = Math.floor(BOARD_WIDTH / 2);
-  let bullet = null;
+  const bullets = [];
   let direction = 1;
   let ticks = 0;
   let stopped = false;
@@ -36,7 +37,7 @@ export const createInvaderGame = (onExit) => {
     for (const invader of invaders) {
       if (invader.alive) cells[invader.y][invader.x] = "W";
     }
-    if (bullet) cells[bullet.y][bullet.x] = "|";
+    for (const bullet of bullets) cells[bullet.y][bullet.x] = "|";
     cells[PLAYER_Y][playerX] = "A";
 
     const border = `+${"-".repeat(BOARD_WIDTH)}+`;
@@ -62,16 +63,17 @@ export const createInvaderGame = (onExit) => {
   const tick = () => {
     if (stopped) return;
     ticks += 1;
-    if (bullet) {
+    for (let index = bullets.length - 1; index >= 0; index -= 1) {
+      const bullet = bullets[index];
       bullet.y -= 1;
       const hit = invaders.find(
-        (invader) => invader.alive && invader.x === bullet?.x && invader.y === bullet?.y,
+        (invader) => invader.alive && invader.x === bullet.x && invader.y === bullet.y,
       );
       if (hit) {
         hit.alive = false;
-        bullet = null;
+        bullets.splice(index, 1);
       } else if (bullet.y < 0) {
-        bullet = null;
+        bullets.splice(index, 1);
       }
     }
 
@@ -113,8 +115,8 @@ export const createInvaderGame = (onExit) => {
       render();
     } else if (key === " ") {
       event.preventDefault();
-      if (!bullet) {
-        bullet = { x: playerX, y: PLAYER_Y - 1 };
+      if (bullets.length < MAX_BULLETS) {
+        bullets.push({ x: playerX, y: PLAYER_Y - 1 });
         render();
       }
     }

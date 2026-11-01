@@ -96,14 +96,15 @@ const nextPost = currentIndex > 0 ? posts[currentIndex - 1] : undefined;
 	.post-meta, .post-tags { color: #8d7eaa; font-family: 'Space Mono', monospace; font-size: 9px; display: flex; flex-wrap: wrap; gap: 8px 14px; }
 	.post-tags { margin: 14px 0 0; padding: 0; list-style: none; }
 	.post-tags li { padding: 4px 7px; border: 1px solid #392950; color: #a99dbf; }
-	.post-content { padding: clamp(24px, 5vw, 52px); color: #d3c7e2; font-size: 15px; line-height: 1.8; }
+	.post-content { min-width: 0; padding: clamp(24px, 5vw, 52px); color: #d3c7e2; font-size: 15px; line-height: 1.8; overflow-wrap: anywhere; }
 	.post-content h2, .post-content h3, .post-content h4 { margin: 2em 0 0.7em; color: #f6f1ff; font-family: 'Space Grotesk', sans-serif; font-weight: 500; line-height: 1.25; }
 	.post-content h2 { font-size: 28px; }
 	.post-content h3 { font-size: 21px; }
 	.post-content p, .post-content ul, .post-content ol, .post-content blockquote { margin: 0 0 1.25em; }
 	.post-content a { color: #40f4ff; text-underline-offset: 3px; }
-	.post-content img, .post-content video, .post-content iframe { max-width: 100%; }
-	.post-content pre { max-width: 100%; padding: 18px; border: 1px solid #453156; background: #0b0b1c; font-size: 12px; line-height: 1.65; overflow-x: auto; }
+	.post-content img, .post-content video { display: block; max-width: 100%; height: auto; margin-inline: 0; }
+	.post-content iframe { display: block; width: 100%; max-width: 100%; height: auto; border: 0; }
+	.post-content pre { box-sizing: border-box; max-width: 100%; padding: 18px; border: 1px solid #453156; background: #0b0b1c; font-size: 12px; line-height: 1.65; overflow-x: auto; overflow-wrap: normal; }
 	.post-content code { font-family: 'Space Mono', monospace; font-size: 0.88em; }
 	.post-content :not(pre) > code { padding: 2px 5px; border: 1px solid #392950; background: #151321; color: #ff9be9; }
 	.post-content blockquote { padding-left: 18px; border-left: 2px solid #ff4fd8; color: #a99dbf; }

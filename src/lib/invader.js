@@ -1,7 +1,7 @@
 const BOARD_WIDTH = 36;
 const BOARD_HEIGHT = 13;
 const PLAYER_Y = BOARD_HEIGHT - 2;
-const MAX_BULLETS = 2;
+const MAX_BULLETS = 3;
 
 export const createInvaderGame = (onExit) => {
   const game = document.createElement("div");
@@ -29,24 +29,27 @@ export const createInvaderGame = (onExit) => {
   let ticks = 0;
   let stopped = false;
   let timer;
+  const cells = new Uint8Array(BOARD_WIDTH * BOARD_HEIGHT);
 
   const render = () => {
-    const cells = Array.from({ length: BOARD_HEIGHT }, () =>
-      Array.from({ length: BOARD_WIDTH }, () => " "),
-    );
+    cells.fill(32);
     for (const invader of invaders) {
-      if (invader.alive) cells[invader.y][invader.x] = "W";
+      if (invader.alive) cells[invader.y * BOARD_WIDTH + invader.x] = 87;
     }
-    for (const bullet of bullets) cells[bullet.y][bullet.x] = "|";
-    cells[PLAYER_Y][playerX] = "A";
+    for (const bullet of bullets)
+      cells[bullet.y * BOARD_WIDTH + bullet.x] = 124;
+    cells[PLAYER_Y * BOARD_WIDTH + playerX] = 65;
 
     const border = `+${"-".repeat(BOARD_WIDTH)}+`;
-    board.textContent = [
-      "SPACE INVADERS",
-      border,
-      ...cells.map((row) => `|${row.join("")}|`),
-      border,
-    ].join("\n");
+    let output = `SPACE INVADERS\n${border}\n`;
+    for (let y = 0; y < BOARD_HEIGHT; y += 1) {
+      const offset = y * BOARD_WIDTH;
+      let row = "|";
+      for (let x = 0; x < BOARD_WIDTH; x += 1)
+        row += String.fromCharCode(cells[offset + x]);
+      output += `${row}|\n`;
+    }
+    board.textContent = `${output}${border}`;
   };
 
   const finish = (message) => {
@@ -63,9 +66,11 @@ export const createInvaderGame = (onExit) => {
   const tick = () => {
     if (stopped) return;
     ticks += 1;
+    let changed = false;
     for (let index = bullets.length - 1; index >= 0; index -= 1) {
       const bullet = bullets[index];
       bullet.y -= 1;
+      changed = true;
       const hit = invaders.find(
         (invader) => invader.alive && invader.x === bullet.x && invader.y === bullet.y,
       );
@@ -79,6 +84,7 @@ export const createInvaderGame = (onExit) => {
 
     if (ticks % 4 === 0) {
       const activeInvaders = invaders.filter((invader) => invader.alive);
+      changed = activeInvaders.length > 0 || changed;
       const leftEdge = Math.min(...activeInvaders.map((invader) => invader.x));
       const rightEdge = Math.max(...activeInvaders.map((invader) => invader.x));
       if (leftEdge + direction < 1 || rightEdge + direction >= BOARD_WIDTH - 1) {
@@ -94,7 +100,7 @@ export const createInvaderGame = (onExit) => {
       }
     }
 
-    render();
+    if (changed) render();
     if (invaders.every((invader) => !invader.alive)) finish("ALL CLEAR");
   };
 

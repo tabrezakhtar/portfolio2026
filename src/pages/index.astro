@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import SideMenu from '../components/SideMenu.astro';
 import Projects from '../components/Projects.astro';
+import Services from '../components/Services.astro';
 import Animate from '../components/Animate.astro';
 import InteractiveTerminal from '../components/InteractiveTerminal.astro';
 
@@ -30,8 +31,9 @@ const aboutProjects = [
 		<header class="site-header">
 			<a class="wordmark" href="#home" aria-label="Tabrez, home">tabrez<span>.</span></a>
 			<nav class="main-nav" aria-label="Main navigation">
-				<a href="#projects">Work</a>
 				<a href="#about">About</a>
+				<a href="#projects">Work</a>
+				<a href="#services">Services</a>
 				<a href="#contact">Contact</a>
 			</nav>
 			<a class="availability" href="mailto:hello@tabrez.dev">
@@ -83,8 +85,6 @@ const aboutProjects = [
 				</div>
 			</section>
 
-			<Projects />
-
 			<section class="about-section" id="about" aria-labelledby="about-title">
 				<div class="terminal-window content-window">
 					<div class="terminal-titlebar">
@@ -127,9 +127,6 @@ const aboutProjects = [
 						</ul>
 					</div>
 
-					<p class="about-copy" id="capabilities">
-						I work across the full stack, from shaping databases and building backend APIs to creating thoughtful front ends with TypeScript, React, and Tailwind.
-					</p>
 				</div>
 					</div>
 					<div class="tmux-statusbar">
@@ -139,6 +136,9 @@ const aboutProjects = [
 					</div>
 				</div>
 			</section>
+
+			<Projects />
+			<Services />
 
 			<section class="contact-section" id="contact" aria-labelledby="contact-title">
 				<div class="terminal-window content-window">
@@ -1142,16 +1142,6 @@ const aboutProjects = [
 		color: #c1b6d2;
 		font-size: 11px;
 		line-height: 1.65;
-	}
-
-	.about-copy#capabilities {
-		max-width: 780px;
-		margin: 24px 0 0;
-		padding-top: 18px;
-		border-top: 1px solid #453156;
-		color: #a89bbd;
-		font-size: 12px;
-		line-height: 1.8;
 	}
 
 	.about-intro h2 {

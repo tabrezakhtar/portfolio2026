@@ -19,12 +19,12 @@ const projects = [
 			'I’m actively building Fixit CRM and looking forward to sharing more as it develops.',
 		],
 		tech: [
-			{ icon: 'bx bx-code-alt', name: 'Next.js' },
-			{ icon: 'bx bxl-react', name: 'React' },
-			{ icon: 'bx bxl-typescript', name: 'TypeScript' },
+			{ icon: 'nextjs', name: 'Next.js' },
+			{ icon: 'react', name: 'React' },
+			{ icon: 'ts', name: 'TypeScript' },
 			{ icon: 'bx bx-palette', name: 'Mantine' },
-			{ icon: 'bx bx-cube', name: 'Prisma' },
-			{ icon: 'bx bxl-postgresql', name: 'PostgreSQL' },
+			{ icon: 'prisma', name: 'Prisma' },
+			{ icon: 'postgres', name: 'PostgreSQL' },
 		],
 	},
 	{
@@ -48,14 +48,14 @@ const projects = [
 			'Built with a Node.js and Express backend, MongoDB, custom passwordless JWT authentication, and a React frontend using Context API and Tailwind CSS.',
 		],
 		tech: [
-			{ icon: 'bx bxl-javascript', name: 'JavaScript' },
-			{ icon: 'bx bxl-nodejs', name: 'Node.js' },
-			{ icon: 'bx bxl-mongodb', name: 'MongoDB' },
-			{ icon: 'bx bxl-react', name: 'React' },
-			{ icon: 'bx bxl-tailwind-css', name: 'Tailwind CSS' },
-			{ icon: 'bx bxl-html5', name: 'HTML5' },
-			{ icon: 'bx bxl-git', name: 'Git' },
-			{ icon: 'bx bxl-visual-studio', name: 'VS Code' },
+			{ icon: 'js', name: 'JavaScript' },
+			{ icon: 'nodejs', name: 'Node.js' },
+			{ icon: 'mongodb', name: 'MongoDB' },
+			{ icon: 'react', name: 'React' },
+			{ icon: 'tailwind', name: 'Tailwind CSS' },
+			{ icon: 'html', name: 'HTML5' },
+			{ icon: 'git', name: 'Git' },
+			{ icon: 'vscode', name: 'VS Code' },
 		],
 	},
 	{
@@ -68,8 +68,8 @@ const projects = [
 			'Built with just HTML and CSS. Keeping it simple makes the site fast, reliable, and easy to maintain.',
 		],
 		tech: [
-			{ icon: 'bx bxl-html5', name: 'HTML5' },
-			{ icon: 'bx bxl-css3', name: 'CSS3' },
+			{ icon: 'html', name: 'HTML5' },
+			{ icon: 'css', name: 'CSS3' },
 		],
 	},
 	{
@@ -82,10 +82,10 @@ const projects = [
 			'It uses plain JavaScript and Chart.js, with Astro providing routing and Markdown support.',
 		],
 		tech: [
-			{ icon: 'bx bxl-javascript', name: 'JavaScript' },
-			{ icon: 'bx bxl-html5', name: 'HTML5' },
-			{ icon: 'bx bxl-git', name: 'Git' },
-			{ icon: 'bx bxl-visual-studio', name: 'VS Code' },
+			{ icon: 'js', name: 'JavaScript' },
+			{ icon: 'html', name: 'HTML5' },
+			{ icon: 'git', name: 'Git' },
+			{ icon: 'vscode', name: 'VS Code' },
 		],
 	},
 	{
@@ -99,11 +99,11 @@ const projects = [
 			'Built with React Context API and BeerCSS. The tennis scoring logic was developed test-first with Jest to cover the many edge cases in the rules.',
 		],
 		tech: [
-			{ icon: 'bx bxl-javascript', name: 'JavaScript' },
-			{ icon: 'bx bxl-react', name: 'React' },
-			{ icon: 'bx bxl-html5', name: 'HTML5' },
-			{ icon: 'bx bxl-git', name: 'Git' },
-			{ icon: 'bx bxl-visual-studio', name: 'VS Code' },
+			{ icon: 'js', name: 'JavaScript' },
+			{ icon: 'react', name: 'React' },
+			{ icon: 'html', name: 'HTML5' },
+			{ icon: 'git', name: 'Git' },
+			{ icon: 'vscode', name: 'VS Code' },
 		],
 	},
 ];
@@ -183,7 +183,14 @@ const projects = [
 							</div>
 							<ul class="project-tech" aria-label={`${project.title} technologies`}>
 								{project.tech.map((item) => (
-									<li><i class={item.icon} aria-hidden="true"></i>{item.name}</li>
+									<li>
+										{item.icon.startsWith('bx ') ? (
+											<i class={item.icon} aria-hidden="true"></i>
+										) : (
+											<img src={`https://skillicons.dev/icons?i=${item.icon}&theme=dark`} alt="" aria-hidden="true" loading="lazy" decoding="async" width="18" height="18" />
+										)}
+										{item.name}
+									</li>
 								))}
 							</ul>
 							<div class="project-actions">
@@ -236,7 +243,16 @@ const projects = [
 										{project.description.map((paragraph) => <p>{paragraph}</p>)}
 									</div>
 									<ul class="project-tech" aria-label={`${project.title} technologies`}>
-										{project.tech.map((item) => <li><i class={item.icon} aria-hidden="true"></i>{item.name}</li>)}
+										{project.tech.map((item) => (
+											<li>
+												{item.icon.startsWith('bx ') ? (
+													<i class={item.icon} aria-hidden="true"></i>
+												) : (
+													<img src={`https://skillicons.dev/icons?i=${item.icon}&theme=dark`} alt="" aria-hidden="true" loading="lazy" decoding="async" width="18" height="18" />
+												)}
+												{item.name}
+											</li>
+										))}
 									</ul>
 									<div class="project-actions">
 										<a href={project.site} target="_blank" rel="noopener noreferrer">Visit project <span aria-hidden="true">↗</span></a>
@@ -746,6 +762,12 @@ const projects = [
 	.project-tech i {
 		color: #40f4ff;
 		font-size: 14px;
+	}
+
+	.project-tech img {
+		width: 18px;
+		height: 18px;
+		object-fit: contain;
 	}
 
 	.project-actions {

@@ -1,0 +1,395 @@
+---
+const services = [
+	{
+		icon: 'bx bxs-component',
+		title: 'Full-stack development',
+		description: 'Take a product from early idea to a dependable release, or pick up an existing codebase and carry a feature through from interface to database.',
+		deliverables: ['Front end and backend features', 'Database design and testing', 'Deployment and release support'],
+		technologies: [
+			{ name: 'Next.js', icon: 'nextjs' },
+			{ name: 'TypeScript', icon: 'ts' },
+			{ name: 'React', icon: 'react' },
+			{ name: 'PostgreSQL', icon: 'postgres' },
+			{ name: 'Prisma', icon: 'prisma' },
+		],
+	},
+	{
+		icon: 'bx bx-desktop',
+		title: 'Front-end development',
+		description: 'Turn designs and requirements into clear, responsive interfaces, and make existing products easier to use and simpler to extend.',
+		deliverables: ['Responsive pages from designs', 'New features for existing apps', 'Polish, accessibility, and usability'],
+		technologies: [
+			{ name: 'React', icon: 'react' },
+			{ name: 'Angular', icon: 'angular' },
+			{ name: 'TypeScript', icon: 'ts' },
+			{ name: 'Astro', icon: 'astro' },
+			{ name: 'Tailwind CSS', icon: 'tailwind' },
+			{ name: 'HTML', icon: 'html' },
+		],
+	},
+	{
+		icon: 'bx bxl-javascript',
+		title: 'Back-end and APIs',
+		description: 'Build the server-side functionality that keeps an application useful: reliable endpoints, well-shaped data, and services that work together.',
+		deliverables: ['API endpoints and application logic', 'Data models and persistence', 'Third-party API integrations'],
+		technologies: [
+			{ name: 'Node.js', icon: 'nodejs' },
+			{ name: 'Express', icon: 'express' },
+			{ name: 'MongoDB', icon: 'mongodb' },
+			{ name: 'PostgreSQL', icon: 'postgres' },
+			{ name: 'Postman', icon: 'postman' },
+		],
+	},
+	{
+		icon: 'bx bx-git-merge',
+		title: 'Integration and delivery',
+		description: 'Connect the moving parts and get changes ready for real users, with practical testing and deployment support throughout.',
+		deliverables: ['Service and platform integrations', 'Unit and feature testing', 'Deployment and follow-up improvements'],
+		technologies: [
+			{ name: 'Jest', icon: 'jest' },
+			{ name: 'Git', icon: 'git' },
+			{ name: 'AWS', icon: 'aws' },
+			{ name: 'Netlify', icon: 'netlify' },
+		],
+	},
+];
+---
+
+<section class="services-section" id="services" aria-labelledby="services-title">
+	<div class="services-window">
+		<div class="services-titlebar">
+			<span class="title-mark" aria-hidden="true">❯</span>
+			<span class="terminal-title">tabrez@localhost <span>~/services</span> zsh</span>
+			<span class="terminal-title-meta">{services.length} service areas</span>
+		</div>
+		<div class="services-content">
+			<div class="services-heading">
+				<div>
+					<p class="terminal-prompt"><span>tabrez@localhost</span>:~/services$ cat services.md</p>
+					<h2 id="services-title">Ways I can help<span class="coral-dot">.</span></h2>
+				</div>
+				<p class="services-intro">From a single feature to a complete product, I can help make the next step real.</p>
+			</div>
+
+			<div class="services-grid">
+				{services.map((service, index) => (
+					<article class="service-item">
+						<div class="service-item-heading">
+							<span class="service-icon"><i class={service.icon} aria-hidden="true"></i></span>
+							<span class="service-index">0{index + 1}</span>
+						</div>
+						<h3>{service.title}</h3>
+						<p>{service.description}</p>
+						<ul>
+							{service.deliverables.map((deliverable) => <li>{deliverable}</li>)}
+						</ul>
+						<div class="service-technologies">
+							<p>TECHNOLOGIES</p>
+							<ul aria-label={`${service.title} technologies`}>
+								{service.technologies.map((technology) => (
+									<li>
+										<img
+											src={`https://skillicons.dev/icons?i=${technology.icon}&theme=dark`}
+											alt=""
+											aria-hidden="true"
+											loading="lazy"
+											decoding="async"
+											width="24"
+											height="24"
+										/>
+										<span>{technology.name}</span>
+									</li>
+								))}
+							</ul>
+						</div>
+					</article>
+				))}
+			</div>
+		</div>
+		<div class="services-statusbar">
+			<span class="status-session">[dev-session]</span>
+			<span>0:portfolio-  1:projects-  2:services*</span>
+			<span class="status-right">READY TO BUILD</span>
+		</div>
+	</div>
+</section>
+
+<style>
+	.services-section {
+		padding: 0 0 20px;
+	}
+
+	.services-window {
+		min-width: 0;
+		border: 1px solid #59406f;
+		background: #100e1d;
+		box-shadow: 0 0 0 1px #ff4fd80c, 0 14px 52px #03020b70, 0 0 32px #8c38ff12;
+	}
+
+	.services-titlebar {
+		min-height: 37px;
+		padding: 0 13px;
+		border-bottom: 1px solid #38294b;
+		background: #121511;
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+	}
+
+	.title-mark {
+		margin-right: 9px;
+		color: #b9ff66;
+		font-family: 'Space Mono', monospace;
+		font-size: 11px;
+		font-weight: 700;
+	}
+
+	.terminal-title,
+	.terminal-title-meta,
+	.terminal-prompt,
+	.services-statusbar {
+		font-family: 'Space Mono', monospace;
+	}
+
+	.terminal-title {
+		color: #e6d9f5;
+		font-size: 10px;
+	}
+
+	.terminal-title > span {
+		color: #b99aff;
+	}
+
+	.terminal-title-meta {
+		color: #8d7eaa;
+		font-size: 9px;
+	}
+
+	.services-content {
+		padding: 35px clamp(18px, 3.2vw, 40px) 36px;
+	}
+
+	.services-heading {
+		margin-bottom: 27px;
+		display: flex;
+		align-items: end;
+		justify-content: space-between;
+		gap: 24px;
+	}
+
+	.terminal-prompt {
+		margin: 0 0 15px;
+		color: #d3c7e2;
+		font-size: 10px;
+	}
+
+	.terminal-prompt span {
+		color: #b9ff66;
+	}
+
+	.services-heading h2 {
+		margin: 0;
+		font-family: 'Space Grotesk', sans-serif;
+		font-size: 39px;
+		font-weight: 500;
+		line-height: 1.04;
+	}
+
+	.coral-dot {
+		color: #ff4fd8;
+	}
+
+	.services-intro {
+		max-width: 290px;
+		margin: 0 0 3px;
+		color: #a89bbd;
+		font-size: 13px;
+		line-height: 1.8;
+	}
+
+	.services-grid {
+		border-top: 1px solid #453156;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.service-item {
+		min-width: 0;
+		padding: 24px 24px 25px 0;
+		border-bottom: 1px solid #453156;
+	}
+
+	.service-item:nth-child(even) {
+		padding-right: 0;
+		padding-left: 26px;
+		border-left: 1px solid #453156;
+	}
+
+	.service-item-heading {
+		margin-bottom: 17px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.service-icon {
+		width: 36px;
+		aspect-ratio: 1;
+		border: 1px solid #40f4ff55;
+		background: #40f4ff0b;
+		color: #40f4ff;
+		display: grid;
+		place-items: center;
+		font-size: 19px;
+	}
+
+	.service-index {
+		color: #736584;
+		font-family: 'Space Mono', monospace;
+		font-size: 10px;
+	}
+
+	.service-item h3 {
+		margin: 0 0 9px;
+		font-family: 'Space Grotesk', sans-serif;
+		font-size: 19px;
+		font-weight: 500;
+	}
+
+	.service-item > p {
+		max-width: 520px;
+		margin: 0 0 15px;
+		color: #c1b6d2;
+		font-size: 12px;
+		line-height: 1.75;
+	}
+
+	.service-item ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		gap: 7px;
+	}
+
+	.service-item li {
+		position: relative;
+		padding-left: 14px;
+		color: #a89bbd;
+		font-size: 11px;
+		line-height: 1.5;
+	}
+
+	.service-item li::before {
+		position: absolute;
+		top: 0.65em;
+		left: 0;
+		width: 5px;
+		aspect-ratio: 1;
+		background: #b9ff66;
+		content: '';
+	}
+
+	.service-technologies {
+		margin-top: 20px;
+	}
+
+	.service-technologies > p {
+		margin: 0 0 9px;
+		color: #8d7eaa;
+		font-family: 'Space Mono', monospace;
+		font-size: 8px;
+	}
+
+	.service-technologies ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 7px;
+	}
+
+	.service-technologies li {
+		padding: 4px 8px 4px 5px;
+		border: 1px solid #453156;
+		background: #151321;
+		color: #c1b6d2;
+		display: inline-flex;
+		align-items: center;
+		gap: 7px;
+		font-size: 10px;
+	}
+
+	.service-technologies li::before {
+		display: none;
+	}
+
+	.service-technologies img {
+		width: 24px;
+		height: 24px;
+		display: block;
+		object-fit: contain;
+	}
+
+	.services-statusbar {
+		min-height: 29px;
+		padding: 0 11px;
+		border-top: 1px solid #453156;
+		background: #1a1529;
+		color: #a99dbf;
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		font-size: 8px;
+	}
+
+	.status-session {
+		padding: 3px 6px;
+		background: #ff4fd8;
+		color: #180e23;
+		font-weight: 700;
+	}
+
+	.status-right {
+		margin-left: auto;
+		color: #40f4ff;
+	}
+
+	@media (max-width: 640px) {
+		.services-content {
+			padding: 24px 17px;
+		}
+
+		.services-heading {
+			align-items: flex-start;
+			flex-direction: column;
+			gap: 12px;
+		}
+
+		.services-heading h2 {
+			font-size: 33px;
+		}
+
+		.services-intro {
+			max-width: 100%;
+		}
+
+		.services-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.service-item,
+		.service-item:nth-child(even) {
+			padding: 21px 0;
+			border-left: 0;
+		}
+
+		.services-statusbar {
+			gap: 8px;
+			padding: 0 6px;
+			font-size: 7px;
+		}
+
+		.services-statusbar .status-right {
+			display: none;
+		}
+	}
+</style>

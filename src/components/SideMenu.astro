@@ -1,22 +1,3 @@
----
-const roles = [
-	'JavaScript developer',
-	'JavaScript engineer',
-	'React developer',
-	'React engineer',
-	'Front-end developer',
-	'Front-end engineer',
-	'Frontend developer',
-	'Frontend engineer',
-	'Full-stack developer',
-	'Full-stack engineer',
-	'Fullstack engineer',
-	'Fullstack engineer',
-	'Node.js developer',
-	'Node.js engineer',
-];
----
-
 <aside class="side-menu" aria-label="Profile and site navigation">
 	<header class="side-titlebar">
 		<span class="side-title-mark" aria-hidden="true">❯</span>
@@ -48,13 +29,6 @@ const roles = [
 				</a>
 			</div>
 		</div>
-
-		<details class="role-details">
-			<summary>Specialties</summary>
-			<ul>
-				{roles.map((role) => <li>{role}</li>)}
-			</ul>
-		</details>
 
 		<nav class="side-nav" aria-label="Main navigation">
 			<p class="side-prompt"><span>tabrez@localhost</span>:~$ ls ./navigation</p>
@@ -263,29 +237,6 @@ const roles = [
 		color: #0b0b1c;
 	}
 
-	.role-details {
-		margin-top: 24px;
-		padding: 12px 0;
-		border-top: 1px solid #392950;
-		border-bottom: 1px solid #392950;
-		color: #a89bbd;
-		font-family: 'Space Mono', monospace;
-		font-size: 10px;
-	}
-
-	.role-details summary {
-		color: #b9ff66;
-		cursor: pointer;
-		list-style-position: inside;
-		text-transform: uppercase;
-	}
-
-	.role-details ul {
-		margin: 12px 0 0;
-		padding: 0 0 0 17px;
-		line-height: 1.9;
-	}
-
 	.side-nav {
 		margin-top: 22px;
 		display: grid;
@@ -294,13 +245,13 @@ const roles = [
 
 	.side-prompt {
 		margin: 0 0 9px;
-		color: #c1b6d2;
+		color: #d3c7e2;
 		font-size: 9px;
 		white-space: nowrap;
 	}
 
 	.side-prompt span {
-		color: #40f4ff;
+		color: #b9ff66;
 	}
 
 	.side-nav a {
@@ -380,16 +331,6 @@ const roles = [
 		.social-links a {
 			width: 27px;
 			font-size: 15px;
-		}
-
-		.role-details {
-			grid-column: 1 / -1;
-			margin: 0;
-			padding: 8px 0;
-		}
-
-		.role-details ul {
-			columns: 2;
 		}
 
 		.side-nav {

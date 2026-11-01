@@ -32,7 +32,7 @@ const roles = [
 					alt="Tabrez Akhtar profile picture"
 				/>
 			</a>
-			<h2><a href="#home">Tabrez Akhtar</a></h2>
+			<h2><a href="/">Tabrez Akhtar</a></h2>
 			<div class="social-links" aria-label="Social links">
 				<a href="mailto:hello@melodyapps.co.uk" aria-label="Email Tabrez Akhtar" title="Email">
 					<i class="bx bx-envelope" aria-hidden="true"></i>
@@ -74,6 +74,17 @@ const roles = [
 </aside>
 
 <script>
+	const homeLinks = document.querySelectorAll<HTMLAnchorElement>('.avatar-link, .side-nav a[href="#home"]');
+	homeLinks.forEach((homeLink) => {
+		homeLink.addEventListener('click', () => {
+		window.setTimeout(() => {
+			if (window.location.hash === '#home') {
+				window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}`);
+			}
+		}, 0);
+		});
+	});
+
 	const sideNav = document.querySelector('.side-nav');
 	if (sideNav) {
 		const links = Array.from(sideNav.querySelectorAll('a[href^="#"]')) as any[];

@@ -29,6 +29,34 @@ const {
 	</head>
 	<body>
 		<slot />
+		<script is:inline>
+			(function(projectName) {
+				if (!projectName || typeof projectName !== 'string') {
+					console.error('Anon Hit Counter: Project name is required');
+					return;
+				}
+
+				const API_URL = 'https://anon-hit-counter.vercel.app/log';
+
+				function sendHit() {
+					const mode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+					fetch(API_URL, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							project: projectName,
+							page: window.location.href,
+							mode: mode,
+						}),
+						keepalive: true,
+					}).catch(function(error) {
+						console.debug('Analytics request failed:', error);
+					});
+				}
+
+				document.addEventListener('DOMContentLoaded', sendHit);
+			})('portfolio2026');
+		</script>
 	</body>
 </html>
 

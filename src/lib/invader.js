@@ -52,6 +52,7 @@ export const createInvaderGame = (onExit) => {
     if (stopped) return;
     stopped = true;
     window.clearInterval(timer);
+    document.removeEventListener("keydown", handleKeydown, true);
     instructions.textContent = `${message}  |  Q returns to the terminal`;
     game.removeAttribute("data-invader-game");
     game.tabIndex = -1;
@@ -95,11 +96,11 @@ export const createInvaderGame = (onExit) => {
     if (invaders.every((invader) => !invader.alive)) finish("ALL CLEAR");
   };
 
-  timer = window.setInterval(tick, 160);
-  game.addEventListener("keydown", (event) => {
+  const handleKeydown = (event) => {
     if (stopped) return;
+    event.stopImmediatePropagation();
     const key = event.key.toLowerCase();
-    if (key === "q" || key === "escape") {
+    if (key === "q" || event.code === "KeyQ" || key === "escape") {
       event.preventDefault();
       finish("GAME ENDED");
     } else if (key === "arrowleft" || key === "a") {
@@ -117,7 +118,10 @@ export const createInvaderGame = (onExit) => {
         render();
       }
     }
-  });
+  };
+
+  document.addEventListener("keydown", handleKeydown, true);
+  timer = window.setInterval(tick, 160);
 
   render();
   return game;

@@ -32,7 +32,7 @@
         TypeScript <span>·</span> React <span>·</span> Astro <span>·</span> CSS
       </p>
       <p class="command-hint">
-        Commands: whoami · date · stack · projects · about · contact · party · invader
+        Commands: whoami · date · stack · projects · about · contact · invader
       </p>
       <p class="command-hint">Type help for archive commands. Press Tab to complete.</p>
     </div>
@@ -100,8 +100,6 @@
     let draft = "";
     let lastTabValue = "";
     let lastTabMatches: string[] = [];
-    let partyTimer = 0;
-    let partyBurst: HTMLDivElement | null = null;
     type FileNode =
       | { type: "file"; content: string }
       | { type: "directory"; children: Record<string, FileNode> };
@@ -756,9 +754,26 @@ const filesystem = directory({
         renderPagerPage();
       }
     };
+    const navigateToSection = (sectionId: string) => {
+      const target = document.getElementById(sectionId);
+      if (!target) return;
+
+      const nextUrl = new URL(window.location.href);
+      nextUrl.hash = sectionId;
+      if (nextUrl.href !== window.location.href)
+        window.history.pushState(null, "", nextUrl);
+      target.scrollIntoView({ behavior: "smooth" });
+    };
+    window.addEventListener("popstate", () => {
+      const sectionId = window.location.hash.slice(1);
+      if (sectionId)
+        document
+          .getElementById(sectionId)
+          ?.scrollIntoView({ behavior: "smooth" });
+    });
     const commands: Partial<Record<string, (args: string[]) => string>> = {
       help: () =>
-        "Commands: whoami, date, stack, projects, about, contact, party, invader.\nArchive: ls, cd, pwd, cat, more, less, head, tail, find, grep, tree, stat, wc, history, man.\nType man COMMAND for details. Press Tab for command and path completion.\nAlien research archive: /research. Fictional field notes; reported encounters are unverified.",
+        "Commands: whoami, date, stack, projects, about, contact, invader.\nArchive: ls, cd, pwd, cat, more, less, head, tail, find, grep, tree, stat, wc, history, man.\nType man COMMAND for details. Press Tab for command and path completion.\nAlien research archive: /research. Fictional field notes; reported encounters are unverified.",
       pwd: () => nodePath(workingDirectory),
       ls: (args) => {
         const showAll =
@@ -969,68 +984,17 @@ const filesystem = directory({
       stack: () => "Node.js · Express · Next.js · TypeScript · JavaScript · React · MongoDB",
       invader: () => "",
       projects: () => {
-        document.getElementById("work")?.scrollIntoView({ behavior: "smooth" });
+        navigateToSection("projects");
         return "Opening selected work...";
       },
       about: () => {
-        document
-          .getElementById("about")
-          ?.scrollIntoView({ behavior: "smooth" });
+        navigateToSection("about");
         return "Opening about.md...";
       },
       contact: () => {
-        document
-          .getElementById("contact")
-          ?.scrollIntoView({ behavior: "smooth" });
+        navigateToSection("contact");
         return "Opening contact.txt...";
-      },
-      party: () => {
-        terminalWindow.classList.remove("is-party");
-        void terminalWindow.offsetWidth;
-        terminalWindow.classList.add("is-party");
-        window.clearTimeout(partyTimer);
-        partyBurst?.remove();
-        partyBurst = document.createElement("div");
-        partyBurst.className = "terminal-party-burst";
-        partyBurst.setAttribute("aria-hidden", "true");
-        const banner = document.createElement("pre");
-        banner.className = "terminal-party-banner";
-        banner.textContent =
-          "+----------------------+\n|  >>> PARTY MODE <<<  |\n+----------------------+";
-        partyBurst.append(banner);
-        const symbols = ["*", "+", "x", ".", "o", "/", "\\", "|", "-", "="];
-        const colors = ["#40f4ff", "#b9ff66", "#ff4fd8"];
-        for (let index = 0; index < 52; index += 1) {
-          const spark = document.createElement("span");
-          spark.className = "terminal-party-spark";
-          spark.textContent = symbols[index % symbols.length];
-          const burstX = index < 26 ? 28 : 72;
-          const burstY = index < 26 ? 32 : 68;
-          spark.style.left = `${burstX + (Math.random() - 0.5) * 16}%`;
-          spark.style.top = `${burstY + (Math.random() - 0.5) * 16}%`;
-          spark.style.color = colors[index % colors.length];
-          spark.style.setProperty(
-            "--spark-x",
-            `${Math.round((Math.random() - 0.5) * 230)}px`,
-          );
-          spark.style.setProperty(
-            "--spark-y",
-            `${Math.round((Math.random() - 0.5) * 170)}px`,
-          );
-          spark.style.animationDuration = `${900 + Math.random() * 600}ms`;
-          spark.style.animationDelay = `${Math.random() * 160}ms`;
-          partyBurst.append(spark);
-        }
-        terminalWindow.append(partyBurst);
-        partyTimer = window.setTimeout(() => {
-          terminalWindow.classList.remove("is-party");
-          partyBurst?.remove();
-          partyBurst = null;
-        }, 1750);
-        return "Neon protocol engaged. Nice moves.";
-      },
-      sudo: () =>
-        "Permission denied: your taste is already dangerously powerful.",
+      }
     };
 
     const completionOptions: Record<string, string[]> = {
@@ -1289,6 +1253,7 @@ const filesystem = directory({
     document.addEventListener(
       "keydown",
       (event) => {
+        if (terminalScreen.classList.contains("is-invader-active")) return;
         if (pager) {
           const key = event.key.toLowerCase();
           if (key === "q" || key === "escape") closePager();
@@ -1429,9 +1394,9 @@ const filesystem = directory({
   }
 
   .interactive-terminal-pane .status-output {
-    height: 180px;
-    min-height: 180px;
-    max-height: 180px;
+    height: 207px;
+    min-height: 207px;
+    max-height: 207px;
     padding: 8px 17px;
     display: flex;
     flex-direction: column;
@@ -1442,12 +1407,6 @@ const filesystem = directory({
     font:
       9px "Space Mono",
       monospace;
-  }
-
-  .interactive-terminal-pane .status-output.is-invader-active {
-    height: 207px;
-    min-height: 207px;
-    max-height: 207px;
   }
 
   .interactive-terminal-pane .status-output p {
@@ -1569,87 +1528,6 @@ const filesystem = directory({
 
   .interactive-terminal-pane .stack-list {
     color: #40f4ff;
-  }
-
-  .terminal-window.is-party {
-    animation: terminal-party 220ms steps(2, end) 5;
-  }
-
-  .terminal-party-burst {
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .terminal-party-spark {
-    position: absolute;
-    z-index: 1;
-    font-family: "Space Mono", monospace;
-    font-size: 14px;
-    font-weight: 700;
-    text-shadow: 0 0 9px currentColor;
-    animation: party-spark 1050ms cubic-bezier(0.15, 0.7, 0.3, 1) both;
-  }
-
-  .terminal-party-banner {
-    position: absolute;
-    z-index: 2;
-    top: 50%;
-    left: 50%;
-    margin: 0;
-    color: #b9ff66;
-    font-family: "Space Mono", monospace;
-    font-size: 11px;
-    line-height: 1.5;
-    text-align: center;
-    text-shadow: 0 0 12px #b9ff66a0;
-    transform: translate(-50%, -50%);
-    animation: party-banner 1500ms ease-out both;
-  }
-
-  @keyframes terminal-party {
-    50% {
-      border-color: #b9ff66;
-      box-shadow:
-        0 0 0 1px #b9ff6640,
-        0 0 22px #40f4ff65;
-    }
-  }
-
-  @keyframes party-spark {
-    0% {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.25) rotate(0deg);
-    }
-    15% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      transform: translate(
-          calc(-50% + var(--spark-x)),
-          calc(-50% + var(--spark-y))
-        )
-        scale(1.35) rotate(180deg);
-    }
-  }
-
-  @keyframes party-banner {
-    0% {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.55);
-    }
-    15%,
-    68% {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    100% {
-      opacity: 0;
-      transform: translate(-50%, -65%) scale(1.08);
-    }
   }
 
   @media (max-width: 900px) {

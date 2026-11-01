@@ -25,7 +25,7 @@ import InteractiveTerminal from './InteractiveTerminal.astro';
 					<div class="hero-copy">
 						<p class="terminal-prompt"><span>tabrez@localhost</span>:~$ whoami</p>
 						<p class="eyebrow"><span class="eyebrow-line"></span> Full-Stack Engineer</p>
-						<h1 id="hero-title">Making the internet feel a little more <span>human.</span></h1>
+						<h1 id="hero-title" class="glitch-text" data-glitch-text="Making the internet feel a little more human.">Making the internet feel a little more <span>human.</span></h1>
 						<p class="hero-description">
 							I’m Tabrez, a developer who cares just as much about how it feels as how it works. I turn
 							good ideas into useful, thoughtful digital experiences.
@@ -97,3 +97,115 @@ import InteractiveTerminal from './InteractiveTerminal.astro';
 		window.setInterval(updateClock, 1000);
 	}
 </script>
+
+<style>
+	h1.glitch-text {
+		font-family: 'Geist Pixel', monospace;
+		font-weight: 400;
+		line-height: 1.1;
+		text-shadow: 2px 0 #ff4fd866, -2px 0 #40f4ff66;
+	}
+
+	.glitch-text {
+		position: relative;
+		isolation: isolate;
+	}
+
+	.glitch-text::before,
+	.glitch-text::after {
+		position: absolute;
+		inset: 0;
+		content: attr(data-glitch-text);
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.glitch-text::before {
+		color: #40f4ff;
+		text-shadow: 5px 0 #40f4ff;
+		animation: hero-glitch-cyan 3.8s steps(1, end) infinite;
+	}
+
+	.glitch-text::after {
+		color: #ff4fd8;
+		text-shadow: -5px 0 #ff4fd8;
+		animation: hero-glitch-magenta 3.8s steps(1, end) infinite;
+	}
+
+	@keyframes hero-glitch-cyan {
+		0%,
+		84%,
+		100% {
+			opacity: 0;
+			transform: translate(0);
+			clip-path: inset(0 0 100% 0);
+		}
+		85% {
+			opacity: 1;
+			transform: translate(8px, -2px) skewX(-2deg);
+			clip-path: inset(6% 0 70% 0);
+		}
+		86% {
+			opacity: 0.95;
+			transform: translate(-6px, 1px) skewX(2deg);
+			clip-path: inset(43% 0 33% 0);
+		}
+		88% {
+			opacity: 1;
+			transform: translate(5px, 2px) skewX(-1deg);
+			clip-path: inset(74% 0 4% 0);
+		}
+		90% {
+			opacity: 0.9;
+			transform: translate(-8px, -1px);
+			clip-path: inset(21% 0 55% 0);
+		}
+		93% {
+			opacity: 0;
+			transform: translate(0);
+			clip-path: inset(0 0 100% 0);
+		}
+	}
+
+	@keyframes hero-glitch-magenta {
+		0%,
+		84%,
+		100% {
+			opacity: 0;
+			transform: translate(0);
+			clip-path: inset(100% 0 0 0);
+		}
+		85% {
+			opacity: 0.95;
+			transform: translate(-8px, 1px) skewX(2deg);
+			clip-path: inset(26% 0 48% 0);
+		}
+		87% {
+			opacity: 1;
+			transform: translate(7px, -2px) skewX(-2deg);
+			clip-path: inset(62% 0 12% 0);
+		}
+		89% {
+			opacity: 0.9;
+			transform: translate(-5px, 2px);
+			clip-path: inset(9% 0 70% 0);
+		}
+		91% {
+			opacity: 1;
+			transform: translate(8px, 0) skewX(1deg);
+			clip-path: inset(38% 0 39% 0);
+		}
+		93% {
+			opacity: 0;
+			transform: translate(0);
+			clip-path: inset(100% 0 0 0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.glitch-text::before,
+		.glitch-text::after {
+			animation: none;
+		}
+	}
+</style>

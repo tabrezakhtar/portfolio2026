@@ -1,3 +1,7 @@
+---
+const stackContent = 'Node.js · Express · Next.js · TypeScript · JavaScript · React · MongoDB';
+---
+
 <div class="interactive-terminal-pane terminal-pane terminal-pane--status">
   <div class="pane-title">
     <span>
@@ -15,6 +19,7 @@
     <div
       class="terminal-transcript"
       data-terminal-output
+      data-terminal-stack={stackContent}
       aria-live="polite"
       aria-relevant="additions text"
     >
@@ -26,10 +31,10 @@
         <span class="status-clean">● working tree clean</span>
       </p>
       <p>
-        <span class="prompt-symbol">❯</span> cat stack.txt
+        <span class="prompt-symbol">❯</span> stack
       </p>
       <p class="stack-list">
-        TypeScript <span>·</span> React <span>·</span> Astro <span>·</span> CSS
+        {stackContent}
       </p>
       <p class="command-hint">
         Commands: whoami · date · stack · projects · about · contact · invader
@@ -69,6 +74,7 @@
   const terminalOutput = document.querySelector<HTMLElement>(
     "[data-terminal-output]",
   );
+  const stackContent = terminalOutput?.dataset.terminalStack ?? "";
   const terminalScreen = terminalForm?.closest<HTMLElement>(".status-output");
   const terminalWindow = terminalForm?.closest<HTMLElement>(".terminal-window");
   const invaderTrigger = document.querySelector<HTMLButtonElement>(
@@ -982,7 +988,7 @@ const filesystem = directory({
           timeStyle: "medium",
           hourCycle: "h23",
         }),
-      stack: () => "Node.js · Express · Next.js · TypeScript · JavaScript · React · MongoDB",
+      stack: () => stackContent,
       invader: () => "",
       projects: () => {
         navigateToSection("projects");

@@ -1,4 +1,6 @@
 ---
+import 'lite-youtube-embed/src/lite-yt-embed.css';
+
 interface Props {
 	title?: string;
 	description?: string;
@@ -98,11 +100,30 @@ const {
 	::-webkit-scrollbar-corner {
 		background: #100e1d;
 	}
+
+	lite-youtube {
+		width: 560px;
+		height: 420px;
+		max-width: 560px;
+	}
+
+	lite-youtube::after {
+		padding-bottom: 0;
+	}
+
+	@media (max-width: 560px) {
+		lite-youtube {
+			width: 100%;
+			height: auto;
+			aspect-ratio: 4 / 3;
+		}
+	}
 </style>
 
 <script>
 	import hljs from 'highlight.js';
 	import 'highlight.js/styles/github-dark.css';
+	import 'lite-youtube-embed';
 
 	document.addEventListener('DOMContentLoaded', () => {
 		hljs.highlightAll();

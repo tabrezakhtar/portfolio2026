@@ -7,7 +7,7 @@ author: 'Tabrez Akhtar'
 tags: ["AI", "OpenRouter", "OpenAI", "Node.js", "React", "RiffTales"]
 ---
 
-<lite-youtube videoid="4q7l-bIRJAI" title="RiffTales AI Equipment Description Generator" playlabel="Play the RiffTales AI equipment description video" style="width: 560px; height: 420px; max-width: 100%;"></lite-youtube>
+<lite-youtube videoid="4q7l-bIRJAI" title="RiffTales AI Equipment Description Generator" playlabel="Play the RiffTales AI equipment description video"></lite-youtube>
 
 One of the things I want to make easier on <a href="https://rifftales.net" target="_blank" rel="noreferrer">RiffTales</a> is for users to add their instruments as easily as possible.
 

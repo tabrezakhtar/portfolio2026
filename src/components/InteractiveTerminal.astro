@@ -599,15 +599,6 @@ const filesystem = directory({
         }),
       }),
     });
-    if (filesystem.type === "directory") {
-      const researchFolder = filesystem.children.research;
-      if (researchFolder?.type === "directory") {
-        const alienArchive = researchFolder.children.aliens;
-        if (alienArchive?.type === "directory") {
-          researchFolder.children = alienArchive.children;
-        }
-      }
-    }
     let workingDirectory: string[] = [];
     let pager: PagerState | null = null;
     const tokenize = (value: string) =>
@@ -780,7 +771,7 @@ const filesystem = directory({
     });
     const commands: Partial<Record<string, (args: string[]) => string>> = {
       help: () =>
-        "Commands: whoami, date, stack, projects, about, contact, invader.\nArchive: ls, cd, pwd, cat, more, less, head, tail, find, grep, tree, stat, wc, history, man.\nType man COMMAND for details. Press Tab for command and path completion.\nAlien research archive: /research. Fictional field notes; reported encounters are unverified.",
+        "Commands: whoami, date, stack, projects, about, contact, invader.\nArchive: ls, cd, pwd, cat, more, less, head, tail, find, grep, tree, stat, wc, history, man.\nType man COMMAND for details. Press Tab for command and path completion.",
       pwd: () => nodePath(workingDirectory),
       ls: (args) => {
         const showAll =

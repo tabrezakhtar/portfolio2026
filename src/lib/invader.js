@@ -15,7 +15,7 @@ export const createInvaderGame = (onExit) => {
   board.className = "terminal-invader-board";
   const instructions = document.createElement("p");
   instructions.className = "terminal-invader-instructions";
-  instructions.textContent = "A/D or arrows move  |  Space fires  |  Q quits";
+  instructions.textContent = "Move: A / D or ← / →  |  Fire: Space  |  Quit: Q";
   game.append(board, instructions);
 
   const invaders = Array.from({ length: 24 }, (_, index) => ({

@@ -76,10 +76,10 @@ const roles = [
 <script>
 	const sideNav = document.querySelector('.side-nav');
 	if (sideNav) {
-		const links = Array.from(sideNav.querySelectorAll('a[href^="#"]'));
+		const links = Array.from(sideNav.querySelectorAll('a[href^="#"]')) as any[];
 		let clickedHash = '';
 
-		const selectLink = (link) => {
+		const selectLink = (link: any) => {
 			links.forEach((item) => {
 				const selected = item === link;
 				item.classList.toggle('is-selected', selected);

@@ -88,7 +88,7 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 	const PSI_IM = (FIXED_IM - START_IM) / START_SCALE;
 	const INTRO_CYCLES = Math.log(START_SCALE / LOOP_SCALE) / CYCLE_LOG;
 
-	const bitmapFont = {
+	const bitmapFont: Record<string, string[]> = {
 		A: ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
 		B: ['11110', '10001', '10001', '11110', '10001', '10001', '11110'],
 		C: ['01111', '10000', '10000', '10000', '10000', '10000', '01111'],
@@ -131,13 +131,13 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 		'!': ['00100', '00100', '00100', '00100', '00100', '00000', '00100'],
 	};
 
-	function smoothstep(start, end, value) {
+	function smoothstep(start: number, end: number, value: number) {
 		const amount = Math.max(0, Math.min(1, (value - start) / (end - start)));
 		return amount * amount * (3 - 2 * amount);
 	}
 
 	// Smooth escape count, or -1 for points inside the set (or never escaping within the iteration budget).
-	function escapeTime(cr, ci) {
+	function escapeTime(cr: number, ci: number) {
 		const y2 = ci * ci;
 		let x = cr - 0.25;
 		const q = x * x + y2;
@@ -171,7 +171,7 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 		return -1;
 	}
 
-	function initialize(output) {
+	function initialize(output: HTMLElement) {
 		if (active.has(output)) return;
 
 		const fontSize = Number(output.dataset.fontSize) || 14;
@@ -243,14 +243,14 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 			}
 		}
 
-		function put(column, row, shade, colorIndex) {
+		function put(column: number, row: number, shade: number, colorIndex: number) {
 			if (column < 0 || row < 0 || column >= columns || row >= rows) return;
 			const index = row * columns + column;
 			shades[index] = shade;
 			colors[index] = colorIndex;
 		}
 
-		function drawFractal(time) {
+		function drawFractal(time: number) {
 			// Zoom in by ZOOM_PER_CYCLE each cycle. Negative phase is the opening dive from the whole set.
 			const scale = LOOP_SCALE * Math.exp(-CYCLE_LOG * phase);
 			const intro = phase < 0 ? Math.min(1, -phase / INTRO_CYCLES) : 0;
@@ -314,7 +314,7 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 			}
 		}
 
-		function drawScroller(time) {
+		function drawScroller(time: number) {
 			if (!message.length || time < 2.2) return;
 			const pixelWidth = 3; // 3x2 cells per font pixel is close to square for a ~0.6 cell aspect
 			const pixelHeight = 2;
@@ -345,7 +345,7 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 			}
 		}
 
-		function advance(delta) {
+		function advance(delta: number) {
 			elapsed += delta;
 			// Faster during the opening dive, then a steady zoom forever.
 			const intro = phase < 0 ? Math.min(1, -phase / INTRO_CYCLES) : 0;
@@ -385,7 +385,7 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 		}
 
 		// Keep frames affordable on huge screens or slow machines by sampling fewer columns.
-		function adaptQuality(cost) {
+		function adaptQuality(cost: number) {
 			renderCost = renderCost * 0.85 + cost * 0.15;
 			if (renderCost > 22 && stride < 3) {
 				stride += 1;
@@ -400,7 +400,7 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 			if (running && !frame) frame = window.requestAnimationFrame(loop);
 		}
 
-		function loop(timestamp) {
+		function loop(timestamp: number) {
 			frame = 0;
 			if (!running || document.hidden || !onscreen) return;
 			if (timestamp - lastFrame >= 1000 / 30) {
@@ -484,7 +484,7 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 	}
 
 	function initializeAll() {
-		document.querySelectorAll('[data-animate-output]').forEach(initialize);
+		document.querySelectorAll<HTMLElement>('[data-animate-output]').forEach(initialize);
 	}
 
 	function cleanupAll() {

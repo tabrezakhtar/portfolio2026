@@ -57,7 +57,7 @@ export const createInvaderGame = (onExit) => {
     stopped = true;
     window.clearInterval(timer);
     document.removeEventListener("keydown", handleKeydown, true);
-    instructions.textContent = `${message}  |  Q returns to the terminal`;
+    instructions.textContent = `${message}  |  Quit: Q`;
     game.removeAttribute("data-invader-game");
     game.tabIndex = -1;
     onExit();
@@ -101,7 +101,7 @@ export const createInvaderGame = (onExit) => {
     }
 
     if (changed) render();
-    if (invaders.every((invader) => !invader.alive)) finish("ALL CLEAR");
+    if (invaders.every((invader) => !invader.alive)) finish("YOU WIN!");
   };
 
   const handleKeydown = (event) => {

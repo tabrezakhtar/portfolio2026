@@ -7,18 +7,14 @@ import Hero from '../components/Hero.astro';
 import About from '../components/About.astro';
 import Contact from '../components/Contact.astro';
 import Blog from '../components/Blog.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 ---
 
 <Layout>
 	<SideMenu />
 	<div class="site-shell">
-		<header class="site-header">
-			<a class="wordmark" href="/" aria-label="Tabrez, home">tabrez<span>.</span></a>
-			<a class="availability" href="#contact">
-				<span class="availability-dot"></span>
-				OPEN TO COLLAB
-			</a>
-		</header>
+		<SiteHeader />
 
 		<main>
 			<Hero />
@@ -32,15 +28,7 @@ import Blog from '../components/Blog.astro';
 			<Contact />
 		</main>
 
-		<footer class="site-footer">
-			<a class="wordmark" href="/">tabrez<span>.</span></a>
-			<p>Still learning.  Still building. The journey continues.</p>
-			<div class="footer-links">
-				<a href="https://github.com/tabrezakhtar" target="_blank" rel="noreferrer">GitHub ↗</a>
-				<a href="https://www.linkedin.com/in/tabrezakhtar" target="_blank" rel="noreferrer">LinkedIn ↗</a>
-				<span>© 2026</span>
-			</div>
-		</footer>
+		<SiteFooter />
 	</div>
 </Layout>
 
@@ -84,66 +72,8 @@ import Blog from '../components/Blog.astro';
 		padding: 0;
 	}
 
-	.site-header {
-		min-height: 82px;
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
-		align-items: center;
-		border-bottom: 1px solid #312844;
-	}
-
-	.wordmark {
-		width: fit-content;
-		font-family: 'Space Grotesk', sans-serif;
-		font-size: 24px;
-		font-weight: 700;
-		letter-spacing: 0;
-		text-decoration: none;
-	}
-
-	.wordmark span,
 	.coral-dot {
 		color: #ff4fd8;
-	}
-
-	.main-nav,
-	.footer-links {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 34px;
-	}
-
-	.main-nav a,
-	.availability,
-	.footer-links a {
-		font-size: 13px;
-		text-decoration: none;
-	}
-
-	.main-nav a,
-	.footer-links a {
-		transition: color 160ms ease;
-	}
-
-	.main-nav a:hover,
-	.footer-links a:hover {
-		color: #40f4ff;
-	}
-
-	.availability {
-		justify-self: end;
-		display: flex;
-		align-items: center;
-		gap: 9px;
-	}
-
-	.availability-dot {
-		width: 8px;
-		aspect-ratio: 1;
-		border-radius: 50%;
-		background: #b9ff66;
-		box-shadow: 0 0 0 4px #b9ff6620, 0 0 12px #b9ff6690;
 	}
 
 	.terminal-prompt {
@@ -516,68 +446,6 @@ import Blog from '../components/Blog.astro';
 		overflow: hidden;
 	}
 
-	.site-footer {
-		min-height: 82px;
-		border-top: 1px solid #312844;
-		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
-		align-items: center;
-		gap: 15px;
-	}
-
-	.site-footer .wordmark {
-		font-size: 20px;
-	}
-
-	.site-footer > p,
-	.footer-links span {
-		margin: 0;
-		color: #a89bbd;
-		font-size: 10px;
-		text-align: center;
-	}
-
-	.footer-links {
-		justify-content: flex-end;
-		gap: 17px;
-	}
-
-	.footer-links a,
-	.footer-links span {
-		font-size: 10px;
-	}
-
-	.site-header {
-		min-height: 58px;
-		padding: 0 15px;
-		border: 1px solid #392950;
-		border-top: 2px solid #ff4fd8;
-		background: #110f20;
-	}
-
-	.site-header .wordmark,
-	.site-footer .wordmark {
-		font-family: 'Space Mono', monospace;
-	}
-
-	.site-header .wordmark::before {
-		content: '~/';
-		margin-right: 5px;
-		color: #40f4ff;
-	}
-
-	.main-nav a {
-		color: #c1b6d2;
-		font-family: 'Space Mono', monospace;
-		font-size: 11px;
-	}
-
-	.availability {
-		color: #b9ff66;
-		font-family: 'Space Mono', monospace;
-		font-size: 10px;
-	}
-
 	.hero {
 		min-height: 0;
 		padding: 20px 0 20px;
@@ -924,25 +792,6 @@ import Blog from '../components/Blog.astro';
 		font-family: 'Space Mono', monospace;
 	}
 
-	.site-footer {
-		padding: 0 12px;
-		border: 1px solid #392950;
-		border-bottom: 2px solid #40f4ff;
-		background: #110f20;
-	}
-
-	.site-footer .wordmark::before {
-		content: '~/';
-		margin-right: 5px;
-		color: #40f4ff;
-	}
-
-	.site-footer > p,
-	.footer-links a,
-	.footer-links span {
-		font-family: 'Space Mono', monospace;
-	}
-
 	@keyframes rise-in {
 		from {
 			transform: translateY(14px);
@@ -1005,32 +854,6 @@ import Blog from '../components/Blog.astro';
 	@media (max-width: 640px) {
 		.site-shell {
 			padding: 0;
-		}
-
-		.site-header {
-			min-height: 0;
-			padding: 10px 12px;
-			grid-template-columns: minmax(0, 1fr);
-			gap: 8px;
-		}
-
-		.wordmark {
-			font-size: 22px;
-		}
-
-		.main-nav {
-			justify-content: flex-start;
-			flex-wrap: wrap;
-			gap: 8px 18px;
-		}
-
-		.main-nav a,
-		.availability {
-			font-size: 11px;
-		}
-
-		.availability {
-			display: none;
 		}
 
 		.hero {
@@ -1173,48 +996,6 @@ import Blog from '../components/Blog.astro';
 			max-width: 340px;
 		}
 
-		.site-footer {
-			min-height: 110px;
-			padding: 20px 0;
-			grid-template-columns: 1fr auto;
-			row-gap: 12px;
-		}
-
-		.site-footer > p {
-			grid-row: 2;
-			text-align: left;
-		}
-
-		.footer-links {
-			grid-column: 2;
-			grid-row: 1 / span 2;
-			flex-wrap: wrap;
-			gap: 10px 12px;
-		}
-	}
-
-	@media (max-width: 380px) {
-		.main-nav {
-			gap: 8px 12px;
-		}
-
-		.main-nav a {
-			font-size: 10px;
-		}
-
-		.site-footer {
-			grid-template-columns: minmax(0, 1fr);
-		}
-
-		.site-footer > p,
-		.footer-links {
-			grid-column: 1;
-			grid-row: auto;
-		}
-
-		.footer-links {
-			justify-content: flex-start;
-		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {

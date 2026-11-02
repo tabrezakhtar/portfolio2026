@@ -1,0 +1,76 @@
+<header class="site-header">
+	<a class="wordmark" href="/" aria-label="Tabrez, home">tabrez<span>.</span></a>
+	<a class="availability" href="#contact">
+		<span class="availability-dot"></span>
+		OPEN TO COLLAB
+	</a>
+</header>
+
+<style>
+	.site-header {
+		min-height: 58px;
+		padding: 0 15px;
+		border: 1px solid #392950;
+		border-top: 2px solid #ff4fd8;
+		background: #110f20;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+	}
+
+	.wordmark {
+		width: fit-content;
+		font-family: 'Space Mono', monospace;
+		font-size: 24px;
+		font-weight: 700;
+		letter-spacing: 0;
+		text-decoration: none;
+	}
+
+	.wordmark span {
+		color: #ff4fd8;
+	}
+
+	.wordmark::before {
+		content: '~/';
+		margin-right: 5px;
+		color: #40f4ff;
+	}
+
+	.availability {
+		justify-self: end;
+		display: flex;
+		align-items: center;
+		gap: 9px;
+		color: #b9ff66;
+		font-family: 'Space Mono', monospace;
+		font-size: 10px;
+		text-decoration: none;
+	}
+
+	.availability-dot {
+		width: 8px;
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background: #b9ff66;
+		box-shadow: 0 0 0 4px #b9ff6620, 0 0 12px #b9ff6690;
+	}
+
+	@media (max-width: 640px) {
+		.site-header {
+			min-height: 0;
+			padding: 10px 12px;
+			grid-template-columns: minmax(0, 1fr);
+			gap: 8px;
+		}
+
+		.wordmark {
+			font-size: 22px;
+		}
+
+		.availability {
+			display: none;
+			font-size: 11px;
+		}
+	}
+</style>

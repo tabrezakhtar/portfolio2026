@@ -4,6 +4,16 @@
 		<span class="availability-dot"></span>
 		OPEN TO COLLAB
 	</a>
+	<button
+		class="menu-toggle"
+		type="button"
+		data-menu-toggle
+		aria-label="Open menu"
+		aria-controls="side-menu"
+		aria-expanded="false"
+	>
+		<span class="menu-toggle-bar" aria-hidden="true"></span>
+	</button>
 </header>
 
 <style>
@@ -14,8 +24,68 @@
 		border-top: 2px solid #ff4fd8;
 		background: #110f20;
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-columns: minmax(0, 1fr) auto auto;
 		align-items: center;
+		gap: 14px;
+	}
+
+	.menu-toggle {
+		width: 40px;
+		height: 40px;
+		padding: 0;
+		border: 1px solid #453156;
+		background: #171326;
+		display: none;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		transition: border-color 160ms ease;
+	}
+
+	.menu-toggle:hover,
+	.menu-toggle:focus-visible {
+		border-color: #40f4ff;
+	}
+
+	.menu-toggle-bar,
+	.menu-toggle-bar::before,
+	.menu-toggle-bar::after {
+		width: 18px;
+		height: 2px;
+		background: #40f4ff;
+		display: block;
+		transition: transform 200ms ease, background 200ms ease;
+	}
+
+	.menu-toggle-bar {
+		position: relative;
+	}
+
+	.menu-toggle-bar::before,
+	.menu-toggle-bar::after {
+		content: '';
+		position: absolute;
+		left: 0;
+	}
+
+	.menu-toggle-bar::before {
+		top: -6px;
+	}
+
+	.menu-toggle-bar::after {
+		top: 6px;
+	}
+
+	.menu-toggle[aria-expanded='true'] .menu-toggle-bar {
+		background: transparent;
+	}
+
+	.menu-toggle[aria-expanded='true'] .menu-toggle-bar::before {
+		transform: translateY(6px) rotate(45deg);
+	}
+
+	.menu-toggle[aria-expanded='true'] .menu-toggle-bar::after {
+		transform: translateY(-6px) rotate(-45deg);
 	}
 
 	.wordmark {
@@ -56,11 +126,40 @@
 		box-shadow: 0 0 0 4px #b9ff6620, 0 0 12px #b9ff6690;
 	}
 
+	@media (max-width: 900px) {
+		.site-header {
+			position: sticky;
+			top: 0;
+			margin-bottom: var(--page-gutter, 10px);
+			z-index: 10;
+		}
+
+		.menu-toggle {
+			display: flex;
+		}
+
+		:global(html) {
+			scroll-padding-top: 90px;
+		}
+
+		:global(body.menu-open) {
+			overflow: hidden;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.menu-toggle-bar,
+		.menu-toggle-bar::before,
+		.menu-toggle-bar::after {
+			transition: none;
+		}
+	}
+
 	@media (max-width: 640px) {
 		.site-header {
 			min-height: 0;
-			padding: 10px 12px;
-			grid-template-columns: minmax(0, 1fr);
+			padding: 9px 12px;
+			grid-template-columns: minmax(0, 1fr) auto;
 			gap: 8px;
 		}
 

@@ -14,12 +14,6 @@ import Blog from '../components/Blog.astro';
 	<div class="site-shell">
 		<header class="site-header">
 			<a class="wordmark" href="/" aria-label="Tabrez, home">tabrez<span>.</span></a>
-			<nav class="main-nav" aria-label="Main navigation">
-				<a href="#about">About</a>
-				<a href="#projects">Work</a>
-				<a href="#services">Services</a>
-				<a href="#contact">Contact</a>
-			</nav>
 			<a class="availability" href="#contact">
 				<span class="availability-dot"></span>
 				OPEN TO COLLAB
@@ -93,7 +87,7 @@ import Blog from '../components/Blog.astro';
 	.site-header {
 		min-height: 82px;
 		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
+		grid-template-columns: minmax(0, 1fr) auto;
 		align-items: center;
 		border-bottom: 1px solid #312844;
 	}
@@ -997,14 +991,27 @@ import Blog from '../components/Blog.astro';
 
 	}
 
+	@media (max-width: 760px) {
+		.pane-content {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.contact-heading,
+		.contact-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
 	@media (max-width: 640px) {
 		.site-shell {
 			padding: 0;
 		}
 
 		.site-header {
-			min-height: 72px;
-			grid-template-columns: 1fr auto;
+			min-height: 0;
+			padding: 10px 12px;
+			grid-template-columns: minmax(0, 1fr);
+			gap: 8px;
 		}
 
 		.wordmark {
@@ -1012,7 +1019,9 @@ import Blog from '../components/Blog.astro';
 		}
 
 		.main-nav {
-			gap: 18px;
+			justify-content: flex-start;
+			flex-wrap: wrap;
+			gap: 8px 18px;
 		}
 
 		.main-nav a,
@@ -1132,15 +1141,13 @@ import Blog from '../components/Blog.astro';
 
 		.contact-heading {
 			margin: 17px 0 22px;
-			grid-template-columns: 1fr;
 			gap: 16px;
 		}
 
 		.contact-heading h2 {
-			font-size: 54px;
+			font-size: clamp(38px, 11vw, 54px);
 		}
 
-		.contact-grid,
 		.form-row {
 			grid-template-columns: 1fr;
 		}
@@ -1183,6 +1190,30 @@ import Blog from '../components/Blog.astro';
 			grid-row: 1 / span 2;
 			flex-wrap: wrap;
 			gap: 10px 12px;
+		}
+	}
+
+	@media (max-width: 380px) {
+		.main-nav {
+			gap: 8px 12px;
+		}
+
+		.main-nav a {
+			font-size: 10px;
+		}
+
+		.site-footer {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.site-footer > p,
+		.footer-links {
+			grid-column: 1;
+			grid-row: auto;
+		}
+
+		.footer-links {
+			justify-content: flex-start;
 		}
 	}
 

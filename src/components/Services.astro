@@ -353,6 +353,18 @@ const services = [
 		color: #40f4ff;
 	}
 
+	@media (max-width: 760px) {
+		.services-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.service-item,
+		.service-item:nth-child(even) {
+			padding: 21px 0;
+			border-left: 0;
+		}
+	}
+
 	@media (max-width: 640px) {
 		.services-content {
 			padding: 24px 17px;

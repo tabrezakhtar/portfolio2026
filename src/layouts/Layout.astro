@@ -130,4 +130,95 @@ const {
 	document.addEventListener('DOMContentLoaded', () => {
 		hljs.highlightAll();
 	});
+
+	// Reusable "decrypt" scramble animation: add data-decrypt to any element
+	// and it will randomize its text on hover/tap, then settle back to normal.
+	const DECRYPT_UPPER_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	const DECRYPT_LOWER_CHARS = 'abcdefghijklmnopqrstuvwxyz';
+	const DECRYPT_DIGITS = '0123456789';
+	const splitCharacters = (value: string) => {
+		const segmenter = Intl.Segmenter
+			? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+			: null;
+		return segmenter
+			? Array.from(segmenter.segment(value), ({ segment }) => segment)
+			: Array.from(value);
+	};
+	const decryptTimers = new WeakMap();
+	const decryptTextNodes = new WeakMap<HTMLElement, Array<{ node: Text; original: string }>>();
+
+	const runDecrypt = (el: HTMLElement) => {
+		let textNodes = decryptTextNodes.get(el);
+		if (!textNodes) {
+			const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+			textNodes = [];
+			while (walker.nextNode()) {
+				const node = walker.currentNode as Text;
+				textNodes.push({ node, original: node.textContent ?? '' });
+			}
+			decryptTextNodes.set(el, textNodes);
+		}
+
+		const previousTimer = decryptTimers.get(el);
+		if (previousTimer) clearInterval(previousTimer);
+		textNodes.forEach(({ node, original }) => {
+			node.textContent = original;
+		});
+
+		const duration = 400 + Math.random() * 300;
+		const stepTime = 28 + Math.random() * 14;
+		const totalSteps = Math.round(duration / stepTime);
+		const animationText = textNodes.map(({ node, original }) => {
+			const chars = splitCharacters(original);
+			return {
+				node,
+				chars,
+				revealAt: chars.map(() => 0.05 + Math.random() * 0.9),
+			};
+		});
+		let step = 0;
+
+		const interval = setInterval(() => {
+			step += 1;
+			const progress = step / totalSteps;
+			animationText.forEach(({ node, chars, revealAt }) => {
+				node.textContent = chars
+					.map((char, index) => {
+						if (progress >= revealAt[index] || !/^[a-z0-9]$/i.test(char)) return char;
+						const pool = /[0-9]/.test(char)
+							? DECRYPT_DIGITS
+							: char === char.toLowerCase()
+								? DECRYPT_LOWER_CHARS
+								: DECRYPT_UPPER_CHARS;
+						const alternatives = pool.replace(char, '');
+						return alternatives[Math.floor(Math.random() * alternatives.length)];
+					})
+					.join('');
+			});
+
+			if (step >= totalSteps) {
+				clearInterval(interval);
+				decryptTimers.delete(el);
+				textNodes.forEach(({ node, original }) => {
+					node.textContent = original;
+				});
+			}
+		}, stepTime);
+
+		decryptTimers.set(el, interval);
+	};
+
+	document.addEventListener('mouseenter', (event) => {
+		const el = event.target instanceof Element
+			? event.target.closest<HTMLElement>('[data-decrypt]')
+			: null;
+		if (el) runDecrypt(el);
+	}, true);
+
+	document.addEventListener('touchstart', (event) => {
+		const el = event.target instanceof Element
+			? event.target.closest<HTMLElement>('[data-decrypt]')
+			: null;
+		if (el) runDecrypt(el);
+	}, { capture: true, passive: true });
 </script>

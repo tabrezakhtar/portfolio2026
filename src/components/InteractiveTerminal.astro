@@ -1338,11 +1338,74 @@ const filesystem = directory({
 
 <style is:global>
   .interactive-terminal-pane {
+    position: relative;
     min-width: 0;
     overflow: hidden;
     border: 1px solid #413052;
     background: #100e1d;
     grid-column: 1 / -1;
+  }
+
+  .interactive-terminal-pane::after {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      115deg,
+      #40f4ff,
+      #ff4fd8 42%,
+      #b99aff 70%,
+      #b9ff66
+    );
+    content: "";
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .interactive-terminal-pane:hover {
+    animation: terminal-pane-frame-pulse 650ms ease-out both;
+  }
+
+  .interactive-terminal-pane:hover::after {
+    animation: terminal-pane-color-pulse 650ms ease-out both;
+  }
+
+  @keyframes terminal-pane-frame-pulse {
+    0% {
+      border-color: #413052;
+      box-shadow: 0 0 0 0 #40f4ff00, 0 0 0 0 #ff4fd800;
+    }
+    35% {
+      border-color: #40f4ff;
+      box-shadow: 0 0 14px 2px #40f4ff99, 0 0 28px 5px #ff4fd866;
+    }
+    100% {
+      border-color: #413052;
+      box-shadow: 0 0 0 0 #40f4ff00, 0 0 0 0 #ff4fd800;
+    }
+  }
+
+  @keyframes terminal-pane-color-pulse {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    35% {
+      opacity: 0.13;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .interactive-terminal-pane:hover {
+      animation: none;
+      border-color: #40f4ff;
+      box-shadow: 0 0 10px 1px #40f4ff66, 0 0 18px 2px #ff4fd844;
+    }
+
+    .interactive-terminal-pane:hover::after {
+      animation: none;
+      opacity: 0.08;
+    }
   }
 
   .interactive-terminal-pane .pane-title {
@@ -1478,6 +1541,7 @@ const filesystem = directory({
     gap: 8px;
     color: #c1b6d2;
     font-size: 9px;
+    cursor: text;
   }
 
   .interactive-terminal-pane .terminal-prompt-line {
@@ -1541,4 +1605,5 @@ const filesystem = directory({
       font-size: 8px;
     }
   }
+
 </style>

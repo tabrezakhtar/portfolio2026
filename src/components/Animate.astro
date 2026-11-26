@@ -1,6 +1,6 @@
 ---
 /**
- * Astro props for the full-screen ASCII Mandelbrot zoom.
+ * Astro props for the full-screen ASCII animation.
  * @typedef {Object} AnimateProps
  * @property {string} text Optional sine-scroller message; empty by default.
  * @property {number} opacity Overall effect opacity from 0 to 1 (default 0.35).
@@ -45,7 +45,7 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 
 <script>
 	// ---------------------------------------------------------------------------
-	// Endless Mandelbrot zoom, rendered as ASCII.
+	// ASCII Mandelbrot zoom and falling-sand effects.
 	//
 	// The zoom aims at c* = -1.78644025556..., the fixed point of "tuning" by the
 	// period-3 airplane minibrot. Every minibrot there contains a smaller copy of
@@ -61,6 +61,13 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 	const density = ' .:-=+*#%@';
 	// Palette slots walked by successive colour bands: deep purple -> violet -> magenta -> pink -> lavender -> cyan -> blue -> violet.
 	const ramp = [0, 1, 2, 3, 4, 5, 6, 1];
+	const sandRamp = [7, 7, 3, 2, 5, 6];
+	// Falling speeds are in character cells per second; gravity in cells per second squared.
+	const SAND_MIN_SPEED = 14;
+	const SAND_MAX_SPEED = 26;
+	const SAND_TERMINAL_SPEED = 42;
+	const SAND_GRAVITY = 24;
+	const SAND_STEP_SECONDS = 1 / 30;
 	// Scroller letters cycle through pink, cyan, soft pink and the lime accent.
 	const accents = [2, 5, 3, 7];
 	const active = new Map();
@@ -87,6 +94,7 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 	const PSI_RE = (FIXED_RE - START_RE) / START_SCALE;
 	const PSI_IM = (FIXED_IM - START_IM) / START_SCALE;
 	const INTRO_CYCLES = Math.log(START_SCALE / LOOP_SCALE) / CYCLE_LOG;
+	const randomBetween = (min: number, max: number) => min + Math.random() * (max - min);
 
 	const bitmapFont: Record<string, string[]> = {
 		A: ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
@@ -177,6 +185,7 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 		const fontSize = Number(output.dataset.fontSize) || 14;
 		const speed = Number(output.dataset.speed) || 0;
 		const message = (output.dataset.text || '').toUpperCase();
+		const useSand = Math.random() < 0.5;
 
 		const probe = document.createElement('span');
 		probe.textContent = 'M';
@@ -200,6 +209,23 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 		let rows = 1;
 		let shades = new Uint8Array(1); // index into the density ramp for every cell
 		let colors = new Uint8Array(1); // palette slot for every cell
+		let sand = new Uint8Array(1); // occupied sand cells, with a value selecting the grain color
+		// One falling grain per column, plus a respawn timer while that column's grain is idle.
+		let dropX = new Float32Array(1);
+		let dropY = new Float32Array(1);
+		let dropV = new Float32Array(1);
+		let dropDrift = new Float32Array(1);
+		let dropWait = new Float32Array(1);
+		let dropGrain = new Uint8Array(1);
+		let dropLive = new Uint8Array(1);
+		let flushGrains: Array<{ x: number; y: number; vx: number; vy: number; gravity: number; grain: number }> = [];
+		let flushing = false;
+		let flushClock = 0;
+		let flushOrigin = 0;
+		let flushBaseRows = 0;
+		let flushRelease = new Float32Array(1);
+		let flushDone = new Uint8Array(1);
+		let sandClock = 0;
 		let bandValue = new Float32Array(1); // log3 of the escape count per cell, -1 inside the set
 		let gridX = new Float32Array(1); // per-cell offset from the view centre, in view units
 		let gridY = new Float32Array(1);
@@ -207,6 +233,7 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 		let frame = 0;
 		let resizeTimer = 0;
 		let elapsed = 0;
+		let sandAccumulator = 0;
 		let lastFrame = 0;
 		let running = false;
 		let onscreen = false;
@@ -223,6 +250,16 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 			const count = columns * rows;
 			shades = new Uint8Array(count);
 			colors = new Uint8Array(count);
+			sand = new Uint8Array(count);
+			dropX = new Float32Array(columns);
+			dropY = new Float32Array(columns);
+			dropV = new Float32Array(columns);
+			dropDrift = new Float32Array(columns);
+			dropWait = new Float32Array(columns);
+			dropGrain = new Uint8Array(columns);
+			dropLive = new Uint8Array(columns);
+			flushRelease = new Float32Array(columns);
+			flushDone = new Uint8Array(columns);
 			bandValue = new Float32Array(count);
 			gridX = new Float32Array(count);
 			gridY = new Float32Array(count);
@@ -241,6 +278,7 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 					vignette[index] = Math.max(0.4, 1 - 0.4 * (x * x + y * y));
 				}
 			}
+			if (useSand) resetSand();
 		}
 
 		function put(column: number, row: number, shade: number, colorIndex: number) {
@@ -314,6 +352,198 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 			}
 		}
 
+		function seedSand() {
+			const height = Math.min(5, rows);
+			const center = Math.floor(columns / 2);
+			for (let layer = 0; layer < height; layer += 1) {
+				const halfWidth = Math.min(height - layer - 1, Math.floor((columns - 1) / 2));
+				const row = rows - 1 - layer;
+				for (let column = center - halfWidth; column <= center + halfWidth; column += 1) {
+					sand[row * columns + column] = 1 + Math.floor(Math.random() * sandRamp.length);
+				}
+			}
+		}
+
+		function resetSand() {
+			sand.fill(0);
+			flushGrains = [];
+			flushing = false;
+			sandClock = 0;
+			dropLive.fill(0);
+			for (let column = 0; column < columns; column += 1) dropWait[column] = Math.random() * 1.2;
+			seedSand();
+		}
+
+		// A slow side-to-side breeze pushes falling grains so the piles lean and drift instead of staying symmetric.
+		function sandWind() {
+			return Math.sin(sandClock * 0.45) * 5 + Math.sin(sandClock * 1.7) * 2;
+		}
+
+		function spawnDrop(column: number) {
+			dropLive[column] = 1;
+			dropX[column] = column;
+			dropY[column] = 0;
+			dropV[column] = randomBetween(SAND_MIN_SPEED, SAND_MAX_SPEED);
+			dropDrift[column] = randomBetween(0.3, 1.2);
+			dropGrain[column] = 1 + Math.floor(Math.random() * sandRamp.length);
+		}
+
+		function moveDrop(column: number) {
+			const previousRow = Math.floor(dropY[column]);
+			dropV[column] = Math.min(SAND_TERMINAL_SPEED, dropV[column] + SAND_GRAVITY * SAND_STEP_SECONDS);
+			dropY[column] += dropV[column] * SAND_STEP_SECONDS;
+			const driftedX = dropX[column] + sandWind() * dropDrift[column] * SAND_STEP_SECONDS;
+			dropX[column] = ((driftedX % columns) + columns) % columns;
+
+			const x = Math.min(columns - 1, Math.round(dropX[column]));
+			const targetRow = Math.min(rows - 1, Math.floor(dropY[column]));
+			let row = previousRow;
+			while (row < targetRow && sand[(row + 1) * columns + x] === 0) row += 1;
+			const landed = row < targetRow || targetRow === rows - 1 || sand[row * columns + x] !== 0;
+			if (!landed) return;
+
+			// Drift can carry a grain into an occupied cell, so settle on top of whatever is there.
+			while (row >= 0 && sand[row * columns + x] !== 0) row -= 1;
+			if (row >= 0) sand[row * columns + x] = dropGrain[column];
+			dropLive[column] = 0;
+			dropWait[column] = Math.random() * 0.15;
+		}
+
+		function updateDrops() {
+			for (let column = 0; column < columns; column += 1) {
+				if (dropLive[column]) {
+					moveDrop(column);
+					continue;
+				}
+				dropWait[column] -= SAND_STEP_SECONDS;
+				if (dropWait[column] <= 0 && sand[column] === 0) spawnDrop(column);
+			}
+		}
+
+		// Grains slide off slopes steeper than the angle of repose, so landings spread into rough, shifting piles.
+		function settleSand() {
+			for (let row = rows - 2; row >= 0; row -= 1) {
+				const rowStart = row * columns;
+				const reverse = Math.random() < 0.5;
+				for (let step = 0; step < columns; step += 1) {
+					const column = reverse ? columns - 1 - step : step;
+					const index = rowStart + column;
+					const grain = sand[index];
+					if (grain === 0) continue;
+					const below = index + columns;
+					if (sand[below] === 0) {
+						sand[below] = grain;
+						sand[index] = 0;
+						continue;
+					}
+					if (Math.random() > 0.6) continue;
+					const first = Math.random() < 0.5 ? -1 : 1;
+					for (const side of [first, -first]) {
+						const nextColumn = column + side;
+						if (nextColumn < 0 || nextColumn >= columns) continue;
+						if (sand[index + side] !== 0 || sand[below + side] !== 0) continue;
+						sand[below + side] = grain;
+						sand[index] = 0;
+						break;
+					}
+				}
+			}
+		}
+
+		function isSandFull() {
+			let topFilled = 0;
+			for (let column = 0; column < columns; column += 1) {
+				if (sand[column] !== 0) topFilled += 1;
+			}
+			return topFilled >= columns * 0.95;
+		}
+
+		// The floor gives way in a wave from one edge or the centre; each column's sand drops and drains into the base layer.
+		function startFlush() {
+			flushing = true;
+			flushClock = 0;
+			flushBaseRows = Math.min(rows - 1, Math.max(2, Math.floor(rows * 0.14)));
+			const mode = Math.floor(Math.random() * 3);
+			flushOrigin = mode === 0 ? 0 : mode === 1 ? columns - 1 : columns / 2;
+			dropLive.fill(0);
+			for (let column = 0; column < columns; column += 1) {
+				flushRelease[column] = Math.abs(column - flushOrigin) * 0.03 + Math.random() * 0.12;
+				flushDone[column] = 0;
+			}
+		}
+
+		function updateFlush() {
+			flushClock += SAND_STEP_SECONDS;
+			const baseTop = rows - flushBaseRows;
+			let pending = false;
+			for (let column = 0; column < columns; column += 1) {
+				if (flushDone[column]) continue;
+				if (flushClock < flushRelease[column]) {
+					pending = true;
+					continue;
+				}
+				flushDone[column] = 1;
+				const away = column >= flushOrigin ? 1 : -1;
+				for (let row = 0; row < baseTop; row += 1) {
+					const index = row * columns + column;
+					const grain = sand[index];
+					if (grain === 0) continue;
+					sand[index] = 0;
+					flushGrains.push({
+						x: column,
+						y: row,
+						vx: away * Math.random() * 8 + (Math.random() - 0.5) * 6,
+						vy: Math.random() * 5,
+						gravity: randomBetween(55, 145),
+						grain,
+					});
+				}
+			}
+
+			let remaining = 0;
+			for (const grain of flushGrains) {
+				grain.vy += grain.gravity * SAND_STEP_SECONDS;
+				grain.y += grain.vy * SAND_STEP_SECONDS;
+				grain.x += grain.vx * SAND_STEP_SECONDS;
+				if (grain.y >= baseTop) continue;
+				flushGrains[remaining] = grain;
+				remaining += 1;
+			}
+			flushGrains.length = remaining;
+
+			if (!pending && remaining === 0) {
+				flushing = false;
+				for (let column = 0; column < columns; column += 1) dropWait[column] = Math.random() * 0.5;
+			}
+		}
+
+		function updateSand() {
+			sandClock += SAND_STEP_SECONDS;
+			if (flushing) {
+				updateFlush();
+				return;
+			}
+			updateDrops();
+			settleSand();
+			if (isSandFull()) startFlush();
+		}
+
+		function drawSand() {
+			for (let index = 0; index < sand.length; index += 1) {
+				const grain = sand[index];
+				if (grain === 0) continue;
+				shades[index] = 7 + (grain % 3);
+				colors[index] = sandRamp[(grain - 1) % sandRamp.length];
+			}
+			for (let column = 0; column < columns; column += 1) {
+				if (!dropLive[column]) continue;
+				put(Math.round(dropX[column]), Math.floor(dropY[column]), 9, sandRamp[(dropGrain[column] - 1) % sandRamp.length]);
+			}
+			for (const grain of flushGrains) {
+				put(Math.round(grain.x), Math.floor(grain.y), 9, sandRamp[(grain.grain - 1) % sandRamp.length]);
+			}
+		}
+
 		function drawScroller(time: number) {
 			if (!message.length || time < 2.2) return;
 			const pixelWidth = 3; // 3x2 cells per font pixel is close to square for a ~0.6 cell aspect
@@ -347,6 +577,14 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 
 		function advance(delta: number) {
 			elapsed += delta;
+			if (useSand) {
+				sandAccumulator += delta * speed;
+				while (sandAccumulator >= 1 / 30) {
+					updateSand();
+					sandAccumulator -= 1 / 30;
+				}
+				return;
+			}
 			// Faster during the opening dive, then a steady zoom forever.
 			const intro = phase < 0 ? Math.min(1, -phase / INTRO_CYCLES) : 0;
 			phase += delta * speed * CYCLE_RATE * (1 + 0.8 * intro);
@@ -355,7 +593,8 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 
 		function render() {
 			shades.fill(0);
-			drawFractal(elapsed);
+			if (useSand) drawSand();
+			else drawFractal(elapsed);
 			drawScroller(elapsed);
 
 			let html = '';
@@ -429,6 +668,10 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 		function showStaticFrame() {
 			elapsed = 4;
 			phase = 0.35; // a complete copy of the Mandelbrot set fills the view here
+			if (useSand) {
+				resetSand();
+				for (let step = 0; step < 150; step += 1) updateSand();
+			}
 			render();
 		}
 

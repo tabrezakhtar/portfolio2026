@@ -462,7 +462,7 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 		function startFlush() {
 			flushing = true;
 			flushClock = 0;
-			flushBaseRows = Math.min(rows - 1, Math.max(2, Math.floor(rows * 0.14)));
+			flushBaseRows = 0;
 			const mode = Math.floor(Math.random() * 3);
 			flushOrigin = mode === 0 ? 0 : mode === 1 ? columns - 1 : columns / 2;
 			dropLive.fill(0);

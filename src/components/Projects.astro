@@ -174,7 +174,7 @@ const projects = [
 							<div class="portfolio-heading">
 								<div>
 									<p class="project-category">{project.category}</p>
-									<h3>{project.title}</h3>
+									<h3><a class="project-title-link" href={project.site} target="_blank" rel="noopener noreferrer">{project.title}</a></h3>
 								</div>
 								{project.status && <span class="project-status"><span></span>{project.status}</span>}
 							</div>
@@ -204,7 +204,7 @@ const projects = [
 								<header class="project-dialog-header">
 									<div>
 										<p class="project-category">{project.category}</p>
-										<h3 id={`project-dialog-title-${index}`}>{project.title}</h3>
+										<h3 id={`project-dialog-title-${index}`}><a class="project-title-link" href={project.site} target="_blank" rel="noopener noreferrer">{project.title}</a></h3>
 									</div>
 									<button class="dialog-close" type="button" data-close-dialog aria-label="Close project details"><i class="bx bx-x" aria-hidden="true"></i></button>
 								</header>
@@ -711,6 +711,18 @@ const projects = [
 		font-family: 'Space Grotesk', sans-serif;
 		font-size: 25px;
 		font-weight: 500;
+	}
+
+	.project-title-link {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.project-title-link:hover,
+	.project-title-link:focus-visible {
+		color: #40f4ff;
+		text-decoration: underline;
+		text-underline-offset: 4px;
 	}
 
 	.project-status {

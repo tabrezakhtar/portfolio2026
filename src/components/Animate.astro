@@ -213,7 +213,7 @@ const paletteStyle = `${palette.map((color, index) => `--c${index}:${color}`).jo
 		let stride = 1; // adaptive: compute every Nth column on slow machines
 		let renderCost = 8;
 		// phase < 0: the opening dive from the full set; phase in [0, 1): the endless self-similar cycle.
-		let phase = -INTRO_CYCLES;
+		let phase = -INTRO_CYCLES * Math.random();
 		const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 		function resize() {
